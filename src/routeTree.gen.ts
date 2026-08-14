@@ -19,6 +19,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPassRouteImport } from './routes/_authenticated/pass'
 import { Route as AuthenticatedRecordsRouteImport } from './routes/_authenticated/records'
 import { Route as AuthenticatedTrainerCalendarRouteImport } from './routes/_authenticated/trainer/calendar'
+import { Route as AuthenticatedTrainerDashboardRouteImport } from './routes/_authenticated/trainer/dashboard'
 import { Route as AuthenticatedTrainerHomeRouteImport } from './routes/_authenticated/trainer/home'
 import { Route as AuthenticatedTrainerLogsRouteImport } from './routes/_authenticated/trainer/logs'
 import { Route as AuthenticatedTrainerMembersRouteImport } from './routes/_authenticated/trainer/members'
@@ -74,6 +75,12 @@ const AuthenticatedTrainerCalendarRoute =
     path: '/trainer/calendar',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedTrainerDashboardRoute =
+  AuthenticatedTrainerDashboardRouteImport.update({
+    id: '/trainer/dashboard',
+    path: '/trainer/dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTrainerHomeRoute =
   AuthenticatedTrainerHomeRouteImport.update({
     id: '/trainer/home',
@@ -109,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/pass': typeof AuthenticatedPassRoute
   '/records': typeof AuthenticatedRecordsRoute
   '/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
+  '/trainer/dashboard': typeof AuthenticatedTrainerDashboardRoute
   '/trainer/home': typeof AuthenticatedTrainerHomeRoute
   '/trainer/logs': typeof AuthenticatedTrainerLogsRoute
   '/trainer/members': typeof AuthenticatedTrainerMembersRoute
@@ -124,6 +132,7 @@ export interface FileRoutesByTo {
   '/pass': typeof AuthenticatedPassRoute
   '/records': typeof AuthenticatedRecordsRoute
   '/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
+  '/trainer/dashboard': typeof AuthenticatedTrainerDashboardRoute
   '/trainer/home': typeof AuthenticatedTrainerHomeRoute
   '/trainer/logs': typeof AuthenticatedTrainerLogsRoute
   '/trainer/members': typeof AuthenticatedTrainerMembersRoute
@@ -141,6 +150,7 @@ export interface FileRoutesById {
   '/_authenticated/pass': typeof AuthenticatedPassRoute
   '/_authenticated/records': typeof AuthenticatedRecordsRoute
   '/_authenticated/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
+  '/_authenticated/trainer/dashboard': typeof AuthenticatedTrainerDashboardRoute
   '/_authenticated/trainer/home': typeof AuthenticatedTrainerHomeRoute
   '/_authenticated/trainer/logs': typeof AuthenticatedTrainerLogsRoute
   '/_authenticated/trainer/members': typeof AuthenticatedTrainerMembersRoute
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/pass'
     | '/records'
     | '/trainer/calendar'
+    | '/trainer/dashboard'
     | '/trainer/home'
     | '/trainer/logs'
     | '/trainer/members'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/pass'
     | '/records'
     | '/trainer/calendar'
+    | '/trainer/dashboard'
     | '/trainer/home'
     | '/trainer/logs'
     | '/trainer/members'
@@ -189,6 +201,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pass'
     | '/_authenticated/records'
     | '/_authenticated/trainer/calendar'
+    | '/_authenticated/trainer/dashboard'
     | '/_authenticated/trainer/home'
     | '/_authenticated/trainer/logs'
     | '/_authenticated/trainer/members'
@@ -273,6 +286,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTrainerCalendarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/trainer/dashboard': {
+      id: '/_authenticated/trainer/dashboard'
+      path: '/trainer/dashboard'
+      fullPath: '/trainer/dashboard'
+      preLoaderRoute: typeof AuthenticatedTrainerDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/trainer/home': {
       id: '/_authenticated/trainer/home'
       path: '/trainer/home'
@@ -312,6 +332,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPassRoute: typeof AuthenticatedPassRoute
   AuthenticatedRecordsRoute: typeof AuthenticatedRecordsRoute
   AuthenticatedTrainerCalendarRoute: typeof AuthenticatedTrainerCalendarRoute
+  AuthenticatedTrainerDashboardRoute: typeof AuthenticatedTrainerDashboardRoute
   AuthenticatedTrainerHomeRoute: typeof AuthenticatedTrainerHomeRoute
   AuthenticatedTrainerLogsRoute: typeof AuthenticatedTrainerLogsRoute
   AuthenticatedTrainerMembersRoute: typeof AuthenticatedTrainerMembersRoute
@@ -326,6 +347,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPassRoute: AuthenticatedPassRoute,
   AuthenticatedRecordsRoute: AuthenticatedRecordsRoute,
   AuthenticatedTrainerCalendarRoute: AuthenticatedTrainerCalendarRoute,
+  AuthenticatedTrainerDashboardRoute: AuthenticatedTrainerDashboardRoute,
   AuthenticatedTrainerHomeRoute: AuthenticatedTrainerHomeRoute,
   AuthenticatedTrainerLogsRoute: AuthenticatedTrainerLogsRoute,
   AuthenticatedTrainerMembersRoute: AuthenticatedTrainerMembersRoute,
