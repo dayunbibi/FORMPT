@@ -9,8 +9,7 @@ import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, EmptyState, ListSkeleton, Section, StatusPill } from "@/components/pt/kit";
 import { cn } from "@/lib/utils";
-import { dayKey, fmtMonthYear, fmtTime, nameMap, statusLabel, statusTone, useMyMembers, weekdayShort } from "@/lib/pt";
-import { useI18n } from "@/lib/i18n";
+import { dayKey, fmtTime, nameMap, statusLabel, statusTone, useMyMembers } from "@/lib/pt";
 import { useTrainerBookings } from "./home";
 
 export const Route = createFileRoute("/_authenticated/trainer/calendar")({
@@ -26,7 +25,6 @@ export const Route = createFileRoute("/_authenticated/trainer/calendar")({
 });
 
 function TrainerCalendar() {
-  const { t } = useI18n();
   const me = useRoleGate("trainer");
   const trainerId = me.data?.user.id;
   const bookings = useTrainerBookings(trainerId);
@@ -34,7 +32,6 @@ function TrainerCalendar() {
   const names = nameMap(members.data);
   const [cursor, setCursor] = useState(() => new Date());
   const [selected, setSelected] = useState(() => dayKey(new Date()));
-  const weekdayNamesList = [0, 1, 2, 3, 4, 5, 6].map(weekdayShort);
   const queryClient = useQueryClient();
 
   // 지난 수업의 완료/노쇼는 트레이너가 직접 태깅한다 (자동 판정 없음).
@@ -48,9 +45,9 @@ function TrainerCalendar() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trainer-bookings"] });
-      toast.success(t("예약 상태를 변경했습니다"));
+      toast.success("예약 상태를 변경했습니다");
     },
-    onError: () => toast.error(t("변경에 실패했습니다")),
+    onError: () => toast.error("변경에 실패했습니다"),
   });
 
   const byDay = useMemo(() => {
@@ -89,19 +86,21 @@ function TrainerCalendar() {
   }
 
   return (
-    <AppShell title={t("캘린더")} subtitle={t("날짜를 탭하면 예약 리스트가 열립니다")} role="trainer">
+    <AppShell title="캘린더" subtitle="날짜를 탭하면 예약 리스트가 열립니다" role="trainer">
       <Card className="space-y-4">
         <div className="flex items-center justify-between">
           <button
-            aria-label={t("이전 달")}
+            aria-label="이전 달"
             onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1))}
             className="flex size-9 items-center justify-center rounded-2xl border-2 border-border-strong"
           >
             <ChevronLeft className="size-4" />
           </button>
-          <p className="text-lg font-extrabold">{fmtMonthYear(cursor)}</p>
+          <p className="text-lg font-extrabold">
+            {cursor.getFullYear()}년 {cursor.getMonth() + 1}월
+          </p>
           <button
-            aria-label={t("다음 달")}
+            aria-label="다음 달"
             onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1))}
             className="flex size-9 items-center justify-center rounded-2xl border-2 border-border-strong"
           >
@@ -110,8 +109,8 @@ function TrainerCalendar() {
         </div>
 
         <div className="grid grid-cols-7 gap-1 text-center text-xs font-bold text-muted-foreground">
-          {weekdayNamesList.map((d, i) => (
-            <span key={i}>{d}</span>
+          {["일", "월", "화", "수", "목", "금", "토"].map((d) => (
+            <span key={d}>{d}</span>
           ))}
         </div>
         <div className="grid grid-cols-7 gap-1">
@@ -147,25 +146,25 @@ function TrainerCalendar() {
         </div>
         <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
-            <span className="size-1.5 rounded-full bg-lime" />{t("확정")}
+            <span className="size-1.5 rounded-full bg-lime" />확정
           </span>
           <span className="flex items-center gap-1">
-            <span className="size-1.5 rounded-full bg-warn" />{t("대기·취소요청")}
+            <span className="size-1.5 rounded-full bg-warn" />대기·취소요청
           </span>
           <span className="flex items-center gap-1">
-            <span className="size-1.5 rounded-full bg-ink" />{t("완료")}
+            <span className="size-1.5 rounded-full bg-ink" />완료
           </span>
           <span className="flex items-center gap-1">
-            <span className="size-1.5 rounded-full bg-destructive" />{t("노쇼")}
+            <span className="size-1.5 rounded-full bg-destructive" />노쇼
           </span>
         </div>
       </Card>
 
-      <Section title={t("{date} 예약 ({n})", { date: selected, n: dayList.length })}>
+      <Section title={`${selected} 예약 (${dayList.length})`}>
         {bookings.isLoading ? (
           <ListSkeleton rows={2} />
         ) : dayList.length === 0 ? (
-          <EmptyState title={t("이 날은 예약이 없어요")} description={t("다른 날짜를 탭해서 일정을 확인해 보세요.")} />
+          <EmptyState title="이 날은 예약이 없어요" description="다른 날짜를 탭해서 일정을 확인해 보세요." />
         ) : (
           <div className="space-y-2">
             {dayList.map((b) => (
@@ -173,7 +172,7 @@ function TrainerCalendar() {
                 <div>
                   <p className="font-bold">{fmtTime(b.start_at)}</p>
                   <p className="text-sm text-muted-foreground">
-                    {names.get(b.member_id) ?? t("회원")} · {t("{n}분", { n: b.duration_min })}
+                    {names.get(b.member_id) ?? "회원"} · {b.duration_min}분
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -187,7 +186,7 @@ function TrainerCalendar() {
                           className="rounded-2xl border-2"
                           onClick={() => tag.mutate({ id: b.id, status: "completed" })}
                         >
-                          {t("완료")}
+                          완료
                         </Button>
                         <Button
                           size="sm"
@@ -195,7 +194,7 @@ function TrainerCalendar() {
                           className="rounded-2xl border-2 border-destructive text-destructive"
                           onClick={() => tag.mutate({ id: b.id, status: "no_show" })}
                         >
-                          {t("노쇼")}
+                          노쇼
                         </Button>
                       </>
                     )}

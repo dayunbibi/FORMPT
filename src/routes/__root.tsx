@@ -13,24 +13,22 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { LanguageProvider, useI18n } from "@/lib/i18n";
 
 function NotFoundComponent() {
-  const { t } = useI18n();
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="display-xl text-7xl text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">{t("페이지를 찾을 수 없습니다")}</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">페이지를 찾을 수 없습니다</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          {t("주소가 변경되었거나 삭제된 페이지입니다.")}
+          주소가 변경되었거나 삭제된 페이지입니다.
         </p>
         <div className="mt-6">
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-2xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
           >
-            {t("홈으로")}
+            홈으로
           </Link>
         </div>
       </div>
@@ -41,7 +39,6 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
-  const { t } = useI18n();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
@@ -50,10 +47,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          {t("화면을 불러오지 못했습니다")}
+          화면을 불러오지 못했습니다
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          {t("잠시 후 다시 시도해 주세요.")}
+          잠시 후 다시 시도해 주세요.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -63,13 +60,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             }}
             className="inline-flex items-center justify-center rounded-2xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
           >
-            {t("다시 시도")}
+            다시 시도
           </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-2xl border-2 border-border-strong bg-card px-4 py-2 text-sm font-semibold text-foreground"
           >
-            {t("홈으로")}
+            홈으로
           </a>
         </div>
       </div>
@@ -134,11 +131,9 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <Toaster position="top-center" />
-      </LanguageProvider>
+      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <Outlet />
+      <Toaster position="top-center" />
     </QueryClientProvider>
   );
 }
