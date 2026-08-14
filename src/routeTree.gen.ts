@@ -18,6 +18,7 @@ import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/h
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedPassRouteImport } from './routes/_authenticated/pass'
 import { Route as AuthenticatedRecordsRouteImport } from './routes/_authenticated/records'
+import { Route as AuthenticatedTrainerCalendarRouteImport } from './routes/_authenticated/trainer/calendar'
 import { Route as AuthenticatedTrainerHomeRouteImport } from './routes/_authenticated/trainer/home'
 
 const IndexRoute = IndexRouteImport.update({
@@ -64,6 +65,12 @@ const AuthenticatedRecordsRoute = AuthenticatedRecordsRouteImport.update({
   path: '/records',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTrainerCalendarRoute =
+  AuthenticatedTrainerCalendarRouteImport.update({
+    id: '/trainer/calendar',
+    path: '/trainer/calendar',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTrainerHomeRoute =
   AuthenticatedTrainerHomeRouteImport.update({
     id: '/trainer/home',
@@ -80,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pass': typeof AuthenticatedPassRoute
   '/records': typeof AuthenticatedRecordsRoute
+  '/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
   '/trainer/home': typeof AuthenticatedTrainerHomeRoute
 }
 export interface FileRoutesByTo {
@@ -91,6 +99,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pass': typeof AuthenticatedPassRoute
   '/records': typeof AuthenticatedRecordsRoute
+  '/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
   '/trainer/home': typeof AuthenticatedTrainerHomeRoute
 }
 export interface FileRoutesById {
@@ -104,6 +113,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/pass': typeof AuthenticatedPassRoute
   '/_authenticated/records': typeof AuthenticatedRecordsRoute
+  '/_authenticated/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
   '/_authenticated/trainer/home': typeof AuthenticatedTrainerHomeRoute
 }
 export interface FileRouteTypes {
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/pass'
     | '/records'
+    | '/trainer/calendar'
     | '/trainer/home'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/pass'
     | '/records'
+    | '/trainer/calendar'
     | '/trainer/home'
   id:
     | '__root__'
@@ -140,6 +152,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/pass'
     | '/_authenticated/records'
+    | '/_authenticated/trainer/calendar'
     | '/_authenticated/trainer/home'
   fileRoutesById: FileRoutesById
 }
@@ -214,6 +227,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRecordsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/trainer/calendar': {
+      id: '/_authenticated/trainer/calendar'
+      path: '/trainer/calendar'
+      fullPath: '/trainer/calendar'
+      preLoaderRoute: typeof AuthenticatedTrainerCalendarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/trainer/home': {
       id: '/_authenticated/trainer/home'
       path: '/trainer/home'
@@ -231,6 +251,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPassRoute: typeof AuthenticatedPassRoute
   AuthenticatedRecordsRoute: typeof AuthenticatedRecordsRoute
+  AuthenticatedTrainerCalendarRoute: typeof AuthenticatedTrainerCalendarRoute
   AuthenticatedTrainerHomeRoute: typeof AuthenticatedTrainerHomeRoute
 }
 
@@ -241,6 +262,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPassRoute: AuthenticatedPassRoute,
   AuthenticatedRecordsRoute: AuthenticatedRecordsRoute,
+  AuthenticatedTrainerCalendarRoute: AuthenticatedTrainerCalendarRoute,
   AuthenticatedTrainerHomeRoute: AuthenticatedTrainerHomeRoute,
 }
 
