@@ -27,9 +27,13 @@ function DashboardPage() {
   const names = nameMap(members.data);
 
   const credits = useQuery({
-    queryKey: ["trainer-credits", trainerId],
+    queryKey: ["trainer-credits", trainerId, memberIds],
     queryFn: async () => {
-      const { data, error } = await supabase.from("credit_entries").select("member_id, delta");
+      // 내 담당 회원의 이용권 내역만 조회한다.
+      const { data, error } = await supabase
+        .from("credit_entries")
+        .select("member_id, delta")
+        .in("member_id", memberIds);
       if (error) throw error;
       const map = new Map<string, number>();
       (data ?? []).forEach((row) => map.set(row.member_id, (map.get(row.member_id) ?? 0) + row.delta));
