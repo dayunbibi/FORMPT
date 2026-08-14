@@ -60,6 +60,7 @@ function TrainerHome() {
       const { data, error } = await supabase
         .from("join_requests")
         .select("id, member_id, message, status, created_at")
+        .eq("trainer_id", trainerId!)
         .eq("status", "pending")
         .order("created_at", { ascending: true });
       if (error) throw error;
