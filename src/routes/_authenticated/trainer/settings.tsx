@@ -70,6 +70,56 @@ function SettingsPage() {
 
   return (
     <AppShell title="설정" subtitle="운영시간과 예약 정책" role="trainer">
+      <Section title="회원 초대 코드">
+        <Card className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            오프라인에서 이미 알고 있는 회원에게 이 코드를 알려주세요. 회원이 온보딩 화면에서 코드를
+            입력하면 승인 절차 없이 바로 연결됩니다.
+          </p>
+          {inviteCode.isLoading ? (
+            <ListSkeleton rows={1} />
+          ) : (
+            <div className="rounded-2xl border-2 border-ink bg-ink px-4 py-4 text-center">
+              <p className="text-xs font-bold uppercase tracking-[0.3em] text-ink-foreground/60">
+                invite code
+              </p>
+              <p className="display-xl mt-1 text-3xl tracking-[0.25em] text-lime">
+                {inviteCode.data ?? "--------"}
+              </p>
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="flex-1 rounded-2xl border-2"
+              disabled={!inviteCode.data}
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(inviteCode.data!);
+                  toast.success("코드를 복사했습니다");
+                } catch {
+                  toast.error("복사에 실패했습니다");
+                }
+              }}
+            >
+              코드 복사
+            </Button>
+            <Button
+              variant="outline"
+              className="flex-1 rounded-2xl border-2 border-destructive text-destructive"
+              disabled={regenerate.isPending}
+              onClick={() => {
+                if (!window.confirm("코드를 재발급하면 기존 코드는 더 이상 사용할 수 없습니다. 계속할까요?"))
+                  return;
+                regenerate.mutate();
+              }}
+            >
+              {regenerate.isPending ? "재발급 중..." : "코드 재발급"}
+            </Button>
+          </div>
+        </Card>
+      </Section>
+
       <Section title="수업 · 운영시간">
         <Card className="space-y-4">
           <Field label="수업 시간(분)" htmlFor="session">
