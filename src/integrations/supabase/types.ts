@@ -14,16 +14,321 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          cancel_requested: boolean
+          created_at: string
+          duration_min: number
+          id: string
+          member_id: string
+          member_note: string | null
+          start_at: string
+          status: Database["public"]["Enums"]["booking_status"]
+          trainer_id: string
+        }
+        Insert: {
+          cancel_requested?: boolean
+          created_at?: string
+          duration_min?: number
+          id?: string
+          member_id: string
+          member_note?: string | null
+          start_at: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          trainer_id: string
+        }
+        Update: {
+          cancel_requested?: boolean
+          created_at?: string
+          duration_min?: number
+          id?: string
+          member_id?: string
+          member_note?: string | null
+          start_at?: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          trainer_id?: string
+        }
+        Relationships: []
+      }
+      credit_entries: {
+        Row: {
+          amount_paid: number | null
+          booking_id: string | null
+          created_at: string
+          delta: number
+          id: string
+          kind: string
+          member_id: string
+          note: string | null
+          trainer_id: string | null
+        }
+        Insert: {
+          amount_paid?: number | null
+          booking_id?: string | null
+          created_at?: string
+          delta: number
+          id?: string
+          kind?: string
+          member_id: string
+          note?: string | null
+          trainer_id?: string | null
+        }
+        Update: {
+          amount_paid?: number | null
+          booking_id?: string | null
+          created_at?: string
+          delta?: number
+          id?: string
+          kind?: string
+          member_id?: string
+          note?: string | null
+          trainer_id?: string | null
+        }
+        Relationships: []
+      }
+      join_requests: {
+        Row: {
+          created_at: string
+          id: string
+          member_id: string
+          message: string | null
+          status: Database["public"]["Enums"]["request_status"]
+          trainer_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_id: string
+          message?: string | null
+          status?: Database["public"]["Enums"]["request_status"]
+          trainer_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_id?: string
+          message?: string | null
+          status?: Database["public"]["Enums"]["request_status"]
+          trainer_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          read: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          read?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          read?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string
+          goal: string | null
+          id: string
+          injuries: string | null
+          onboarded: boolean
+          phone: string | null
+          preferred_time: string | null
+          suspended: boolean
+          trainer_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string
+          goal?: string | null
+          id: string
+          injuries?: string | null
+          onboarded?: boolean
+          phone?: string | null
+          preferred_time?: string | null
+          suspended?: boolean
+          trainer_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          goal?: string | null
+          id?: string
+          injuries?: string | null
+          onboarded?: boolean
+          phone?: string | null
+          preferred_time?: string | null
+          suspended?: boolean
+          trainer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_trainer_id_fkey"
+            columns: ["trainer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trainer_settings: {
+        Row: {
+          booking_cutoff_hours: number
+          cancel_cutoff_hours: number
+          close_hour: number
+          closed_weekdays: number[]
+          holidays: string[]
+          open_hour: number
+          session_minutes: number
+          trainer_id: string
+          updated_at: string
+        }
+        Insert: {
+          booking_cutoff_hours?: number
+          cancel_cutoff_hours?: number
+          close_hour?: number
+          closed_weekdays?: number[]
+          holidays?: string[]
+          open_hour?: number
+          session_minutes?: number
+          trainer_id: string
+          updated_at?: string
+        }
+        Update: {
+          booking_cutoff_hours?: number
+          cancel_cutoff_hours?: number
+          close_hour?: number
+          closed_weekdays?: number[]
+          holidays?: string[]
+          open_hour?: number
+          session_minutes?: number
+          trainer_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      workout_items: {
+        Row: {
+          exercise: string
+          id: string
+          log_id: string
+          position: number
+          reps: number | null
+          sets: number | null
+          weight_kg: number | null
+        }
+        Insert: {
+          exercise: string
+          id?: string
+          log_id: string
+          position?: number
+          reps?: number | null
+          sets?: number | null
+          weight_kg?: number | null
+        }
+        Update: {
+          exercise?: string
+          id?: string
+          log_id?: string
+          position?: number
+          reps?: number | null
+          sets?: number | null
+          weight_kg?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workout_items_log_id_fkey"
+            columns: ["log_id"]
+            isOneToOne: false
+            referencedRelation: "workout_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workout_logs: {
+        Row: {
+          created_at: string
+          feedback: string | null
+          id: string
+          log_date: string
+          member_id: string
+          trainer_id: string
+        }
+        Insert: {
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          log_date?: string
+          member_id: string
+          trainer_id: string
+        }
+        Update: {
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          log_date?: string
+          member_id?: string
+          trainer_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_my_member: { Args: { _member_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "member" | "trainer"
+      booking_status:
+        | "pending"
+        | "confirmed"
+        | "cancelled"
+        | "completed"
+        | "no_show"
+      request_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +455,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["member", "trainer"],
+      booking_status: [
+        "pending",
+        "confirmed",
+        "cancelled",
+        "completed",
+        "no_show",
+      ],
+      request_status: ["pending", "approved", "rejected"],
+    },
   },
 } as const
