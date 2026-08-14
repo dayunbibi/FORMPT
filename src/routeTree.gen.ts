@@ -20,6 +20,7 @@ import { Route as AuthenticatedPassRouteImport } from './routes/_authenticated/p
 import { Route as AuthenticatedRecordsRouteImport } from './routes/_authenticated/records'
 import { Route as AuthenticatedTrainerCalendarRouteImport } from './routes/_authenticated/trainer/calendar'
 import { Route as AuthenticatedTrainerHomeRouteImport } from './routes/_authenticated/trainer/home'
+import { Route as AuthenticatedTrainerMembersRouteImport } from './routes/_authenticated/trainer/members'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -77,6 +78,12 @@ const AuthenticatedTrainerHomeRoute =
     path: '/trainer/home',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedTrainerMembersRoute =
+  AuthenticatedTrainerMembersRouteImport.update({
+    id: '/trainer/members',
+    path: '/trainer/members',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/records': typeof AuthenticatedRecordsRoute
   '/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
   '/trainer/home': typeof AuthenticatedTrainerHomeRoute
+  '/trainer/members': typeof AuthenticatedTrainerMembersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -101,6 +109,7 @@ export interface FileRoutesByTo {
   '/records': typeof AuthenticatedRecordsRoute
   '/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
   '/trainer/home': typeof AuthenticatedTrainerHomeRoute
+  '/trainer/members': typeof AuthenticatedTrainerMembersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,6 +124,7 @@ export interface FileRoutesById {
   '/_authenticated/records': typeof AuthenticatedRecordsRoute
   '/_authenticated/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
   '/_authenticated/trainer/home': typeof AuthenticatedTrainerHomeRoute
+  '/_authenticated/trainer/members': typeof AuthenticatedTrainerMembersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/records'
     | '/trainer/calendar'
     | '/trainer/home'
+    | '/trainer/members'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/records'
     | '/trainer/calendar'
     | '/trainer/home'
+    | '/trainer/members'
   id:
     | '__root__'
     | '/'
@@ -154,6 +166,7 @@ export interface FileRouteTypes {
     | '/_authenticated/records'
     | '/_authenticated/trainer/calendar'
     | '/_authenticated/trainer/home'
+    | '/_authenticated/trainer/members'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -241,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTrainerHomeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/trainer/members': {
+      id: '/_authenticated/trainer/members'
+      path: '/trainer/members'
+      fullPath: '/trainer/members'
+      preLoaderRoute: typeof AuthenticatedTrainerMembersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -253,6 +273,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRecordsRoute: typeof AuthenticatedRecordsRoute
   AuthenticatedTrainerCalendarRoute: typeof AuthenticatedTrainerCalendarRoute
   AuthenticatedTrainerHomeRoute: typeof AuthenticatedTrainerHomeRoute
+  AuthenticatedTrainerMembersRoute: typeof AuthenticatedTrainerMembersRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -264,6 +285,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRecordsRoute: AuthenticatedRecordsRoute,
   AuthenticatedTrainerCalendarRoute: AuthenticatedTrainerCalendarRoute,
   AuthenticatedTrainerHomeRoute: AuthenticatedTrainerHomeRoute,
+  AuthenticatedTrainerMembersRoute: AuthenticatedTrainerMembersRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
