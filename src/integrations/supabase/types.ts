@@ -319,6 +319,12 @@ export type Database = {
         Returns: boolean
       }
       is_my_member: { Args: { _member_id: string }; Returns: boolean }
+      taken_slots: {
+        Args: { _day: string; _trainer_id: string }
+        Returns: {
+          start_at: string
+        }[]
+      }
     }
     Enums: {
       app_role: "member" | "trainer"
