@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FieldLabel } from "@/components/pt/kit";
-import type { Role } from "@/lib/pt";
+import { getMe, type Role } from "@/lib/pt";
 
 const schema = z.object({
   email: z.string().trim().email({ message: "이메일 형식을 확인해 주세요" }).max(255),
