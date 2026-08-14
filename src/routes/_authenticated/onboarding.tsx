@@ -33,6 +33,32 @@ function OnboardingPage() {
   const [preferred, setPreferred] = useState("");
   const [phone, setPhone] = useState("");
   const [term, setTerm] = useState("");
+  const [code, setCode] = useState("");
+  const linkedTrainerId = me.data?.profile?.trainer_id ?? null;
+
+  const redeem = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.rpc("redeem_invite_code", { _code: code.trim() });
+      if (error) throw error;
+      const row = (data ?? [])[0];
+      if (!row) throw new Error("invalid code");
+      return row;
+    },
+    onSuccess: async (row) => {
+      setCode("");
+      await queryClient.invalidateQueries({ queryKey: ["me"] });
+      queryClient.invalidateQueries({ queryKey: ["my-join-requests"] });
+      toast.success(`${row.trainer_name} 트레이너와 연결되었습니다`);
+    },
+    onError: (error: { message?: string }) => {
+      const message = error?.message ?? "";
+      if (message.includes("already linked")) {
+        toast.error("이미 다른 트레이너와 연결되어 있어 코드로 재연결할 수 없습니다");
+      } else {
+        toast.error("초대 코드가 올바르지 않습니다");
+      }
+    },
+  });
 
   useEffect(() => {
     if (me.data?.role === "trainer") navigate({ to: "/trainer/home", replace: true });
