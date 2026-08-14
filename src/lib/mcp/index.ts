@@ -19,5 +19,13 @@ export default defineMcp({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated",
   }),
-  tools: [getMySummary, listBookings, listWorkoutLogs, requestBooking, listMyMembers, updateBookingStatus],
+  // exactOptionalPropertyTypes 설정 때문에 outputSchema 없는 도구는 캐스팅이 필요하다.
+  tools: [
+    getMySummary,
+    listBookings,
+    listWorkoutLogs,
+    requestBooking,
+    listMyMembers,
+    updateBookingStatus,
+  ] as Parameters<typeof defineMcp>[0]["tools"],
 });
