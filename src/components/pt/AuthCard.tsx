@@ -71,8 +71,9 @@ export function AuthCard({ role, allowSignup = true }: { role: Role; allowSignup
         });
         if (error) throw error;
       }
+      const me = await getMe();
       await queryClient.invalidateQueries();
-      navigate({ to: role === "trainer" ? "/trainer/home" : "/home", replace: true });
+      navigate({ to: me?.role === "trainer" ? "/trainer/home" : "/home", replace: true });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "잠시 후 다시 시도해 주세요");
     } finally {
