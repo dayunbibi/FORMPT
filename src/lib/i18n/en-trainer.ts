@@ -1,1 +1,61 @@
-export const EN_TRAINER: Record<string, string> = {};
+/** 트레이너 홈/캘린더/대시보드 화면 문구 */
+export const EN_TRAINER: Record<string, string> = {
+  // 공통 액션
+  승인: "Approve",
+  거절: "Decline",
+  유지: "Keep",
+
+  // 홈
+  "오늘의 운영": "Today's overview",
+  "처리 대기": "Needs review",
+  "승인·취소요청": "Approvals & cancel requests",
+  "오늘 수업": "Today's sessions",
+  "취소 제외": "Excludes cancelled",
+  "승인 대기 ({n})": "Pending approval ({n})",
+  "대기 중인 예약이 없어요": "No bookings waiting",
+  "새 예약 요청이 오면 여기에 표시됩니다.": "New booking requests will show up here.",
+  "취소 요청 ({n})": "Cancel requests ({n})",
+  "취소 승인": "Approve cancellation",
+  "오늘 예약된 수업 ({n})": "Today's scheduled sessions ({n})",
+  "오늘 수업이 없어요": "No sessions today",
+  "캘린더에서 이번 달 일정을 확인해 보세요.": "Check this month's schedule on the calendar.",
+  "캘린더 보기": "View calendar",
+  "완료·노쇼 정리 ({n})": "Mark completed / no-show ({n})",
+  "가입 요청 ({n})": "Join requests ({n})",
+  "새 가입 요청이 없어요": "No new join requests",
+  "회원이 검색으로 요청을 보내면 여기에 표시됩니다.": "Requests from members will show up here.",
+  "처리했습니다": "Done",
+  "처리에 실패했습니다": "Something went wrong",
+  "예약 상태를 변경했습니다": "Booking status updated",
+  "변경에 실패했습니다": "Failed to update",
+
+  // 캘린더
+  캘린더: "Calendar",
+  "날짜를 탭하면 예약 리스트가 열립니다": "Tap a date to see its booking list",
+  "이전 달": "Previous month",
+  "다음 달": "Next month",
+  확정: "Confirmed",
+  "대기·취소요청": "Pending / cancel request",
+  완료: "Completed",
+  노쇼: "No-show",
+  "{date} 예약 ({n})": "Bookings on {date} ({n})",
+  "이 날은 예약이 없어요": "No bookings on this day",
+  "다른 날짜를 탭해서 일정을 확인해 보세요.": "Tap another date to view its schedule.",
+  "{n}분": "{n} min",
+
+  // 대시보드
+  대시보드: "Dashboard",
+  "{month} 운영 현황": "{month} overview",
+  "이번 달 수업": "Sessions this month",
+  "예약 {n}건": "{n} booked",
+  노쇼율: "No-show rate",
+  "노쇼 {n}회": "{n} no-shows",
+  "담당 회원": "Members",
+  "재등록 임박": "Renewals due soon",
+  "남은 2회 이하": "2 or fewer sessions left",
+  "재등록 임박 회원": "Members due for renewal",
+  "임박한 회원이 없어요": "No renewals due yet",
+  "남은 횟수가 2회 이하가 되면 여기에 표시됩니다.": "Members with 2 or fewer sessions left will show up here.",
+  "연락처 미등록": "No phone on file",
+  "남은 {n}회": "{n} left",
+};
