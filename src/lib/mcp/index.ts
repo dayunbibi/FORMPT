@@ -27,5 +27,5 @@ export default defineMcp({
     requestBooking,
     listMyMembers,
     updateBookingStatus,
-  ] as Parameters<typeof defineMcp>[0]["tools"],
+  ] as unknown as Parameters<typeof defineMcp>[0]["tools"],
 });
