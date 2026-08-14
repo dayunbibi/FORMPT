@@ -251,10 +251,7 @@ function TrainerHome() {
       </Section>
 
       {toTag.length > 0 && (
-        <Section
-          title={`완료·노쇼 정리 (${toTag.length})`}
-          description="지난 수업은 트레이너가 직접 완료 또는 노쇼로 지정합니다."
-        >
+        <Section title={`완료·노쇼 정리 (${toTag.length})`}>
           <div className="space-y-2">
             {toTag.map((b) => (
               <Card key={b.id} className="flex items-center justify-between gap-3 py-3">
