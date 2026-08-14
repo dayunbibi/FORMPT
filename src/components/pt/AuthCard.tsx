@@ -25,17 +25,21 @@ export function AuthCard({ role, allowSignup = true }: { role: Role; allowSignup
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  // 세션이 이미 있으면 역할 선택 없이 본인 역할의 홈으로 바로 이동한다.
   useEffect(() => {
     let alive = true;
-    supabase.auth.getSession().then(({ data }) => {
+    (async () => {
+      const { data } = await supabase.auth.getSession();
       if (!alive || !data.session) return;
+      const me = await getMe();
+      if (!alive || !me) return;
       queryClient.invalidateQueries({ queryKey: ["me"] });
-      navigate({ to: role === "trainer" ? "/trainer/home" : "/home", replace: true });
-    });
+      navigate({ to: me.role === "trainer" ? "/trainer/home" : "/home", replace: true });
+    })();
     return () => {
       alive = false;
     };
-  }, [navigate, queryClient, role]);
+  }, [navigate, queryClient]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
