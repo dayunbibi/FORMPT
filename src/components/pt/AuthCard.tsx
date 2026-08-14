@@ -97,7 +97,7 @@ export function AuthCard({ role, allowSignup = true }: { role: Role; allowSignup
 
   return (
     <form onSubmit={submit} className="rounded-2xl border border-border bg-card p-6 shadow-card">
-      <div className="mb-5 flex gap-2 rounded-2xl bg-secondary p-1">
+      <div className={"mb-5 flex gap-2 rounded-2xl bg-secondary p-1 " + (allowSignup ? "" : "hidden")}>
         {(["login", "signup"] as const).map((m) => (
           <button
             key={m}
