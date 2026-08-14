@@ -326,6 +326,7 @@ export type Database = {
           id: string
         }[]
       }
+      my_trainer_id: { Args: never; Returns: string }
       taken_slots: {
         Args: { _day: string; _trainer_id: string }
         Returns: {
