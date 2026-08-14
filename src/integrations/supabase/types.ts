@@ -55,6 +55,7 @@ export type Database = {
           amount_paid: number | null
           booking_id: string | null
           created_at: string
+          currency: Database["public"]["Enums"]["currency_code"]
           delta: number
           id: string
           kind: string
@@ -66,6 +67,7 @@ export type Database = {
           amount_paid?: number | null
           booking_id?: string | null
           created_at?: string
+          currency?: Database["public"]["Enums"]["currency_code"]
           delta: number
           id?: string
           kind?: string
@@ -77,6 +79,7 @@ export type Database = {
           amount_paid?: number | null
           booking_id?: string | null
           created_at?: string
+          currency?: Database["public"]["Enums"]["currency_code"]
           delta?: number
           id?: string
           kind?: string
@@ -193,6 +196,7 @@ export type Database = {
           cancel_cutoff_hours: number
           close_hour: number
           closed_weekdays: number[]
+          default_currency: Database["public"]["Enums"]["currency_code"]
           holidays: string[]
           open_hour: number
           session_minutes: number
@@ -204,6 +208,7 @@ export type Database = {
           cancel_cutoff_hours?: number
           close_hour?: number
           closed_weekdays?: number[]
+          default_currency?: Database["public"]["Enums"]["currency_code"]
           holidays?: string[]
           open_hour?: number
           session_minutes?: number
@@ -215,6 +220,7 @@ export type Database = {
           cancel_cutoff_hours?: number
           close_hour?: number
           closed_weekdays?: number[]
+          default_currency?: Database["public"]["Enums"]["currency_code"]
           holidays?: string[]
           open_hour?: number
           session_minutes?: number
@@ -342,6 +348,7 @@ export type Database = {
         | "cancelled"
         | "completed"
         | "no_show"
+      currency_code: "KRW" | "CAD"
       request_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
@@ -478,6 +485,7 @@ export const Constants = {
         "completed",
         "no_show",
       ],
+      currency_code: ["KRW", "CAD"],
       request_status: ["pending", "approved", "rejected"],
     },
   },
