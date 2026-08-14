@@ -36,6 +36,29 @@ function SettingsPage() {
     enabled: !!trainerId,
   });
 
+  const inviteCode = useQuery({
+    queryKey: ["invite-code", trainerId],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("my_invite_code");
+      if (error) throw error;
+      return data as string;
+    },
+    enabled: !!trainerId,
+  });
+
+  const regenerate = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.rpc("regenerate_invite_code");
+      if (error) throw error;
+      return data as string;
+    },
+    onSuccess: (code) => {
+      queryClient.setQueryData(["invite-code", trainerId], code);
+      toast.success("새 초대 코드를 발급했습니다");
+    },
+    onError: () => toast.error("코드 재발급에 실패했습니다"),
+  });
+
   const [form, setForm] = useState(DEFAULT_SETTINGS);
   const [holiday, setHoliday] = useState("");
 
