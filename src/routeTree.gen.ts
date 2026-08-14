@@ -10,33 +10,208 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as TrainerLoginRouteImport } from './routes/trainer-login'
+import { Route as AuthenticatedBookRouteImport } from './routes/_authenticated/book'
+import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticated/bookings'
+import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedPassRouteImport } from './routes/_authenticated/pass'
+import { Route as AuthenticatedRecordsRouteImport } from './routes/_authenticated/records'
+import { Route as AuthenticatedTrainerCalendarRouteImport } from './routes/_authenticated/trainer/calendar'
+import { Route as AuthenticatedTrainerDashboardRouteImport } from './routes/_authenticated/trainer/dashboard'
+import { Route as AuthenticatedTrainerHomeRouteImport } from './routes/_authenticated/trainer/home'
+import { Route as AuthenticatedTrainerLogsRouteImport } from './routes/_authenticated/trainer/logs'
+import { Route as AuthenticatedTrainerMembersRouteImport } from './routes/_authenticated/trainer/members'
+import { Route as AuthenticatedTrainerSettingsRouteImport } from './routes/_authenticated/trainer/settings'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrainerLoginRoute = TrainerLoginRouteImport.update({
+  id: '/trainer-login',
+  path: '/trainer-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedBookRoute = AuthenticatedBookRouteImport.update({
+  id: '/book',
+  path: '/book',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBookingsRoute = AuthenticatedBookingsRouteImport.update({
+  id: '/bookings',
+  path: '/bookings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPassRoute = AuthenticatedPassRouteImport.update({
+  id: '/pass',
+  path: '/pass',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRecordsRoute = AuthenticatedRecordsRouteImport.update({
+  id: '/records',
+  path: '/records',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTrainerCalendarRoute =
+  AuthenticatedTrainerCalendarRouteImport.update({
+    id: '/trainer/calendar',
+    path: '/trainer/calendar',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTrainerDashboardRoute =
+  AuthenticatedTrainerDashboardRouteImport.update({
+    id: '/trainer/dashboard',
+    path: '/trainer/dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTrainerHomeRoute =
+  AuthenticatedTrainerHomeRouteImport.update({
+    id: '/trainer/home',
+    path: '/trainer/home',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTrainerLogsRoute =
+  AuthenticatedTrainerLogsRouteImport.update({
+    id: '/trainer/logs',
+    path: '/trainer/logs',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTrainerMembersRoute =
+  AuthenticatedTrainerMembersRouteImport.update({
+    id: '/trainer/members',
+    path: '/trainer/members',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTrainerSettingsRoute =
+  AuthenticatedTrainerSettingsRouteImport.update({
+    id: '/trainer/settings',
+    path: '/trainer/settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/trainer-login': typeof TrainerLoginRoute
+  '/book': typeof AuthenticatedBookRoute
+  '/bookings': typeof AuthenticatedBookingsRoute
+  '/home': typeof AuthenticatedHomeRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/pass': typeof AuthenticatedPassRoute
+  '/records': typeof AuthenticatedRecordsRoute
+  '/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
+  '/trainer/dashboard': typeof AuthenticatedTrainerDashboardRoute
+  '/trainer/home': typeof AuthenticatedTrainerHomeRoute
+  '/trainer/logs': typeof AuthenticatedTrainerLogsRoute
+  '/trainer/members': typeof AuthenticatedTrainerMembersRoute
+  '/trainer/settings': typeof AuthenticatedTrainerSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/trainer-login': typeof TrainerLoginRoute
+  '/book': typeof AuthenticatedBookRoute
+  '/bookings': typeof AuthenticatedBookingsRoute
+  '/home': typeof AuthenticatedHomeRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/pass': typeof AuthenticatedPassRoute
+  '/records': typeof AuthenticatedRecordsRoute
+  '/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
+  '/trainer/dashboard': typeof AuthenticatedTrainerDashboardRoute
+  '/trainer/home': typeof AuthenticatedTrainerHomeRoute
+  '/trainer/logs': typeof AuthenticatedTrainerLogsRoute
+  '/trainer/members': typeof AuthenticatedTrainerMembersRoute
+  '/trainer/settings': typeof AuthenticatedTrainerSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/trainer-login': typeof TrainerLoginRoute
+  '/_authenticated/book': typeof AuthenticatedBookRoute
+  '/_authenticated/bookings': typeof AuthenticatedBookingsRoute
+  '/_authenticated/home': typeof AuthenticatedHomeRoute
+  '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/pass': typeof AuthenticatedPassRoute
+  '/_authenticated/records': typeof AuthenticatedRecordsRoute
+  '/_authenticated/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
+  '/_authenticated/trainer/dashboard': typeof AuthenticatedTrainerDashboardRoute
+  '/_authenticated/trainer/home': typeof AuthenticatedTrainerHomeRoute
+  '/_authenticated/trainer/logs': typeof AuthenticatedTrainerLogsRoute
+  '/_authenticated/trainer/members': typeof AuthenticatedTrainerMembersRoute
+  '/_authenticated/trainer/settings': typeof AuthenticatedTrainerSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/trainer-login'
+    | '/book'
+    | '/bookings'
+    | '/home'
+    | '/onboarding'
+    | '/pass'
+    | '/records'
+    | '/trainer/calendar'
+    | '/trainer/dashboard'
+    | '/trainer/home'
+    | '/trainer/logs'
+    | '/trainer/members'
+    | '/trainer/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/trainer-login'
+    | '/book'
+    | '/bookings'
+    | '/home'
+    | '/onboarding'
+    | '/pass'
+    | '/records'
+    | '/trainer/calendar'
+    | '/trainer/dashboard'
+    | '/trainer/home'
+    | '/trainer/logs'
+    | '/trainer/members'
+    | '/trainer/settings'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/trainer-login'
+    | '/_authenticated/book'
+    | '/_authenticated/bookings'
+    | '/_authenticated/home'
+    | '/_authenticated/onboarding'
+    | '/_authenticated/pass'
+    | '/_authenticated/records'
+    | '/_authenticated/trainer/calendar'
+    | '/_authenticated/trainer/dashboard'
+    | '/_authenticated/trainer/home'
+    | '/_authenticated/trainer/logs'
+    | '/_authenticated/trainer/members'
+    | '/_authenticated/trainer/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  TrainerLoginRoute: typeof TrainerLoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +223,144 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trainer-login': {
+      id: '/trainer-login'
+      path: '/trainer-login'
+      fullPath: '/trainer-login'
+      preLoaderRoute: typeof TrainerLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/book': {
+      id: '/_authenticated/book'
+      path: '/book'
+      fullPath: '/book'
+      preLoaderRoute: typeof AuthenticatedBookRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/bookings': {
+      id: '/_authenticated/bookings'
+      path: '/bookings'
+      fullPath: '/bookings'
+      preLoaderRoute: typeof AuthenticatedBookingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/home': {
+      id: '/_authenticated/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AuthenticatedHomeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/pass': {
+      id: '/_authenticated/pass'
+      path: '/pass'
+      fullPath: '/pass'
+      preLoaderRoute: typeof AuthenticatedPassRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/records': {
+      id: '/_authenticated/records'
+      path: '/records'
+      fullPath: '/records'
+      preLoaderRoute: typeof AuthenticatedRecordsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/trainer/calendar': {
+      id: '/_authenticated/trainer/calendar'
+      path: '/trainer/calendar'
+      fullPath: '/trainer/calendar'
+      preLoaderRoute: typeof AuthenticatedTrainerCalendarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/trainer/dashboard': {
+      id: '/_authenticated/trainer/dashboard'
+      path: '/trainer/dashboard'
+      fullPath: '/trainer/dashboard'
+      preLoaderRoute: typeof AuthenticatedTrainerDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/trainer/home': {
+      id: '/_authenticated/trainer/home'
+      path: '/trainer/home'
+      fullPath: '/trainer/home'
+      preLoaderRoute: typeof AuthenticatedTrainerHomeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/trainer/logs': {
+      id: '/_authenticated/trainer/logs'
+      path: '/trainer/logs'
+      fullPath: '/trainer/logs'
+      preLoaderRoute: typeof AuthenticatedTrainerLogsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/trainer/members': {
+      id: '/_authenticated/trainer/members'
+      path: '/trainer/members'
+      fullPath: '/trainer/members'
+      preLoaderRoute: typeof AuthenticatedTrainerMembersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/trainer/settings': {
+      id: '/_authenticated/trainer/settings'
+      path: '/trainer/settings'
+      fullPath: '/trainer/settings'
+      preLoaderRoute: typeof AuthenticatedTrainerSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBookRoute: typeof AuthenticatedBookRoute
+  AuthenticatedBookingsRoute: typeof AuthenticatedBookingsRoute
+  AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
+  AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedPassRoute: typeof AuthenticatedPassRoute
+  AuthenticatedRecordsRoute: typeof AuthenticatedRecordsRoute
+  AuthenticatedTrainerCalendarRoute: typeof AuthenticatedTrainerCalendarRoute
+  AuthenticatedTrainerDashboardRoute: typeof AuthenticatedTrainerDashboardRoute
+  AuthenticatedTrainerHomeRoute: typeof AuthenticatedTrainerHomeRoute
+  AuthenticatedTrainerLogsRoute: typeof AuthenticatedTrainerLogsRoute
+  AuthenticatedTrainerMembersRoute: typeof AuthenticatedTrainerMembersRoute
+  AuthenticatedTrainerSettingsRoute: typeof AuthenticatedTrainerSettingsRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBookRoute: AuthenticatedBookRoute,
+  AuthenticatedBookingsRoute: AuthenticatedBookingsRoute,
+  AuthenticatedHomeRoute: AuthenticatedHomeRoute,
+  AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedPassRoute: AuthenticatedPassRoute,
+  AuthenticatedRecordsRoute: AuthenticatedRecordsRoute,
+  AuthenticatedTrainerCalendarRoute: AuthenticatedTrainerCalendarRoute,
+  AuthenticatedTrainerDashboardRoute: AuthenticatedTrainerDashboardRoute,
+  AuthenticatedTrainerHomeRoute: AuthenticatedTrainerHomeRoute,
+  AuthenticatedTrainerLogsRoute: AuthenticatedTrainerLogsRoute,
+  AuthenticatedTrainerMembersRoute: AuthenticatedTrainerMembersRoute,
+  AuthenticatedTrainerSettingsRoute: AuthenticatedTrainerSettingsRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  TrainerLoginRoute: TrainerLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
