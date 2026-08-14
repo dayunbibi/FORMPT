@@ -15,6 +15,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/lib/pt";
+import { useI18n } from "@/lib/i18n";
+import { LangToggle } from "@/components/pt/LangToggle";
 
 const memberNav = [
   { to: "/home", label: "홈", icon: Home },
@@ -46,6 +48,7 @@ export function AppShell({
   children: ReactNode;
   banner?: ReactNode | undefined;
 }) {
+  const { t } = useI18n();
   const nav = role === "trainer" ? trainerNav : memberNav;
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
@@ -69,13 +72,16 @@ export function AppShell({
             <h1 className="truncate text-2xl">{title}</h1>
             {subtitle && <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>}
           </div>
+          <div className="flex shrink-0 items-center gap-2">
+          <LangToggle />
           <button
             onClick={signOut}
-            aria-label="로그아웃"
+            aria-label={t("로그아웃")}
             className="flex size-10 shrink-0 items-center justify-center rounded-2xl border-2 border-border-strong bg-card text-foreground"
           >
             <LogOut className="size-4" />
           </button>
+          </div>
         </div>
       </header>
 
@@ -98,7 +104,7 @@ export function AppShell({
                 )}
               >
                 <Icon className={cn("size-5", active && "text-lime")} />
-                {item.label}
+                {t(item.label)}
               </Link>
             );
           })}
