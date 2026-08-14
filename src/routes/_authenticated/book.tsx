@@ -118,6 +118,10 @@ function BookPage() {
 
   return (
     <AppShell title="예약하기" subtitle="날짜를 고르고 가능한 시간을 선택하세요" role="member">
+      <p className="rounded-2xl border-2 border-dashed border-border-strong px-4 py-3 text-xs leading-relaxed text-muted-foreground">
+        시간을 선택하면 <span className="font-bold text-foreground">예약 신청</span> 상태로 접수되고, 트레이너가
+        승인하면 확정됩니다.
+      </p>
       <Card className="space-y-4">
         <div className="flex items-center justify-between">
           <button
