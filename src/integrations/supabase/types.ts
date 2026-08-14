@@ -319,6 +319,13 @@ export type Database = {
         Returns: boolean
       }
       is_my_member: { Args: { _member_id: string }; Returns: boolean }
+      list_trainers: {
+        Args: never
+        Returns: {
+          full_name: string
+          id: string
+        }[]
+      }
       taken_slots: {
         Args: { _day: string; _trainer_id: string }
         Returns: {
