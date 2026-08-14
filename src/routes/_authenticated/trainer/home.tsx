@@ -33,9 +33,11 @@ export function useTrainerBookings(trainerId?: string) {
   return useQuery({
     queryKey: ["trainer-bookings", trainerId],
     queryFn: async () => {
+      // 접근 제어는 DB 정책이 담당하지만, 쿼리에서도 담당 트레이너로 명시 제한한다.
       const { data, error } = await supabase
         .from("bookings")
         .select("*")
+        .eq("trainer_id", trainerId!)
         .order("start_at", { ascending: true });
       if (error) throw error;
       return (data ?? []) as Booking[];
