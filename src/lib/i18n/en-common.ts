@@ -85,7 +85,7 @@ export const EN_COMMON: Record<string, string> = {
   "통화 (Currency)": "Currency",
   "기본 통화": "Default currency",
   "원 (KRW)": "Korean won (KRW)",
-  "캐나다달러 (CAD)": "Canadian dollar (CAD)",,
+  "캐나다달러 (CAD)": "Canadian dollar (CAD)",
   // 에이전트 연결 동의
   "연결 요청을 불러올 수 없어요": "We couldn't load this connection request",
   "외부 앱": "External app",
