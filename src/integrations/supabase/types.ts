@@ -190,6 +190,27 @@ export type Database = {
           },
         ]
       }
+      trainer_invite_codes: {
+        Row: {
+          code: string
+          created_at: string
+          trainer_id: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          trainer_id: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          trainer_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       trainer_settings: {
         Row: {
           booking_cutoff_hours: number
@@ -317,6 +338,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      gen_invite_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -332,7 +354,16 @@ export type Database = {
           id: string
         }[]
       }
+      my_invite_code: { Args: never; Returns: string }
       my_trainer_id: { Args: never; Returns: string }
+      redeem_invite_code: {
+        Args: { _code: string }
+        Returns: {
+          trainer_id: string
+          trainer_name: string
+        }[]
+      }
+      regenerate_invite_code: { Args: never; Returns: string }
       taken_slots: {
         Args: { _day: string; _trainer_id: string }
         Returns: {

@@ -33,6 +33,32 @@ function OnboardingPage() {
   const [preferred, setPreferred] = useState("");
   const [phone, setPhone] = useState("");
   const [term, setTerm] = useState("");
+  const [code, setCode] = useState("");
+  const linkedTrainerId = me.data?.profile?.trainer_id ?? null;
+
+  const redeem = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.rpc("redeem_invite_code", { _code: code.trim() });
+      if (error) throw error;
+      const row = (data ?? [])[0];
+      if (!row) throw new Error("invalid code");
+      return row;
+    },
+    onSuccess: async (row) => {
+      setCode("");
+      await queryClient.invalidateQueries({ queryKey: ["me"] });
+      queryClient.invalidateQueries({ queryKey: ["my-join-requests"] });
+      toast.success(`${row.trainer_name} 트레이너와 연결되었습니다`);
+    },
+    onError: (error: { message?: string }) => {
+      const message = error?.message ?? "";
+      if (message.includes("already linked")) {
+        toast.error("이미 다른 트레이너와 연결되어 있어 코드로 재연결할 수 없습니다");
+      } else {
+        toast.error("초대 코드가 올바르지 않습니다");
+      }
+    },
+  });
 
   useEffect(() => {
     if (me.data?.role === "trainer") navigate({ to: "/trainer/home", replace: true });
@@ -176,6 +202,45 @@ function OnboardingPage() {
             />
           </div>
         </Card>
+
+        <div className="space-y-3">
+          <h2 className="text-lg font-extrabold">초대 코드로 연결하기</h2>
+          {linkedTrainerId ? (
+            <Card className="flex items-center justify-between gap-3">
+              <div>
+                <p className="font-bold">담당 트레이너와 연결되어 있습니다</p>
+                <p className="text-xs text-muted-foreground">
+                  다른 트레이너로 재연결하려면 담당 트레이너에게 문의해 주세요.
+                </p>
+              </div>
+              <StatusPill tone="lime">연결됨</StatusPill>
+            </Card>
+          ) : (
+            <Card className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                이미 오프라인에서 함께 운동하는 트레이너가 있다면, 받은 초대 코드를 입력하면 승인
+                절차 없이 바로 연결됩니다.
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  id="invite"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.toUpperCase())}
+                  placeholder="예: A7KQ2M9X"
+                  maxLength={12}
+                  className="rounded-2xl tracking-[0.25em]"
+                />
+                <Button
+                  className="rounded-2xl"
+                  disabled={redeem.isPending || code.trim().length < 4}
+                  onClick={() => redeem.mutate()}
+                >
+                  {redeem.isPending ? "연결 중..." : "연결"}
+                </Button>
+              </div>
+            </Card>
+          )}
+        </div>
 
         <div className="space-y-3">
           <h2 className="text-lg font-extrabold">트레이너 찾기</h2>
