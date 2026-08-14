@@ -20,6 +20,7 @@ import { Route as AuthenticatedPassRouteImport } from './routes/_authenticated/p
 import { Route as AuthenticatedRecordsRouteImport } from './routes/_authenticated/records'
 import { Route as AuthenticatedTrainerCalendarRouteImport } from './routes/_authenticated/trainer/calendar'
 import { Route as AuthenticatedTrainerHomeRouteImport } from './routes/_authenticated/trainer/home'
+import { Route as AuthenticatedTrainerLogsRouteImport } from './routes/_authenticated/trainer/logs'
 import { Route as AuthenticatedTrainerMembersRouteImport } from './routes/_authenticated/trainer/members'
 
 const IndexRoute = IndexRouteImport.update({
@@ -78,6 +79,12 @@ const AuthenticatedTrainerHomeRoute =
     path: '/trainer/home',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedTrainerLogsRoute =
+  AuthenticatedTrainerLogsRouteImport.update({
+    id: '/trainer/logs',
+    path: '/trainer/logs',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTrainerMembersRoute =
   AuthenticatedTrainerMembersRouteImport.update({
     id: '/trainer/members',
@@ -96,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/records': typeof AuthenticatedRecordsRoute
   '/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
   '/trainer/home': typeof AuthenticatedTrainerHomeRoute
+  '/trainer/logs': typeof AuthenticatedTrainerLogsRoute
   '/trainer/members': typeof AuthenticatedTrainerMembersRoute
 }
 export interface FileRoutesByTo {
@@ -109,6 +117,7 @@ export interface FileRoutesByTo {
   '/records': typeof AuthenticatedRecordsRoute
   '/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
   '/trainer/home': typeof AuthenticatedTrainerHomeRoute
+  '/trainer/logs': typeof AuthenticatedTrainerLogsRoute
   '/trainer/members': typeof AuthenticatedTrainerMembersRoute
 }
 export interface FileRoutesById {
@@ -124,6 +133,7 @@ export interface FileRoutesById {
   '/_authenticated/records': typeof AuthenticatedRecordsRoute
   '/_authenticated/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
   '/_authenticated/trainer/home': typeof AuthenticatedTrainerHomeRoute
+  '/_authenticated/trainer/logs': typeof AuthenticatedTrainerLogsRoute
   '/_authenticated/trainer/members': typeof AuthenticatedTrainerMembersRoute
 }
 export interface FileRouteTypes {
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/records'
     | '/trainer/calendar'
     | '/trainer/home'
+    | '/trainer/logs'
     | '/trainer/members'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/records'
     | '/trainer/calendar'
     | '/trainer/home'
+    | '/trainer/logs'
     | '/trainer/members'
   id:
     | '__root__'
@@ -166,6 +178,7 @@ export interface FileRouteTypes {
     | '/_authenticated/records'
     | '/_authenticated/trainer/calendar'
     | '/_authenticated/trainer/home'
+    | '/_authenticated/trainer/logs'
     | '/_authenticated/trainer/members'
   fileRoutesById: FileRoutesById
 }
@@ -254,6 +267,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTrainerHomeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/trainer/logs': {
+      id: '/_authenticated/trainer/logs'
+      path: '/trainer/logs'
+      fullPath: '/trainer/logs'
+      preLoaderRoute: typeof AuthenticatedTrainerLogsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/trainer/members': {
       id: '/_authenticated/trainer/members'
       path: '/trainer/members'
@@ -273,6 +293,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRecordsRoute: typeof AuthenticatedRecordsRoute
   AuthenticatedTrainerCalendarRoute: typeof AuthenticatedTrainerCalendarRoute
   AuthenticatedTrainerHomeRoute: typeof AuthenticatedTrainerHomeRoute
+  AuthenticatedTrainerLogsRoute: typeof AuthenticatedTrainerLogsRoute
   AuthenticatedTrainerMembersRoute: typeof AuthenticatedTrainerMembersRoute
 }
 
@@ -285,6 +306,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRecordsRoute: AuthenticatedRecordsRoute,
   AuthenticatedTrainerCalendarRoute: AuthenticatedTrainerCalendarRoute,
   AuthenticatedTrainerHomeRoute: AuthenticatedTrainerHomeRoute,
+  AuthenticatedTrainerLogsRoute: AuthenticatedTrainerLogsRoute,
   AuthenticatedTrainerMembersRoute: AuthenticatedTrainerMembersRoute,
 }
 

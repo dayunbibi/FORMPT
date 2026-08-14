@@ -143,7 +143,7 @@ export function StatSkeleton({ count = 2 }: { count?: number }) {
   );
 }
 
-export function FieldLabel({ children, htmlFor }: { children: ReactNode; htmlFor?: string }) {
+export function FieldLabel({ children, htmlFor }: { children: ReactNode; htmlFor?: string | undefined }) {
   return (
     <label htmlFor={htmlFor} className="mb-1.5 block text-xs font-bold text-muted-foreground">
       {children}
