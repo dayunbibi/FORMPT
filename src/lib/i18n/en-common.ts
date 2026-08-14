@@ -85,5 +85,14 @@ export const EN_COMMON: Record<string, string> = {
   "통화 (Currency)": "Currency",
   "기본 통화": "Default currency",
   "원 (KRW)": "Korean won (KRW)",
-  "캐나다달러 (CAD)": "Canadian dollar (CAD)",
+  "캐나다달러 (CAD)": "Canadian dollar (CAD)",,
+  // 에이전트 연결 동의
+  "연결 요청을 불러올 수 없어요": "We couldn't load this connection request",
+  "외부 앱": "External app",
+  "인증 서버가 이동할 주소를 반환하지 않았습니다.": "The authorization server did not return a redirect address.",
+  "{app}을(를) 내 계정에 연결할까요?": "Connect {app} to your account?",
+  "연결하면 {app}이(가) 내 계정 권한으로 FORMFIT 데이터를 읽고 쓸 수 있습니다. 회원은 본인 데이터, 트레이너는 담당 회원 데이터까지만 접근됩니다.":
+    "Once connected, {app} can read and write your FORMFIT data with your permissions. Members can only access their own data; trainers only their own members' data.",
+  "연결 허용": "Allow",
+  거절: "Deny",
 };

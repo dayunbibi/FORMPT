@@ -9,7 +9,7 @@ import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, EmptyState, ListSkeleton, Section } from "@/components/pt/kit";
 import { cn } from "@/lib/utils";
-import { dayKey, fetchSettings, fmtMonthYear, fmtTime, weekdayNames } from "@/lib/pt";
+import { dayKey, fetchSettings, fmtMonthDay, fmtMonthYear, fmtTime, weekdayNames } from "@/lib/pt";
 import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/book")({
@@ -185,7 +185,7 @@ function BookPage() {
         )}
       </Card>
 
-      <Section title={selected ? t("{month} {day}일 가능한 시간", { month: fmtMonthYear(selected).split(" ")[0] ?? "", day: selected.getDate() }) : t("시간 선택")}>
+      <Section title={selected ? t("{date} 가능한 시간", { date: fmtMonthDay(selected) }) : t("시간 선택")}>
         {!selected ? (
           <EmptyState title={t("날짜를 먼저 선택해 주세요")} description={t("캘린더에서 원하는 날짜를 탭하면 가능한 시간이 표시됩니다.")} />
         ) : settings.isLoading || taken.isLoading ? (
