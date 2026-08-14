@@ -32,6 +32,23 @@ function TrainerCalendar() {
   const names = nameMap(members.data);
   const [cursor, setCursor] = useState(() => new Date());
   const [selected, setSelected] = useState(() => dayKey(new Date()));
+  const queryClient = useQueryClient();
+
+  // 지난 수업의 완료/노쇼는 트레이너가 직접 태깅한다 (자동 판정 없음).
+  const tag = useMutation({
+    mutationFn: async (input: { id: string; status: "completed" | "no_show" }) => {
+      const { error } = await supabase
+        .from("bookings")
+        .update({ status: input.status })
+        .eq("id", input.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trainer-bookings"] });
+      toast.success("예약 상태를 변경했습니다");
+    },
+    onError: () => toast.error("변경에 실패했습니다"),
+  });
 
   const byDay = useMemo(() => {
     const map = new Map<string, typeof bookings.data>();
