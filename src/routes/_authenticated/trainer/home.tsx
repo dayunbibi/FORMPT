@@ -6,7 +6,16 @@ import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, EmptyState, ListSkeleton, Section, StatCard, StatSkeleton, StatusPill } from "@/components/pt/kit";
-import { dayKey, fmtDateTime, fmtTime, statusLabel, statusTone, type Booking } from "@/lib/pt";
+import {
+  dayKey,
+  fmtDateTime,
+  fmtTime,
+  nameMap,
+  statusLabel,
+  statusTone,
+  useMyMembers,
+  type Booking,
+} from "@/lib/pt";
 
 export const Route = createFileRoute("/_authenticated/trainer/home")({
   head: () => ({
@@ -20,18 +29,16 @@ export const Route = createFileRoute("/_authenticated/trainer/home")({
   component: TrainerHome,
 });
 
-type Named = Booking & { profiles?: { full_name: string } | null };
-
 export function useTrainerBookings(trainerId?: string) {
   return useQuery({
     queryKey: ["trainer-bookings", trainerId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookings")
-        .select("*, profiles!bookings_member_id_fkey(full_name)")
+        .select("*")
         .order("start_at", { ascending: true });
       if (error) throw error;
-      return (data ?? []) as Named[];
+      return (data ?? []) as Booking[];
     },
     enabled: !!trainerId,
   });
@@ -42,22 +49,19 @@ function TrainerHome() {
   const trainerId = me.data?.user.id;
   const queryClient = useQueryClient();
   const bookings = useTrainerBookings(trainerId);
+  const members = useMyMembers(trainerId);
+  const names = nameMap(members.data);
 
   const requests = useQuery({
     queryKey: ["join-requests", trainerId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("join_requests")
-        .select("id, member_id, message, status, created_at, profiles!join_requests_member_id_fkey(full_name)")
+        .select("id, member_id, message, status, created_at")
         .eq("status", "pending")
         .order("created_at", { ascending: true });
       if (error) throw error;
-      return (data ?? []) as {
-        id: string;
-        member_id: string;
-        message: string | null;
-        profiles?: { full_name: string } | null;
-      }[];
+      return (data ?? []) as { id: string; member_id: string; message: string | null }[];
     },
     enabled: !!trainerId,
   });
@@ -70,7 +74,7 @@ function TrainerHome() {
         .eq("id", input.id);
       if (error) throw error;
       if (input.approve) {
-        await supabase.from("profiles").update({ trainer_id: trainerId }).eq("id", input.memberId);
+        await supabase.from("profiles").update({ trainer_id: trainerId ?? null }).eq("id", input.memberId);
       }
     },
     onSuccess: () => {
@@ -93,6 +97,7 @@ function TrainerHome() {
     onError: () => toast.error("변경에 실패했습니다"),
   });
 
+  const requestNames = names;
   const all = bookings.data ?? [];
   const pending = all.filter((b) => b.status === "pending");
   const cancelReq = all.filter((b) => b.cancel_requested && b.status === "confirmed");
@@ -122,7 +127,7 @@ function TrainerHome() {
               <Card key={b.id} className="space-y-3">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-extrabold">{b.profiles?.full_name ?? "회원"}</p>
+                    <p className="font-extrabold">{names.get(b.member_id) ?? "회원"}</p>
                     <p className="text-sm text-muted-foreground">{fmtDateTime(b.start_at)}</p>
                   </div>
                   <StatusPill tone={statusTone(b)}>{statusLabel(b)}</StatusPill>
@@ -155,7 +160,7 @@ function TrainerHome() {
               <Card key={b.id} className="space-y-3">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-extrabold">{b.profiles?.full_name ?? "회원"}</p>
+                    <p className="font-extrabold">{names.get(b.member_id) ?? "회원"}</p>
                     <p className="text-sm text-muted-foreground">{fmtDateTime(b.start_at)}</p>
                   </div>
                   <StatusPill tone="warn">취소요청</StatusPill>
@@ -205,7 +210,7 @@ function TrainerHome() {
               <Card key={b.id} className="flex items-center justify-between gap-3 py-3">
                 <div>
                   <p className="font-bold">{fmtTime(b.start_at)}</p>
-                  <p className="text-sm text-muted-foreground">{b.profiles?.full_name ?? "회원"}</p>
+                  <p className="text-sm text-muted-foreground">{names.get(b.member_id) ?? "회원"}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <StatusPill tone={statusTone(b)}>{statusLabel(b)}</StatusPill>
@@ -236,7 +241,7 @@ function TrainerHome() {
             {(requests.data ?? []).map((r) => (
               <Card key={r.id} className="space-y-3">
                 <div>
-                  <p className="font-extrabold">{r.profiles?.full_name ?? "회원"}</p>
+                  <p className="font-extrabold">{requestNames.get(r.member_id) ?? "회원"}</p>
                   {r.message && <p className="text-sm text-muted-foreground">{r.message}</p>}
                 </div>
                 <div className="flex gap-2">

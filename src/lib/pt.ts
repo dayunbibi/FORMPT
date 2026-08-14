@@ -172,3 +172,26 @@ export function statusTone(b: Pick<Booking, "status" | "cancel_requested">) {
 export function isUpcoming(b: Booking) {
   return new Date(b.start_at).getTime() > Date.now() && b.status !== "cancelled";
 }
+
+/** 트레이너의 회원 목록 (프로필 전체) */
+export function useMyMembers(trainerId?: string) {
+  return useQuery({
+    queryKey: ["trainer-members", trainerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("trainer_id", trainerId!)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as Profile[];
+    },
+    enabled: !!trainerId,
+  });
+}
+
+export function nameMap(profiles: Profile[] | undefined) {
+  const map = new Map<string, string>();
+  (profiles ?? []).forEach((p) => map.set(p.id, p.full_name));
+  return map;
+}
