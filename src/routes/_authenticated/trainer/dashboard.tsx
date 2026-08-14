@@ -24,6 +24,7 @@ function DashboardPage() {
   const trainerId = me.data?.user.id;
   const bookings = useTrainerBookings(trainerId);
   const members = useMyMembers(trainerId);
+  const memberIds = (members.data ?? []).map((m) => m.id);
   const names = nameMap(members.data);
 
   const credits = useQuery({
@@ -39,7 +40,7 @@ function DashboardPage() {
       (data ?? []).forEach((row) => map.set(row.member_id, (map.get(row.member_id) ?? 0) + row.delta));
       return map;
     },
-    enabled: !!trainerId,
+    enabled: !!trainerId && memberIds.length > 0,
   });
 
   const now = new Date();

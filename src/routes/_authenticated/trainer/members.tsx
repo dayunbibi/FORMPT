@@ -38,6 +38,7 @@ function MembersPage() {
   const trainerId = me.data?.user.id;
   const queryClient = useQueryClient();
   const members = useMyMembers(trainerId);
+  const memberIds = (members.data ?? []).map((m) => m.id);
 
   const credits = useQuery({
     queryKey: ["trainer-credits", trainerId, memberIds],
