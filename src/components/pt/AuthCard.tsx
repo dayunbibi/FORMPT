@@ -15,7 +15,7 @@ const schema = z.object({
   full_name: z.string().trim().max(40).optional(),
 });
 
-export function AuthCard({ role }: { role: Role }) {
+export function AuthCard({ role, allowSignup = true }: { role: Role; allowSignup?: boolean }) {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
