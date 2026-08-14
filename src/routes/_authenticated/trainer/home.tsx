@@ -104,6 +104,14 @@ function TrainerHome() {
   const today = all.filter(
     (b) => dayKey(new Date(b.start_at)) === dayKey(new Date()) && b.status !== "cancelled",
   );
+  const now = Date.now();
+  // 노쇼/완료는 자동 판정하지 않고, 시간이 지난 확정 예약을 트레이너가 직접 태깅한다.
+  const toTag = all.filter(
+    (b) =>
+      b.status === "confirmed" &&
+      +new Date(b.start_at) + b.duration_min * 60_000 < now &&
+      dayKey(new Date(b.start_at)) !== dayKey(new Date()),
+  );
 
   return (
     <AppShell title="오늘의 운영" subtitle={me.data?.profile?.full_name ?? ""} role="trainer">
