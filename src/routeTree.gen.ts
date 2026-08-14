@@ -21,6 +21,7 @@ import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/h
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedPassRouteImport } from './routes/_authenticated/pass'
 import { Route as AuthenticatedRecordsRouteImport } from './routes/_authenticated/records'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as AuthenticatedTrainerCalendarRouteImport } from './routes/_authenticated/trainer/calendar'
 import { Route as AuthenticatedTrainerDashboardRouteImport } from './routes/_authenticated/trainer/dashboard'
@@ -90,6 +91,11 @@ const AuthenticatedRecordsRoute = AuthenticatedRecordsRouteImport.update({
   path: '/records',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
     id: '/.mcp/invoke-tool/$tool',
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pass': typeof AuthenticatedPassRoute
   '/records': typeof AuthenticatedRecordsRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
   '/trainer/dashboard': typeof AuthenticatedTrainerDashboardRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pass': typeof AuthenticatedPassRoute
   '/records': typeof AuthenticatedRecordsRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
   '/trainer/dashboard': typeof AuthenticatedTrainerDashboardRoute
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/pass': typeof AuthenticatedPassRoute
   '/_authenticated/records': typeof AuthenticatedRecordsRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
   '/_authenticated/trainer/dashboard': typeof AuthenticatedTrainerDashboardRoute
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/pass'
     | '/records'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/trainer/calendar'
     | '/trainer/dashboard'
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/pass'
     | '/records'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/trainer/calendar'
     | '/trainer/dashboard'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/pass'
     | '/_authenticated/records'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/trainer/calendar'
     | '/_authenticated/trainer/dashboard'
@@ -266,6 +278,7 @@ export interface RootRouteChildren {
   TrainerLoginRoute: typeof TrainerLoginRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 
@@ -354,6 +367,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/records'
       preLoaderRoute: typeof AuthenticatedRecordsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/.mcp/invoke-tool/$tool': {
       id: '/.mcp/invoke-tool/$tool'
@@ -448,6 +468,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
 }
 export const routeTree = rootRouteImport
