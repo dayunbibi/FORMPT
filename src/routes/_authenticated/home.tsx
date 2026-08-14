@@ -7,7 +7,6 @@ import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, EmptyState, ListSkeleton, Section, StatCard, StatSkeleton, StatusPill } from "@/components/pt/kit";
 import { fetchRemaining, fmtDateTime, statusLabel, statusTone, type Booking } from "@/lib/pt";
-import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/home")({
   head: () => ({
@@ -22,7 +21,6 @@ export const Route = createFileRoute("/_authenticated/home")({
 });
 
 function MemberHome() {
-  const { t } = useI18n();
   const me = useRoleGate("member");
   const userId = me.data?.user.id;
 
@@ -70,15 +68,15 @@ function MemberHome() {
 
   return (
     <AppShell
-      title={t("{name}님, 오늘도 가볍게", { name: me.data?.profile?.full_name ?? "" })}
-      subtitle={linked ? undefined : t("아직 담당 트레이너가 연결되지 않았어요")}
+      title={`${me.data?.profile?.full_name ?? ""}님, 오늘도 가볍게`}
+      subtitle={linked ? undefined : "아직 담당 트레이너가 연결되지 않았어요"}
       role="member"
       banner={
         soon ? (
           <div className="flex items-start gap-3 rounded-2xl border-2 border-ink bg-lime px-4 py-3 text-lime-foreground">
             <Bell className="mt-0.5 size-4 shrink-0" />
             <p className="text-sm font-bold">
-              {t("예약 리마인드 · {time} 수업이 곧 시작됩니다", { time: fmtDateTime(soon.start_at) })}
+              예약 리마인드 · {fmtDateTime(soon.start_at)} 수업이 곧 시작됩니다
             </p>
           </div>
         ) : undefined
@@ -89,38 +87,38 @@ function MemberHome() {
       ) : (
         <div className="grid grid-cols-2 gap-3">
           <StatCard
-            label={t("남은 PT")}
+            label="남은 PT"
             value={remaining.data ?? 0}
-            unit={t("회")}
-            hint={t("이용 이력과 항상 일치")}
+            unit="회"
+            hint="이용 이력과 항상 일치"
           />
-          <StatCard label={t("예정된 예약")} value={upcoming.length} unit={t("건")} hint={t("취소 제외")} />
+          <StatCard label="예정된 예약" value={upcoming.length} unit="건" hint="취소 제외" />
         </div>
       )}
 
-      <Section title={t("다음 예약")}>
+      <Section title="다음 예약">
         {bookings.isLoading ? (
           <ListSkeleton rows={1} />
         ) : next ? (
           <Card className="flex items-center justify-between gap-3">
             <div>
               <p className="text-lg font-extrabold">{fmtDateTime(next.start_at)}</p>
-              <p className="text-sm text-muted-foreground">{t("{n}분 수업", { n: next.duration_min })}</p>
+              <p className="text-sm text-muted-foreground">{next.duration_min}분 수업</p>
             </div>
             <StatusPill tone={statusTone(next)}>{statusLabel(next)}</StatusPill>
           </Card>
         ) : (
           <EmptyState
-            title={t("예정된 예약이 없어요")}
+            title="예정된 예약이 없어요"
             description={
               linked
-                ? t("캘린더에서 원하는 날짜와 시간을 골라 예약해 보세요.")
-                : t("먼저 트레이너에게 가입 요청을 보내면 예약할 수 있어요.")
+                ? "캘린더에서 원하는 날짜와 시간을 골라 예약해 보세요."
+                : "먼저 트레이너에게 가입 요청을 보내면 예약할 수 있어요."
             }
             action={
               <Button asChild className="rounded-2xl">
                 <Link to={linked ? "/book" : "/onboarding"}>
-                  {linked ? t("예약하기") : t("트레이너 찾기")}
+                  {linked ? "예약하기" : "트레이너 찾기"}
                 </Link>
               </Button>
             }
@@ -128,7 +126,7 @@ function MemberHome() {
         )}
       </Section>
 
-      <Section title={t("최근 운동 · 피드백")}>
+      <Section title="최근 운동 · 피드백">
         {lastLog.isLoading ? (
           <ListSkeleton rows={1} />
         ) : lastLog.data ? (
@@ -139,7 +137,7 @@ function MemberHome() {
                 <li key={i} className="flex justify-between gap-2">
                   <span className="font-semibold">{item.exercise}</span>
                   <span className="text-muted-foreground">
-                    {item.weight_kg ?? 0}kg · {item.reps ?? 0}{t("회")} · {item.sets ?? 0}{t("세트")}
+                    {item.weight_kg ?? 0}kg · {item.reps ?? 0}회 · {item.sets ?? 0}세트
                   </span>
                 </li>
               ))}
@@ -150,16 +148,16 @@ function MemberHome() {
               </p>
             )}
             <Button asChild variant="outline" className="w-full rounded-2xl border-2">
-              <Link to="/records">{t("전체 기록 보기")}</Link>
+              <Link to="/records">전체 기록 보기</Link>
             </Button>
           </Card>
         ) : (
           <EmptyState
-            title={t("아직 운동기록이 없어요")}
-            description={t("수업이 끝나면 트레이너가 종목·무게·횟수와 피드백을 기록해 줍니다.")}
+            title="아직 운동기록이 없어요"
+            description="수업이 끝나면 트레이너가 종목·무게·횟수와 피드백을 기록해 줍니다."
             action={
               <Button asChild variant="outline" className="rounded-2xl border-2">
-                <Link to="/pass">{t("이용권 확인")}</Link>
+                <Link to="/pass">이용권 확인</Link>
               </Button>
             }
           />

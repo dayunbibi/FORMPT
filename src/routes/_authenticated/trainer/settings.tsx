@@ -5,20 +5,11 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, Field, ListSkeleton, Section } from "@/components/pt/kit";
 import { cn } from "@/lib/utils";
-import { DEFAULT_SETTINGS, fetchSettings, weekdayNames } from "@/lib/pt";
-import { CURRENCIES, CURRENCY_LABEL } from "@/lib/money";
-import { useI18n } from "@/lib/i18n";
+import { DEFAULT_SETTINGS, fetchSettings } from "@/lib/pt";
 
 export const Route = createFileRoute("/_authenticated/trainer/settings")({
   head: () => ({
@@ -32,9 +23,9 @@ export const Route = createFileRoute("/_authenticated/trainer/settings")({
   component: SettingsPage,
 });
 
+const WEEK = ["일", "월", "화", "수", "목", "금", "토"];
+
 function SettingsPage() {
-  const { t } = useI18n();
-  const WEEK = weekdayNames();
   const me = useRoleGate("trainer");
   const trainerId = me.data?.user.id;
   const queryClient = useQueryClient();
@@ -64,24 +55,24 @@ function SettingsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["settings"] });
-      toast.success(t("설정을 저장했습니다"));
+      toast.success("설정을 저장했습니다");
     },
-    onError: () => toast.error(t("저장에 실패했습니다")),
+    onError: () => toast.error("저장에 실패했습니다"),
   });
 
   if (settings.isLoading) {
     return (
-      <AppShell title={t("설정")} role="trainer">
+      <AppShell title="설정" role="trainer">
         <ListSkeleton rows={3} />
       </AppShell>
     );
   }
 
   return (
-    <AppShell title={t("설정")} subtitle={t("운영시간과 예약 정책")} role="trainer">
-      <Section title={t("수업 · 운영시간")}>
+    <AppShell title="설정" subtitle="운영시간과 예약 정책" role="trainer">
+      <Section title="수업 · 운영시간">
         <Card className="space-y-4">
-          <Field label={t("수업 시간(분)")} htmlFor="session">
+          <Field label="수업 시간(분)" htmlFor="session">
             <Input
               id="session"
               type="number"
@@ -90,7 +81,7 @@ function SettingsPage() {
             />
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label={t("오픈 시각(시)")} htmlFor="open">
+            <Field label="오픈 시각(시)" htmlFor="open">
               <Input
                 id="open"
                 type="number"
@@ -98,7 +89,7 @@ function SettingsPage() {
                 onChange={(e) => setForm({ ...form, open_hour: Number(e.target.value) })}
               />
             </Field>
-            <Field label={t("마감 시각(시)")} htmlFor="close">
+            <Field label="마감 시각(시)" htmlFor="close">
               <Input
                 id="close"
                 type="number"
@@ -110,9 +101,9 @@ function SettingsPage() {
         </Card>
       </Section>
 
-      <Section title={t("예약 정책")}>
+      <Section title="예약 정책">
         <Card className="grid grid-cols-2 gap-3">
-          <Field label={t("예약 마감(시간 전)")} htmlFor="bcut">
+          <Field label="예약 마감(시간 전)" htmlFor="bcut">
             <Input
               id="bcut"
               type="number"
@@ -120,7 +111,7 @@ function SettingsPage() {
               onChange={(e) => setForm({ ...form, booking_cutoff_hours: Number(e.target.value) })}
             />
           </Field>
-          <Field label={t("취소 마감(시간 전)")} htmlFor="ccut">
+          <Field label="취소 마감(시간 전)" htmlFor="ccut">
             <Input
               id="ccut"
               type="number"
@@ -131,35 +122,10 @@ function SettingsPage() {
         </Card>
       </Section>
 
-      <Section title={t("결제")}>
-        <Card className="space-y-3">
-          <Field label={t("기본 통화")} htmlFor="currency">
-            <Select
-              value={form.default_currency}
-              onValueChange={(v) => setForm({ ...form, default_currency: v as typeof form.default_currency })}
-            >
-              <SelectTrigger id="currency" className="rounded-2xl border-2">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {CURRENCIES.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {t(CURRENCY_LABEL[c])}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-          <p className="text-xs text-muted-foreground">
-            {t("이용권 결제 시 기본으로 선택되는 통화입니다. 환율 변환은 하지 않으며 기록된 통화 그대로 표시됩니다.")}
-          </p>
-        </Card>
-      </Section>
-
-      <Section title={t("휴무일")}>
+      <Section title="휴무일">
         <Card className="space-y-4">
           <div>
-            <p className="mb-2 text-xs font-bold text-muted-foreground">{t("휴무 요일")}</p>
+            <p className="mb-2 text-xs font-bold text-muted-foreground">휴무 요일</p>
             <div className="flex gap-2">
               {WEEK.map((label, index) => {
                 const on = form.closed_weekdays.includes(index);
@@ -186,7 +152,7 @@ function SettingsPage() {
             </div>
           </div>
 
-          <Field label={t("특정 휴무일 추가")} htmlFor="holiday">
+          <Field label="특정 휴무일 추가" htmlFor="holiday">
             <div className="flex gap-2">
               <Input
                 id="holiday"
@@ -203,13 +169,13 @@ function SettingsPage() {
                   setHoliday("");
                 }}
               >
-                {t("추가")}
+                추가
               </Button>
             </div>
           </Field>
 
           {form.holidays.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t("등록된 휴무일이 없습니다.")}</p>
+            <p className="text-sm text-muted-foreground">등록된 휴무일이 없습니다.</p>
           ) : (
             <div className="flex flex-wrap gap-2">
               {form.holidays.map((h) => (
@@ -233,7 +199,7 @@ function SettingsPage() {
         disabled={save.isPending}
         onClick={() => save.mutate()}
       >
-        {save.isPending ? t("저장 중...") : t("설정 저장")}
+        {save.isPending ? "저장 중..." : "설정 저장"}
       </Button>
     </AppShell>
   );

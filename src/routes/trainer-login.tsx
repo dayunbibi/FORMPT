@@ -1,7 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AuthCard } from "@/components/pt/AuthCard";
-import { LangToggle } from "@/components/pt/LangToggle";
-import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/trainer-login")({
   head: () => ({
@@ -22,19 +20,15 @@ export const Route = createFileRoute("/trainer-login")({
 });
 
 function TrainerAuthPage() {
-  const { t } = useI18n();
   return (
     <div className="flex min-h-screen flex-col justify-center bg-background px-5 py-12">
       <div className="mx-auto w-full max-w-md">
-        <div className="mb-6 flex justify-end">
-          <LangToggle />
-        </div>
         <p className="display-xl text-xs uppercase tracking-[0.4em] text-muted-foreground">
-          {t("trainer console")}
+          trainer console
         </p>
-        <h1 className="display-xl mt-3 text-5xl">{t("트레이너 로그인")}</h1>
+        <h1 className="display-xl mt-3 text-5xl">트레이너 로그인</h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          {t("승인 대기, 오늘 수업, 회원 이용권을 한 화면에서 처리하세요.")}
+          승인 대기, 오늘 수업, 회원 이용권을 한 화면에서 처리하세요.
         </p>
 
         <div className="mt-8">
@@ -42,13 +36,13 @@ function TrainerAuthPage() {
         </div>
 
         <p className="mt-4 rounded-2xl border-2 border-dashed border-border-strong px-4 py-3 text-xs leading-relaxed text-muted-foreground">
-          {t("트레이너 계정은 서비스 설정 시 1회 발급됩니다. 별도의 트레이너 회원가입은 제공하지 않습니다.")}
+          트레이너 계정은 서비스 설정 시 1회 발급됩니다. 별도의 트레이너 회원가입은 제공하지 않습니다.
         </p>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          {t("회원이세요?")}{" "}
+          회원이세요?{" "}
           <Link to="/" className="font-bold text-foreground underline">
-            {t("회원 로그인으로 이동")}
+            회원 로그인으로 이동
           </Link>
         </p>
       </div>
