@@ -250,6 +250,42 @@ function TrainerHome() {
         )}
       </Section>
 
+      {toTag.length > 0 && (
+        <Section
+          title={`완료·노쇼 정리 (${toTag.length})`}
+          description="지난 수업은 트레이너가 직접 완료 또는 노쇼로 지정합니다."
+        >
+          <div className="space-y-2">
+            {toTag.map((b) => (
+              <Card key={b.id} className="flex items-center justify-between gap-3 py-3">
+                <div>
+                  <p className="font-bold">{fmtDateTime(b.start_at)}</p>
+                  <p className="text-sm text-muted-foreground">{names.get(b.member_id) ?? "회원"}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-2xl border-2"
+                    onClick={() => act.mutate({ id: b.id, patch: { status: "completed" } })}
+                  >
+                    완료
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-2xl border-2 border-destructive text-destructive"
+                    onClick={() => act.mutate({ id: b.id, patch: { status: "no_show" } })}
+                  >
+                    노쇼
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </Section>
+      )}
+
       <Section title={`가입 요청 (${requests.data?.length ?? 0})`}>
         {requests.isLoading ? (
           <ListSkeleton rows={1} />
