@@ -178,6 +178,45 @@ function OnboardingPage() {
         </Card>
 
         <div className="space-y-3">
+          <h2 className="text-lg font-extrabold">초대 코드로 연결하기</h2>
+          {linkedTrainerId ? (
+            <Card className="flex items-center justify-between gap-3">
+              <div>
+                <p className="font-bold">담당 트레이너와 연결되어 있습니다</p>
+                <p className="text-xs text-muted-foreground">
+                  다른 트레이너로 재연결하려면 담당 트레이너에게 문의해 주세요.
+                </p>
+              </div>
+              <StatusPill tone="lime">연결됨</StatusPill>
+            </Card>
+          ) : (
+            <Card className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                이미 오프라인에서 함께 운동하는 트레이너가 있다면, 받은 초대 코드를 입력하면 승인
+                절차 없이 바로 연결됩니다.
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  id="invite"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.toUpperCase())}
+                  placeholder="예: A7KQ2M9X"
+                  maxLength={12}
+                  className="rounded-2xl tracking-[0.25em]"
+                />
+                <Button
+                  className="rounded-2xl"
+                  disabled={redeem.isPending || code.trim().length < 4}
+                  onClick={() => redeem.mutate()}
+                >
+                  {redeem.isPending ? "연결 중..." : "연결"}
+                </Button>
+              </div>
+            </Card>
+          )}
+        </div>
+
+        <div className="space-y-3">
           <h2 className="text-lg font-extrabold">트레이너 찾기</h2>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
