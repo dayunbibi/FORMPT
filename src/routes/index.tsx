@@ -46,10 +46,9 @@ function MemberAuthPage() {
           </p>
         </div>
 
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          트레이너세요?{" "}
-          <Link to="/trainer-login" className="font-bold text-foreground underline">
-            트레이너로 로그인
+        <p className="mt-8 text-center text-xs text-muted-foreground">
+          <Link to="/trainer-login" className="underline underline-offset-2">
+            트레이너이신가요? →
           </Link>
         </p>
       </div>
