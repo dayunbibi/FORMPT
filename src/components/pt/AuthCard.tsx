@@ -15,6 +15,15 @@ const schema = z.object({
   full_name: z.string().trim().max(40).optional(),
 });
 
+
+/** ?next= 로 전달된 같은 출처 상대 경로만 허용한다 (OAuth 연결 동의 화면 복귀용). */
+function safeNext(): string | null {
+  if (typeof window === "undefined") return null;
+  const raw = new URLSearchParams(window.location.search).get("next");
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return null;
+  return raw;
+}
+
 export function AuthCard({ role, allowSignup = true }: { role: Role; allowSignup?: boolean }) {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
@@ -31,6 +40,11 @@ export function AuthCard({ role, allowSignup = true }: { role: Role; allowSignup
     (async () => {
       const { data } = await supabase.auth.getSession();
       if (!alive || !data.session) return;
+      const next = safeNext();
+      if (next) {
+        window.location.replace(next);
+        return;
+      }
       const me = await getMe();
       if (!alive || !me) return;
       queryClient.invalidateQueries({ queryKey: ["me"] });
@@ -55,7 +69,7 @@ export function AuthCard({ role, allowSignup = true }: { role: Role; allowSignup
           email: parsed.data.email,
           password: parsed.data.password,
           options: {
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: window.location.origin + (safeNext() ?? ""),
             data: { full_name: parsed.data.full_name || parsed.data.email.split("@")[0], role },
           },
         });
@@ -70,6 +84,11 @@ export function AuthCard({ role, allowSignup = true }: { role: Role; allowSignup
           password: parsed.data.password,
         });
         if (error) throw error;
+      }
+      const next = safeNext();
+      if (next) {
+        window.location.replace(next);
+        return;
       }
       const me = await getMe();
       await queryClient.invalidateQueries();
