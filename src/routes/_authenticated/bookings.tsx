@@ -18,6 +18,7 @@ import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, EmptyState, ListSkeleton, Section, StatusPill } from "@/components/pt/kit";
 import { fetchSettings, fmtDateTime, statusLabel, statusTone, type Booking } from "@/lib/pt";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/bookings")({
   head: () => ({
@@ -32,6 +33,7 @@ export const Route = createFileRoute("/_authenticated/bookings")({
 });
 
 function BookingsPage() {
+  const { t } = useI18n();
   const me = useRoleGate("member");
   const queryClient = useQueryClient();
   const trainerId = me.data?.profile?.trainer_id ?? null;
@@ -67,9 +69,9 @@ function BookingsPage() {
     },
     onSuccess: (instant) => {
       queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
-      toast.success(instant ? "예약이 취소되었습니다" : "취소 요청을 보냈습니다");
+      toast.success(instant ? t("예약이 취소되었습니다") : t("취소 요청을 보냈습니다"));
     },
-    onError: () => toast.error("처리에 실패했습니다"),
+    onError: () => toast.error(t("처리에 실패했습니다")),
   });
 
   const now = Date.now();
@@ -92,7 +94,7 @@ function BookingsPage() {
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-base font-extrabold">{fmtDateTime(b.start_at)}</p>
-            <p className="text-sm text-muted-foreground">{b.duration_min}분 수업</p>
+            <p className="text-sm text-muted-foreground">{t("{n}분 수업", { n: b.duration_min })}</p>
           </div>
           <StatusPill tone={statusTone(b)}>{statusLabel(b)}</StatusPill>
         </div>
@@ -100,20 +102,20 @@ function BookingsPage() {
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="outline" className="w-full rounded-2xl border-2">
-                예약 취소
+                {t("예약 취소")}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent className="rounded-2xl">
               <AlertDialogHeader>
-                <AlertDialogTitle>예약을 취소할까요?</AlertDialogTitle>
+                <AlertDialogTitle>{t("예약을 취소할까요?")}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  {fmtDateTime(b.start_at)} 수업입니다. 확정된 예약은 트레이너 확인 후 최종 취소됩니다.
+                  {t("{time} 수업입니다. 확정된 예약은 트레이너 확인 후 최종 취소됩니다.", { time: fmtDateTime(b.start_at) })}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className="rounded-2xl">닫기</AlertDialogCancel>
+                <AlertDialogCancel className="rounded-2xl">{t("닫기")}</AlertDialogCancel>
                 <AlertDialogAction className="rounded-2xl" onClick={() => cancel.mutate(b)}>
-                  취소하기
+                  {t("취소하기")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -121,7 +123,7 @@ function BookingsPage() {
         )}
         {!canCancel(b) && b.status === "confirmed" && !b.cancel_requested && (
           <p className="text-xs text-muted-foreground">
-            취소 마감({settings.data?.cancel_cutoff_hours ?? 12}시간 전)이 지나 직접 취소할 수 없어요.
+            {t("취소 마감({hours}시간 전)이 지나 직접 취소할 수 없어요.", { hours: settings.data?.cancel_cutoff_hours ?? 12 })}
           </p>
         )}
       </Card>
@@ -129,17 +131,17 @@ function BookingsPage() {
   }
 
   return (
-    <AppShell title="예약 목록" subtitle="예약 시간 기준으로 구분됩니다" role="member">
-      <Section title={`예정된 예약 (${upcoming.length})`}>
+    <AppShell title={t("예약 목록")} subtitle={t("예약 시간 기준으로 구분됩니다")} role="member">
+      <Section title={t("예정된 예약 ({n})", { n: upcoming.length })}>
         {bookings.isLoading ? (
           <ListSkeleton rows={2} />
         ) : upcoming.length === 0 ? (
           <EmptyState
-            title="예정된 예약이 없어요"
-            description="캘린더에서 원하는 시간에 수업을 잡아보세요."
+            title={t("예정된 예약이 없어요")}
+            description={t("캘린더에서 원하는 시간에 수업을 잡아보세요.")}
             action={
               <Button asChild className="rounded-2xl">
-                <Link to="/book">예약하기</Link>
+                <Link to="/book">{t("예약하기")}</Link>
               </Button>
             }
           />
@@ -152,11 +154,11 @@ function BookingsPage() {
         )}
       </Section>
 
-      <Section title={`지난 예약 (${past.length})`}>
+      <Section title={t("지난 예약 ({n})", { n: past.length })}>
         {bookings.isLoading ? (
           <ListSkeleton rows={1} />
         ) : past.length === 0 ? (
-          <EmptyState title="지난 예약이 없어요" description="수업을 진행하면 이곳에 기록이 쌓입니다." />
+          <EmptyState title={t("지난 예약이 없어요")} description={t("수업을 진행하면 이곳에 기록이 쌓입니다.")} />
         ) : (
           <div className="space-y-3">
             {past.map((b) => (

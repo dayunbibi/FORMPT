@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, EmptyState, ListSkeleton, Section } from "@/components/pt/kit";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/records")({
   head: () => ({
@@ -23,6 +24,7 @@ type Item = { exercise: string; weight_kg: number | null; reps: number | null; s
 type Log = { id: string; log_date: string; feedback: string | null; workout_items: Item[] };
 
 export function RecordsPage() {
+  const { t } = useI18n();
   const me = useRoleGate("member");
 
   const logs = useQuery({
@@ -51,17 +53,17 @@ export function RecordsPage() {
   }
 
   return (
-    <AppShell title="운동기록" subtitle="날짜별 타임라인" role="member">
-      <Section title={`전체 기록 (${list.length})`}>
+    <AppShell title={t("운동기록")} subtitle={t("날짜별 타임라인")} role="member">
+      <Section title={t("전체 기록 ({n})", { n: list.length })}>
         {logs.isLoading ? (
           <ListSkeleton rows={3} />
         ) : list.length === 0 ? (
           <EmptyState
-            title="아직 기록이 없어요"
-            description="수업을 진행하면 트레이너가 종목과 무게, 피드백을 남겨줍니다."
+            title={t("아직 기록이 없어요")}
+            description={t("수업을 진행하면 트레이너가 종목과 무게, 피드백을 남겨줍니다.")}
             action={
               <Button asChild className="rounded-2xl">
-                <Link to="/book">첫 수업 예약하기</Link>
+                <Link to="/book">{t("첫 수업 예약하기")}</Link>
               </Button>
             }
           />
@@ -80,12 +82,12 @@ export function RecordsPage() {
                           {grew(index, item) && (
                             <span className="flex items-center gap-0.5 rounded-full bg-lime px-1.5 py-0.5 text-[10px] font-extrabold text-lime-foreground">
                               <ArrowUpRight className="size-3" />
-                              상승
+                              {t("상승")}
                             </span>
                           )}
                         </span>
                         <span className="text-muted-foreground">
-                          {item.weight_kg ?? 0}kg · {item.reps ?? 0}회 · {item.sets ?? 0}세트
+                          {item.weight_kg ?? 0}kg · {item.reps ?? 0}{t("회")} · {item.sets ?? 0}{t("세트")}
                         </span>
                       </li>
                     ))}
