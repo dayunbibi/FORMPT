@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getLocale, tr } from "@/lib/i18n";
+import type { CurrencyCode } from "@/lib/money";
 
 export type Role = "member" | "trainer";
 export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed" | "no_show";
@@ -38,6 +39,7 @@ export type Settings = {
   cancel_cutoff_hours: number;
   closed_weekdays: number[];
   holidays: string[];
+  default_currency: CurrencyCode;
 };
 
 export const DEFAULT_SETTINGS: Omit<Settings, "trainer_id"> = {
@@ -48,6 +50,7 @@ export const DEFAULT_SETTINGS: Omit<Settings, "trainer_id"> = {
   cancel_cutoff_hours: 12,
   closed_weekdays: [0],
   holidays: [],
+  default_currency: "KRW",
 };
 
 /** 로그인 사용자 + 프로필 + 역할. 최초 로그인 시 프로필/역할 행을 자동 생성한다. */
@@ -76,7 +79,7 @@ export async function getMe() {
       .from("profiles")
       .insert({
         id: user.id,
-        full_name: meta.full_name ?? (user.email?.split("@")[0] ?? "회원"),
+        full_name: meta.full_name ?? (user.email?.split("@")[0] ?? tr("회원")),
         onboarded: role === "trainer",
       })
       .select("*")
