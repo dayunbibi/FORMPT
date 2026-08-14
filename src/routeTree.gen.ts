@@ -22,6 +22,7 @@ import { Route as AuthenticatedTrainerCalendarRouteImport } from './routes/_auth
 import { Route as AuthenticatedTrainerHomeRouteImport } from './routes/_authenticated/trainer/home'
 import { Route as AuthenticatedTrainerLogsRouteImport } from './routes/_authenticated/trainer/logs'
 import { Route as AuthenticatedTrainerMembersRouteImport } from './routes/_authenticated/trainer/members'
+import { Route as AuthenticatedTrainerSettingsRouteImport } from './routes/_authenticated/trainer/settings'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -91,6 +92,12 @@ const AuthenticatedTrainerMembersRoute =
     path: '/trainer/members',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedTrainerSettingsRoute =
+  AuthenticatedTrainerSettingsRouteImport.update({
+    id: '/trainer/settings',
+    path: '/trainer/settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/trainer/home': typeof AuthenticatedTrainerHomeRoute
   '/trainer/logs': typeof AuthenticatedTrainerLogsRoute
   '/trainer/members': typeof AuthenticatedTrainerMembersRoute
+  '/trainer/settings': typeof AuthenticatedTrainerSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -119,6 +127,7 @@ export interface FileRoutesByTo {
   '/trainer/home': typeof AuthenticatedTrainerHomeRoute
   '/trainer/logs': typeof AuthenticatedTrainerLogsRoute
   '/trainer/members': typeof AuthenticatedTrainerMembersRoute
+  '/trainer/settings': typeof AuthenticatedTrainerSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -135,6 +144,7 @@ export interface FileRoutesById {
   '/_authenticated/trainer/home': typeof AuthenticatedTrainerHomeRoute
   '/_authenticated/trainer/logs': typeof AuthenticatedTrainerLogsRoute
   '/_authenticated/trainer/members': typeof AuthenticatedTrainerMembersRoute
+  '/_authenticated/trainer/settings': typeof AuthenticatedTrainerSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/trainer/home'
     | '/trainer/logs'
     | '/trainer/members'
+    | '/trainer/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -165,6 +176,7 @@ export interface FileRouteTypes {
     | '/trainer/home'
     | '/trainer/logs'
     | '/trainer/members'
+    | '/trainer/settings'
   id:
     | '__root__'
     | '/'
@@ -180,6 +192,7 @@ export interface FileRouteTypes {
     | '/_authenticated/trainer/home'
     | '/_authenticated/trainer/logs'
     | '/_authenticated/trainer/members'
+    | '/_authenticated/trainer/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -281,6 +294,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTrainerMembersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/trainer/settings': {
+      id: '/_authenticated/trainer/settings'
+      path: '/trainer/settings'
+      fullPath: '/trainer/settings'
+      preLoaderRoute: typeof AuthenticatedTrainerSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -295,6 +315,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTrainerHomeRoute: typeof AuthenticatedTrainerHomeRoute
   AuthenticatedTrainerLogsRoute: typeof AuthenticatedTrainerLogsRoute
   AuthenticatedTrainerMembersRoute: typeof AuthenticatedTrainerMembersRoute
+  AuthenticatedTrainerSettingsRoute: typeof AuthenticatedTrainerSettingsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -308,6 +329,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTrainerHomeRoute: AuthenticatedTrainerHomeRoute,
   AuthenticatedTrainerLogsRoute: AuthenticatedTrainerLogsRoute,
   AuthenticatedTrainerMembersRoute: AuthenticatedTrainerMembersRoute,
+  AuthenticatedTrainerSettingsRoute: AuthenticatedTrainerSettingsRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
