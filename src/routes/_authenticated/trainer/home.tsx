@@ -104,6 +104,14 @@ function TrainerHome() {
   const today = all.filter(
     (b) => dayKey(new Date(b.start_at)) === dayKey(new Date()) && b.status !== "cancelled",
   );
+  const now = Date.now();
+  // 노쇼/완료는 자동 판정하지 않고, 시간이 지난 확정 예약을 트레이너가 직접 태깅한다.
+  const toTag = all.filter(
+    (b) =>
+      b.status === "confirmed" &&
+      +new Date(b.start_at) + b.duration_min * 60_000 < now &&
+      dayKey(new Date(b.start_at)) !== dayKey(new Date()),
+  );
 
   return (
     <AppShell title="오늘의 운영" subtitle={me.data?.profile?.full_name ?? ""} role="trainer">
@@ -214,22 +222,66 @@ function TrainerHome() {
                 </div>
                 <div className="flex items-center gap-2">
                   <StatusPill tone={statusTone(b)}>{statusLabel(b)}</StatusPill>
-                  {b.status === "confirmed" && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="rounded-2xl border-2"
-                      onClick={() => act.mutate({ id: b.id, patch: { status: "completed" } })}
-                    >
-                      완료
-                    </Button>
-                  )}
+                  {b.status === "confirmed" &&
+                    +new Date(b.start_at) + b.duration_min * 60_000 < now && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="rounded-2xl border-2"
+                          onClick={() => act.mutate({ id: b.id, patch: { status: "completed" } })}
+                        >
+                          완료
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="rounded-2xl border-2 border-destructive text-destructive"
+                          onClick={() => act.mutate({ id: b.id, patch: { status: "no_show" } })}
+                        >
+                          노쇼
+                        </Button>
+                      </>
+                    )}
                 </div>
               </Card>
             ))}
           </div>
         )}
       </Section>
+
+      {toTag.length > 0 && (
+        <Section title={`완료·노쇼 정리 (${toTag.length})`}>
+          <div className="space-y-2">
+            {toTag.map((b) => (
+              <Card key={b.id} className="flex items-center justify-between gap-3 py-3">
+                <div>
+                  <p className="font-bold">{fmtDateTime(b.start_at)}</p>
+                  <p className="text-sm text-muted-foreground">{names.get(b.member_id) ?? "회원"}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-2xl border-2"
+                    onClick={() => act.mutate({ id: b.id, patch: { status: "completed" } })}
+                  >
+                    완료
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-2xl border-2 border-destructive text-destructive"
+                    onClick={() => act.mutate({ id: b.id, patch: { status: "no_show" } })}
+                  >
+                    노쇼
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </Section>
+      )}
 
       <Section title={`가입 요청 (${requests.data?.length ?? 0})`}>
         {requests.isLoading ? (

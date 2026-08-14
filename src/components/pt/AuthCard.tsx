@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FieldLabel } from "@/components/pt/kit";
-import type { Role } from "@/lib/pt";
+import { getMe, type Role } from "@/lib/pt";
 
 const schema = z.object({
   email: z.string().trim().email({ message: "이메일 형식을 확인해 주세요" }).max(255),
@@ -15,7 +15,7 @@ const schema = z.object({
   full_name: z.string().trim().max(40).optional(),
 });
 
-export function AuthCard({ role }: { role: Role }) {
+export function AuthCard({ role, allowSignup = true }: { role: Role; allowSignup?: boolean }) {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,17 +25,21 @@ export function AuthCard({ role }: { role: Role }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  // 세션이 이미 있으면 역할 선택 없이 본인 역할의 홈으로 바로 이동한다.
   useEffect(() => {
     let alive = true;
-    supabase.auth.getSession().then(({ data }) => {
+    (async () => {
+      const { data } = await supabase.auth.getSession();
       if (!alive || !data.session) return;
+      const me = await getMe();
+      if (!alive || !me) return;
       queryClient.invalidateQueries({ queryKey: ["me"] });
-      navigate({ to: role === "trainer" ? "/trainer/home" : "/home", replace: true });
-    });
+      navigate({ to: me.role === "trainer" ? "/trainer/home" : "/home", replace: true });
+    })();
     return () => {
       alive = false;
     };
-  }, [navigate, queryClient, role]);
+  }, [navigate, queryClient]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -67,8 +71,9 @@ export function AuthCard({ role }: { role: Role }) {
         });
         if (error) throw error;
       }
+      const me = await getMe();
       await queryClient.invalidateQueries();
-      navigate({ to: role === "trainer" ? "/trainer/home" : "/home", replace: true });
+      navigate({ to: me?.role === "trainer" ? "/trainer/home" : "/home", replace: true });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "잠시 후 다시 시도해 주세요");
     } finally {
@@ -92,7 +97,7 @@ export function AuthCard({ role }: { role: Role }) {
 
   return (
     <form onSubmit={submit} className="rounded-2xl border border-border bg-card p-6 shadow-card">
-      <div className="mb-5 flex gap-2 rounded-2xl bg-secondary p-1">
+      <div className={"mb-5 flex gap-2 rounded-2xl bg-secondary p-1 " + (allowSignup ? "" : "hidden")}>
         {(["login", "signup"] as const).map((m) => (
           <button
             key={m}

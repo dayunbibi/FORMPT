@@ -32,8 +32,12 @@ function TrainerAuthPage() {
         </p>
 
         <div className="mt-8">
-          <AuthCard role="trainer" />
+          <AuthCard role="trainer" allowSignup={false} />
         </div>
+
+        <p className="mt-4 rounded-2xl border-2 border-dashed border-border-strong px-4 py-3 text-xs leading-relaxed text-muted-foreground">
+          트레이너 계정은 서비스 설정 시 1회 발급됩니다. 별도의 트레이너 회원가입은 제공하지 않습니다.
+        </p>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           회원이세요?{" "}

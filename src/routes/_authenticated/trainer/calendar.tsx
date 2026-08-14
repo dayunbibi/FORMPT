@@ -1,6 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, EmptyState, ListSkeleton, Section, StatusPill } from "@/components/pt/kit";
@@ -28,6 +32,23 @@ function TrainerCalendar() {
   const names = nameMap(members.data);
   const [cursor, setCursor] = useState(() => new Date());
   const [selected, setSelected] = useState(() => dayKey(new Date()));
+  const queryClient = useQueryClient();
+
+  // 지난 수업의 완료/노쇼는 트레이너가 직접 태깅한다 (자동 판정 없음).
+  const tag = useMutation({
+    mutationFn: async (input: { id: string; status: "completed" | "no_show" }) => {
+      const { error } = await supabase
+        .from("bookings")
+        .update({ status: input.status })
+        .eq("id", input.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trainer-bookings"] });
+      toast.success("예약 상태를 변경했습니다");
+    },
+    onError: () => toast.error("변경에 실패했습니다"),
+  });
 
   const byDay = useMemo(() => {
     const map = new Map<string, typeof bookings.data>();
@@ -154,7 +175,30 @@ function TrainerCalendar() {
                     {names.get(b.member_id) ?? "회원"} · {b.duration_min}분
                   </p>
                 </div>
-                <StatusPill tone={statusTone(b)}>{statusLabel(b)}</StatusPill>
+                <div className="flex items-center gap-2">
+                  <StatusPill tone={statusTone(b)}>{statusLabel(b)}</StatusPill>
+                  {b.status === "confirmed" &&
+                    +new Date(b.start_at) + b.duration_min * 60_000 < Date.now() && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="rounded-2xl border-2"
+                          onClick={() => tag.mutate({ id: b.id, status: "completed" })}
+                        >
+                          완료
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="rounded-2xl border-2 border-destructive text-destructive"
+                          onClick={() => tag.mutate({ id: b.id, status: "no_show" })}
+                        >
+                          노쇼
+                        </Button>
+                      </>
+                    )}
+                </div>
               </Card>
             ))}
           </div>
