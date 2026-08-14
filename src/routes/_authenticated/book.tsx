@@ -9,7 +9,8 @@ import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, EmptyState, ListSkeleton, Section } from "@/components/pt/kit";
 import { cn } from "@/lib/utils";
-import { dayKey, fetchSettings, fmtTime } from "@/lib/pt";
+import { dayKey, fetchSettings, fmtMonthDay, fmtMonthYear, fmtTime, weekdayNames } from "@/lib/pt";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/book")({
   head: () => ({
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/_authenticated/book")({
 });
 
 function BookPage() {
+  const { t } = useI18n();
   const me = useRoleGate("member");
   const queryClient = useQueryClient();
   const trainerId = me.data?.profile?.trainer_id ?? null;
@@ -62,9 +64,9 @@ function BookPage() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
       await queryClient.invalidateQueries({ queryKey: ["taken"] });
-      toast.success("예약 요청을 보냈습니다. 트레이너 승인 후 확정됩니다.");
+      toast.success(t("예약 요청을 보냈습니다. 트레이너 승인 후 확정됩니다."));
     },
-    onError: () => toast.error("예약에 실패했습니다"),
+    onError: () => toast.error(t("예약에 실패했습니다")),
   });
 
   const days = useMemo(() => {
@@ -100,13 +102,13 @@ function BookPage() {
 
   if (!trainerId) {
     return (
-      <AppShell title="예약하기" role="member">
+      <AppShell title={t("예약하기")} role="member">
         <EmptyState
-          title="담당 트레이너가 필요해요"
-          description="트레이너를 검색해 가입 요청을 보내고 승인되면 바로 예약할 수 있습니다."
+          title={t("담당 트레이너가 필요해요")}
+          description={t("트레이너를 검색해 가입 요청을 보내고 승인되면 바로 예약할 수 있습니다.")}
           action={
             <Button asChild className="rounded-2xl">
-              <Link to="/onboarding">트레이너 찾기</Link>
+              <Link to="/onboarding">{t("트레이너 찾기")}</Link>
             </Button>
           }
         />
@@ -115,27 +117,25 @@ function BookPage() {
   }
 
   const cutoffMs = (settings.data?.booking_cutoff_hours ?? 3) * 3600 * 1000;
+  const weekdays = weekdayNames();
 
   return (
-    <AppShell title="예약하기" subtitle="날짜를 고르고 가능한 시간을 선택하세요" role="member">
+    <AppShell title={t("예약하기")} subtitle={t("날짜를 고르고 가능한 시간을 선택하세요")} role="member">
       <p className="rounded-2xl border-2 border-dashed border-border-strong px-4 py-3 text-xs leading-relaxed text-muted-foreground">
-        시간을 선택하면 <span className="font-bold text-foreground">예약 신청</span> 상태로 접수되고, 트레이너가
-        승인하면 확정됩니다.
+        {t("시간을 선택하면")} <span className="font-bold text-foreground">{t("예약 신청")}</span> {t("상태로 접수되고, 트레이너가 승인하면 확정됩니다.")}
       </p>
       <Card className="space-y-4">
         <div className="flex items-center justify-between">
           <button
-            aria-label="이전 달"
+            aria-label={t("이전 달")}
             onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1))}
             className="flex size-9 items-center justify-center rounded-2xl border-2 border-border-strong"
           >
             <ChevronLeft className="size-4" />
           </button>
-          <p className="text-lg font-extrabold">
-            {cursor.getFullYear()}년 {cursor.getMonth() + 1}월
-          </p>
+          <p className="text-lg font-extrabold">{fmtMonthYear(cursor)}</p>
           <button
-            aria-label="다음 달"
+            aria-label={t("다음 달")}
             onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1))}
             className="flex size-9 items-center justify-center rounded-2xl border-2 border-border-strong"
           >
@@ -144,8 +144,8 @@ function BookPage() {
         </div>
 
         <div className="grid grid-cols-7 gap-1 text-center text-xs font-bold text-muted-foreground">
-          {["일", "월", "화", "수", "목", "금", "토"].map((d) => (
-            <span key={d}>{d}</span>
+          {weekdays.map((d, i) => (
+            <span key={i}>{d}</span>
           ))}
         </div>
         <div className="grid grid-cols-7 gap-1">
@@ -176,19 +176,22 @@ function BookPage() {
         </div>
         {settings.data && (
           <p className="text-xs text-muted-foreground">
-            수업 {settings.data.session_minutes}분 · 예약 마감 {settings.data.booking_cutoff_hours}시간
-            전 · 휴무 요일 {settings.data.closed_weekdays.map((w) => "일월화수목금토"[w]).join(", ") || "없음"}
+            {t("수업 {min}분 · 예약 마감 {hours}시간 전 · 휴무 요일 {days}", {
+              min: settings.data.session_minutes,
+              hours: settings.data.booking_cutoff_hours,
+              days: settings.data.closed_weekdays.map((w) => weekdays[w]).join(", ") || t("없음"),
+            })}
           </p>
         )}
       </Card>
 
-      <Section title={selected ? `${selected.getMonth() + 1}월 ${selected.getDate()}일 가능한 시간` : "시간 선택"}>
+      <Section title={selected ? t("{date} 가능한 시간", { date: fmtMonthDay(selected) }) : t("시간 선택")}>
         {!selected ? (
-          <EmptyState title="날짜를 먼저 선택해 주세요" description="캘린더에서 원하는 날짜를 탭하면 가능한 시간이 표시됩니다." />
+          <EmptyState title={t("날짜를 먼저 선택해 주세요")} description={t("캘린더에서 원하는 날짜를 탭하면 가능한 시간이 표시됩니다.")} />
         ) : settings.isLoading || taken.isLoading ? (
           <ListSkeleton rows={2} />
         ) : slots.length === 0 ? (
-          <EmptyState title="이 날은 운영하지 않아요" description="다른 날짜를 선택해 주세요." />
+          <EmptyState title={t("이 날은 운영하지 않아요")} description={t("다른 날짜를 선택해 주세요.")} />
         ) : (
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
             {slots.map((slot) => {

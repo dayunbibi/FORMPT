@@ -8,10 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FieldLabel } from "@/components/pt/kit";
 import { getMe, type Role } from "@/lib/pt";
+import { useI18n, tr } from "@/lib/i18n";
+import { LangToggle } from "@/components/pt/LangToggle";
 
-const schema = z.object({
-  email: z.string().trim().email({ message: "이메일 형식을 확인해 주세요" }).max(255),
-  password: z.string().min(6, { message: "비밀번호는 6자 이상이어야 합니다" }).max(72),
+const schema = () => z.object({
+  email: z.string().trim().email({ message: tr("이메일 형식을 확인해 주세요") }).max(255),
+  password: z.string().min(6, { message: tr("비밀번호는 6자 이상이어야 합니다") }).max(72),
   full_name: z.string().trim().max(40).optional(),
 });
 
@@ -33,6 +35,7 @@ export function AuthCard({ role, allowSignup = true }: { role: Role; allowSignup
   const [sentMail, setSentMail] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { t } = useI18n();
 
   // 세션이 이미 있으면 역할 선택 없이 본인 역할의 홈으로 바로 이동한다.
   useEffect(() => {
@@ -57,9 +60,9 @@ export function AuthCard({ role, allowSignup = true }: { role: Role; allowSignup
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const parsed = schema.safeParse({ email, password, full_name: fullName });
+    const parsed = schema().safeParse({ email, password, full_name: fullName });
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? "입력값을 확인해 주세요");
+      toast.error(parsed.error.issues[0]?.message ?? t("입력값을 확인해 주세요"));
       return;
     }
     setBusy(true);
@@ -94,7 +97,7 @@ export function AuthCard({ role, allowSignup = true }: { role: Role; allowSignup
       await queryClient.invalidateQueries();
       navigate({ to: me?.role === "trainer" ? "/trainer/home" : "/home", replace: true });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "잠시 후 다시 시도해 주세요");
+      toast.error(error instanceof Error ? error.message : t("잠시 후 다시 시도해 주세요"));
     } finally {
       setBusy(false);
     }
@@ -103,12 +106,12 @@ export function AuthCard({ role, allowSignup = true }: { role: Role; allowSignup
   if (sentMail) {
     return (
       <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
-        <h2 className="text-xl">메일함을 확인해 주세요</h2>
+        <h2 className="text-xl">{t("메일함을 확인해 주세요")}</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          {email} 으로 인증 메일을 보냈습니다. 링크를 누르면 가입이 완료되고 바로 로그인됩니다.
+          {t("{email} 으로 인증 메일을 보냈습니다. 링크를 누르면 가입이 완료되고 바로 로그인됩니다.", { email })}
         </p>
         <Button className="mt-5 w-full rounded-2xl" variant="outline" onClick={() => setSentMail(false)}>
-          다른 계정으로 시도
+          {t("다른 계정으로 시도")}
         </Button>
       </div>
     );
@@ -127,26 +130,26 @@ export function AuthCard({ role, allowSignup = true }: { role: Role; allowSignup
               (mode === m ? "bg-ink text-ink-foreground" : "text-muted-foreground")
             }
           >
-            {m === "login" ? "로그인" : "회원가입"}
+            {m === "login" ? t("로그인") : t("회원가입")}
           </button>
         ))}
       </div>
 
       {mode === "signup" && (
         <div className="mb-4">
-          <FieldLabel htmlFor="full_name">이름</FieldLabel>
+          <FieldLabel htmlFor="full_name">{t("이름")}</FieldLabel>
           <Input
             id="full_name"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            placeholder="홍길동"
+            placeholder={t("홍길동")}
             className="rounded-2xl"
           />
         </div>
       )}
 
       <div className="mb-4">
-        <FieldLabel htmlFor="email">이메일</FieldLabel>
+        <FieldLabel htmlFor="email">{t("이메일")}</FieldLabel>
         <Input
           id="email"
           type="email"
@@ -159,20 +162,20 @@ export function AuthCard({ role, allowSignup = true }: { role: Role; allowSignup
       </div>
 
       <div className="mb-6">
-        <FieldLabel htmlFor="password">비밀번호</FieldLabel>
+        <FieldLabel htmlFor="password">{t("비밀번호")}</FieldLabel>
         <Input
           id="password"
           type="password"
           autoComplete={mode === "login" ? "current-password" : "new-password"}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="6자 이상"
+          placeholder={t("6자 이상")}
           className="rounded-2xl"
         />
       </div>
 
       <Button type="submit" disabled={busy} className="w-full rounded-2xl py-6 text-base font-extrabold">
-        {busy ? "잠시만요..." : mode === "login" ? "로그인" : "가입하고 시작하기"}
+        {busy ? t("잠시만요...") : mode === "login" ? t("로그인") : t("가입하고 시작하기")}
       </Button>
     </form>
   );

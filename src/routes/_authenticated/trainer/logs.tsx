@@ -18,6 +18,7 @@ import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, EmptyState, Field, ListSkeleton, Section } from "@/components/pt/kit";
 import { dayKey, useMyMembers } from "@/lib/pt";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/trainer/logs")({
   head: () => ({
@@ -35,6 +36,7 @@ type Row = { exercise: string; weight: string; reps: string; sets: string };
 const emptyRow: Row = { exercise: "", weight: "", reps: "", sets: "" };
 
 function LogsPage() {
+  const { t } = useI18n();
   const me = useRoleGate("trainer");
   const trainerId = me.data?.user.id;
   const members = useMyMembers(trainerId);
@@ -77,9 +79,9 @@ function LogsPage() {
       queryClient.invalidateQueries({ queryKey: ["my-logs"] });
       setRows([{ ...emptyRow }]);
       setFeedback("");
-      toast.success("운동기록을 저장했습니다");
+      toast.success(t("운동기록을 저장했습니다"));
     },
-    onError: () => toast.error("저장에 실패했습니다"),
+    onError: () => toast.error(t("저장에 실패했습니다")),
   });
 
   function update(index: number, patch: Partial<Row>) {
@@ -91,7 +93,7 @@ function LogsPage() {
 
   if (members.isLoading) {
     return (
-      <AppShell title="운동기록 작성" role="trainer">
+      <AppShell title={t("운동기록 작성")} role="trainer">
         <ListSkeleton rows={3} />
       </AppShell>
     );
@@ -99,13 +101,13 @@ function LogsPage() {
 
   if (list.length === 0) {
     return (
-      <AppShell title="운동기록 작성" role="trainer">
+      <AppShell title={t("운동기록 작성")} role="trainer">
         <EmptyState
-          title="기록할 회원이 없어요"
-          description="가입 요청을 승인해 회원을 연결하면 기록을 작성할 수 있습니다."
+          title={t("기록할 회원이 없어요")}
+          description={t("가입 요청을 승인해 회원을 연결하면 기록을 작성할 수 있습니다.")}
           action={
             <Button asChild className="rounded-2xl">
-              <Link to="/trainer/home">가입 요청 확인</Link>
+              <Link to="/trainer/home">{t("가입 요청 확인")}</Link>
             </Button>
           }
         />
@@ -114,12 +116,12 @@ function LogsPage() {
   }
 
   return (
-    <AppShell title="운동기록 작성" subtitle="회원 선택 후 종목을 추가하세요" role="trainer">
+    <AppShell title={t("운동기록 작성")} subtitle={t("회원 선택 후 종목을 추가하세요")} role="trainer">
       <Card className="space-y-4">
-        <Field label="회원">
+        <Field label={t("회원")}>
           <Select value={memberId} onValueChange={setMemberId}>
             <SelectTrigger className="rounded-2xl border-2">
-              <SelectValue placeholder="회원을 선택하세요" />
+              <SelectValue placeholder={t("회원을 선택하세요")} />
             </SelectTrigger>
             <SelectContent>
               {list.map((m) => (
@@ -130,13 +132,13 @@ function LogsPage() {
             </SelectContent>
           </Select>
         </Field>
-        <Field label="운동 날짜" htmlFor="log-date">
+        <Field label={t("운동 날짜")} htmlFor="log-date">
           <Input id="log-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
         </Field>
       </Card>
 
       <Section
-        title={`운동 항목 (${rows.length})`}
+        title={t("운동 항목 ({n})", { n: rows.length })}
         action={
           <Button
             size="sm"
@@ -144,7 +146,7 @@ function LogsPage() {
             className="rounded-2xl border-2"
             onClick={() => setRows((prev) => [...prev, { ...emptyRow }])}
           >
-            <Plus className="size-4" /> 추가
+            <Plus className="size-4" /> {t("추가")}
           </Button>
         }
       >
@@ -152,10 +154,10 @@ function LogsPage() {
           {rows.map((row, i) => (
             <Card key={i} className="space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-extrabold">항목 {i + 1}</p>
+                <p className="text-sm font-extrabold">{t("항목 {n}", { n: i + 1 })}</p>
                 {rows.length > 1 && (
                   <button
-                    aria-label="항목 삭제"
+                    aria-label={t("항목 삭제")}
                     onClick={() => setRows((prev) => prev.filter((_, idx) => idx !== i))}
                     className="text-muted-foreground hover:text-destructive"
                   >
@@ -163,16 +165,16 @@ function LogsPage() {
                   </button>
                 )}
               </div>
-              <Field label="운동 이름" htmlFor={`ex-${i}`}>
+              <Field label={t("운동 이름")} htmlFor={`ex-${i}`}>
                 <Input
                   id={`ex-${i}`}
-                  placeholder="벤치프레스"
+                  placeholder={t("벤치프레스")}
                   value={row.exercise}
                   onChange={(e) => update(i, { exercise: e.target.value })}
                 />
               </Field>
               <div className="grid grid-cols-3 gap-2">
-                <Field label="무게(kg)" htmlFor={`w-${i}`}>
+                <Field label={t("무게(kg)")} htmlFor={`w-${i}`}>
                   <Input
                     id={`w-${i}`}
                     type="number"
@@ -180,7 +182,7 @@ function LogsPage() {
                     onChange={(e) => update(i, { weight: e.target.value })}
                   />
                 </Field>
-                <Field label="횟수" htmlFor={`r-${i}`}>
+                <Field label={t("횟수")} htmlFor={`r-${i}`}>
                   <Input
                     id={`r-${i}`}
                     type="number"
@@ -188,7 +190,7 @@ function LogsPage() {
                     onChange={(e) => update(i, { reps: e.target.value })}
                   />
                 </Field>
-                <Field label="세트" htmlFor={`s-${i}`}>
+                <Field label={t("세트")} htmlFor={`s-${i}`}>
                   <Input
                     id={`s-${i}`}
                     type="number"
@@ -203,17 +205,17 @@ function LogsPage() {
       </Section>
 
       <Card className="space-y-4">
-        <Field label="트레이너 피드백" htmlFor="feedback">
+        <Field label={t("트레이너 피드백")} htmlFor="feedback">
           <Textarea
             id="feedback"
             rows={4}
-            placeholder="자세와 다음 목표를 적어주세요"
+            placeholder={t("자세와 다음 목표를 적어주세요")}
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
           />
         </Field>
         <Button className="w-full rounded-2xl" disabled={!canSave} onClick={() => save.mutate()}>
-          {save.isPending ? "저장 중..." : "기록 저장"}
+          {save.isPending ? t("저장 중...") : t("기록 저장")}
         </Button>
       </Card>
     </AppShell>

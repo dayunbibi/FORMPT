@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, EmptyState, ListSkeleton, Section, StatCard, StatSkeleton, StatusPill } from "@/components/pt/kit";
+import { useI18n } from "@/lib/i18n";
 import {
   dayKey,
   fmtDateTime,
@@ -47,6 +48,7 @@ export function useTrainerBookings(trainerId?: string) {
 }
 
 function TrainerHome() {
+  const { t } = useI18n();
   const me = useRoleGate("trainer");
   const trainerId = me.data?.user.id;
   const queryClient = useQueryClient();
@@ -83,9 +85,9 @@ function TrainerHome() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["join-requests"] });
       queryClient.invalidateQueries({ queryKey: ["trainer-members"] });
-      toast.success("처리했습니다");
+      toast.success(t("처리했습니다"));
     },
-    onError: () => toast.error("처리에 실패했습니다"),
+    onError: () => toast.error(t("처리에 실패했습니다")),
   });
 
   const act = useMutation({
@@ -95,9 +97,9 @@ function TrainerHome() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trainer-bookings"] });
-      toast.success("예약 상태를 변경했습니다");
+      toast.success(t("예약 상태를 변경했습니다"));
     },
-    onError: () => toast.error("변경에 실패했습니다"),
+    onError: () => toast.error(t("변경에 실패했습니다")),
   });
 
   const requestNames = names;
@@ -117,28 +119,28 @@ function TrainerHome() {
   );
 
   return (
-    <AppShell title="오늘의 운영" subtitle={me.data?.profile?.full_name ?? ""} role="trainer">
+    <AppShell title={t("오늘의 운영")} subtitle={me.data?.profile?.full_name ?? ""} role="trainer">
       {bookings.isLoading ? (
         <StatSkeleton />
       ) : (
         <div className="grid grid-cols-2 gap-3">
-          <StatCard label="처리 대기" value={pending.length + cancelReq.length} unit="건" hint="승인·취소요청" />
-          <StatCard label="오늘 수업" value={today.length} unit="건" hint="취소 제외" />
+          <StatCard label={t("처리 대기")} value={pending.length + cancelReq.length} unit={t("건")} hint={t("승인·취소요청")} />
+          <StatCard label={t("오늘 수업")} value={today.length} unit={t("건")} hint={t("취소 제외")} />
         </div>
       )}
 
-      <Section title={`승인 대기 (${pending.length})`}>
+      <Section title={t("승인 대기 ({n})", { n: pending.length })}>
         {bookings.isLoading ? (
           <ListSkeleton rows={2} />
         ) : pending.length === 0 ? (
-          <EmptyState title="대기 중인 예약이 없어요" description="새 예약 요청이 오면 여기에 표시됩니다." />
+          <EmptyState title={t("대기 중인 예약이 없어요")} description={t("새 예약 요청이 오면 여기에 표시됩니다.")} />
         ) : (
           <div className="space-y-3">
             {pending.map((b) => (
               <Card key={b.id} className="space-y-3">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-extrabold">{names.get(b.member_id) ?? "회원"}</p>
+                    <p className="font-extrabold">{names.get(b.member_id) ?? t("회원")}</p>
                     <p className="text-sm text-muted-foreground">{fmtDateTime(b.start_at)}</p>
                   </div>
                   <StatusPill tone={statusTone(b)}>{statusLabel(b)}</StatusPill>
@@ -148,14 +150,14 @@ function TrainerHome() {
                     className="flex-1 rounded-2xl"
                     onClick={() => act.mutate({ id: b.id, patch: { status: "confirmed" } })}
                   >
-                    승인
+                    {t("승인")}
                   </Button>
                   <Button
                     variant="outline"
                     className="flex-1 rounded-2xl border-2"
                     onClick={() => act.mutate({ id: b.id, patch: { status: "cancelled" } })}
                   >
-                    거절
+                    {t("거절")}
                   </Button>
                 </div>
               </Card>
@@ -165,16 +167,16 @@ function TrainerHome() {
       </Section>
 
       {cancelReq.length > 0 && (
-        <Section title={`취소 요청 (${cancelReq.length})`}>
+        <Section title={t("취소 요청 ({n})", { n: cancelReq.length })}>
           <div className="space-y-3">
             {cancelReq.map((b) => (
               <Card key={b.id} className="space-y-3">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-extrabold">{names.get(b.member_id) ?? "회원"}</p>
+                    <p className="font-extrabold">{names.get(b.member_id) ?? t("회원")}</p>
                     <p className="text-sm text-muted-foreground">{fmtDateTime(b.start_at)}</p>
                   </div>
-                  <StatusPill tone="warn">취소요청</StatusPill>
+                  <StatusPill tone="warn">{t("취소요청")}</StatusPill>
                 </div>
                 <div className="flex gap-2">
                   <Button
@@ -186,14 +188,14 @@ function TrainerHome() {
                       })
                     }
                   >
-                    취소 승인
+                    {t("취소 승인")}
                   </Button>
                   <Button
                     variant="outline"
                     className="flex-1 rounded-2xl border-2"
                     onClick={() => act.mutate({ id: b.id, patch: { cancel_requested: false } })}
                   >
-                    유지
+                    {t("유지")}
                   </Button>
                 </div>
               </Card>
@@ -202,16 +204,16 @@ function TrainerHome() {
         </Section>
       )}
 
-      <Section title={`오늘 예약된 수업 (${today.length})`}>
+      <Section title={t("오늘 예약된 수업 ({n})", { n: today.length })}>
         {bookings.isLoading ? (
           <ListSkeleton rows={2} />
         ) : today.length === 0 ? (
           <EmptyState
-            title="오늘 수업이 없어요"
-            description="캘린더에서 이번 달 일정을 확인해 보세요."
+            title={t("오늘 수업이 없어요")}
+            description={t("캘린더에서 이번 달 일정을 확인해 보세요.")}
             action={
               <Button asChild variant="outline" className="rounded-2xl border-2">
-                <Link to="/trainer/calendar">캘린더 보기</Link>
+                <Link to="/trainer/calendar">{t("캘린더 보기")}</Link>
               </Button>
             }
           />
@@ -221,7 +223,7 @@ function TrainerHome() {
               <Card key={b.id} className="flex items-center justify-between gap-3 py-3">
                 <div>
                   <p className="font-bold">{fmtTime(b.start_at)}</p>
-                  <p className="text-sm text-muted-foreground">{names.get(b.member_id) ?? "회원"}</p>
+                  <p className="text-sm text-muted-foreground">{names.get(b.member_id) ?? t("회원")}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <StatusPill tone={statusTone(b)}>{statusLabel(b)}</StatusPill>
@@ -234,7 +236,7 @@ function TrainerHome() {
                           className="rounded-2xl border-2"
                           onClick={() => act.mutate({ id: b.id, patch: { status: "completed" } })}
                         >
-                          완료
+                          {t("완료")}
                         </Button>
                         <Button
                           size="sm"
@@ -242,7 +244,7 @@ function TrainerHome() {
                           className="rounded-2xl border-2 border-destructive text-destructive"
                           onClick={() => act.mutate({ id: b.id, patch: { status: "no_show" } })}
                         >
-                          노쇼
+                          {t("노쇼")}
                         </Button>
                       </>
                     )}
@@ -254,13 +256,13 @@ function TrainerHome() {
       </Section>
 
       {toTag.length > 0 && (
-        <Section title={`완료·노쇼 정리 (${toTag.length})`}>
+        <Section title={t("완료·노쇼 정리 ({n})", { n: toTag.length })}>
           <div className="space-y-2">
             {toTag.map((b) => (
               <Card key={b.id} className="flex items-center justify-between gap-3 py-3">
                 <div>
                   <p className="font-bold">{fmtDateTime(b.start_at)}</p>
-                  <p className="text-sm text-muted-foreground">{names.get(b.member_id) ?? "회원"}</p>
+                  <p className="text-sm text-muted-foreground">{names.get(b.member_id) ?? t("회원")}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
@@ -269,7 +271,7 @@ function TrainerHome() {
                     className="rounded-2xl border-2"
                     onClick={() => act.mutate({ id: b.id, patch: { status: "completed" } })}
                   >
-                    완료
+                    {t("완료")}
                   </Button>
                   <Button
                     size="sm"
@@ -277,7 +279,7 @@ function TrainerHome() {
                     className="rounded-2xl border-2 border-destructive text-destructive"
                     onClick={() => act.mutate({ id: b.id, patch: { status: "no_show" } })}
                   >
-                    노쇼
+                    {t("노쇼")}
                   </Button>
                 </div>
               </Card>
@@ -286,17 +288,17 @@ function TrainerHome() {
         </Section>
       )}
 
-      <Section title={`가입 요청 (${requests.data?.length ?? 0})`}>
+      <Section title={t("가입 요청 ({n})", { n: requests.data?.length ?? 0 })}>
         {requests.isLoading ? (
           <ListSkeleton rows={1} />
         ) : (requests.data ?? []).length === 0 ? (
-          <EmptyState title="새 가입 요청이 없어요" description="회원이 검색으로 요청을 보내면 여기에 표시됩니다." />
+          <EmptyState title={t("새 가입 요청이 없어요")} description={t("회원이 검색으로 요청을 보내면 여기에 표시됩니다.")} />
         ) : (
           <div className="space-y-3">
             {(requests.data ?? []).map((r) => (
               <Card key={r.id} className="space-y-3">
                 <div>
-                  <p className="font-extrabold">{requestNames.get(r.member_id) ?? "회원"}</p>
+                  <p className="font-extrabold">{requestNames.get(r.member_id) ?? t("회원")}</p>
                   {r.message && <p className="text-sm text-muted-foreground">{r.message}</p>}
                 </div>
                 <div className="flex gap-2">
@@ -304,14 +306,14 @@ function TrainerHome() {
                     className="flex-1 rounded-2xl"
                     onClick={() => decide.mutate({ id: r.id, memberId: r.member_id, approve: true })}
                   >
-                    승인
+                    {t("승인")}
                   </Button>
                   <Button
                     variant="outline"
                     className="flex-1 rounded-2xl border-2"
                     onClick={() => decide.mutate({ id: r.id, memberId: r.member_id, approve: false })}
                   >
-                    거절
+                    {t("거절")}
                   </Button>
                 </div>
               </Card>

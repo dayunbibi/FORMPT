@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { getLocale, tr } from "@/lib/i18n";
+import type { CurrencyCode } from "@/lib/money";
 
 export type Role = "member" | "trainer";
 export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed" | "no_show";
@@ -37,6 +39,7 @@ export type Settings = {
   cancel_cutoff_hours: number;
   closed_weekdays: number[];
   holidays: string[];
+  default_currency: CurrencyCode;
 };
 
 export const DEFAULT_SETTINGS: Omit<Settings, "trainer_id"> = {
@@ -47,6 +50,7 @@ export const DEFAULT_SETTINGS: Omit<Settings, "trainer_id"> = {
   cancel_cutoff_hours: 12,
   closed_weekdays: [0],
   holidays: [],
+  default_currency: "KRW",
 };
 
 /** 로그인 사용자 + 프로필 + 역할. 최초 로그인 시 프로필/역할 행을 자동 생성한다. */
@@ -75,7 +79,7 @@ export async function getMe() {
       .from("profiles")
       .insert({
         id: user.id,
-        full_name: meta.full_name ?? (user.email?.split("@")[0] ?? "회원"),
+        full_name: meta.full_name ?? (user.email?.split("@")[0] ?? tr("회원")),
         onboarded: role === "trainer",
       })
       .select("*")
@@ -126,7 +130,7 @@ export async function fetchRemaining(memberId: string) {
 }
 
 export function fmtDate(iso: string) {
-  return new Date(iso).toLocaleDateString("ko-KR", {
+  return new Date(iso).toLocaleDateString(getLocale(), {
     month: "long",
     day: "numeric",
     weekday: "short",
@@ -134,11 +138,31 @@ export function fmtDate(iso: string) {
 }
 
 export function fmtTime(iso: string) {
-  return new Date(iso).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+  return new Date(iso).toLocaleTimeString(getLocale(), { hour: "2-digit", minute: "2-digit" });
 }
 
 export function fmtDateTime(iso: string) {
   return `${fmtDate(iso)} ${fmtTime(iso)}`;
+}
+
+/** 언어에 맞춘 "8월 14일" / "August 14" 형식 */
+export function fmtMonthDay(d: Date) {
+  return d.toLocaleDateString(getLocale(), { month: "long", day: "numeric" });
+}
+
+/** 언어에 맞춘 "2026년 8월" / "August 2026" 형식 */
+export function fmtMonthYear(d: Date) {
+  return d.toLocaleDateString(getLocale(), { month: "long", year: "numeric" });
+}
+
+/** 요일 짧은 이름 (0=일요일) */
+export function weekdayShort(weekday: number) {
+  const d = new Date(2024, 8, 1 + weekday); // 2024-09-01 은 일요일
+  return d.toLocaleDateString(getLocale(), { weekday: "short" });
+}
+
+export function weekdayNames() {
+  return [0, 1, 2, 3, 4, 5, 6].map(weekdayShort);
 }
 
 export function dayKey(d: Date) {
@@ -146,14 +170,16 @@ export function dayKey(d: Date) {
 }
 
 export function statusLabel(b: Pick<Booking, "status" | "cancel_requested">) {
-  if (b.cancel_requested && b.status === "confirmed") return "취소요청";
-  return {
-    pending: "승인대기",
-    confirmed: "확정",
-    cancelled: "취소완료",
-    completed: "수업완료",
-    no_show: "노쇼",
-  }[b.status];
+  if (b.cancel_requested && b.status === "confirmed") return tr("취소요청");
+  return tr(
+    {
+      pending: "승인대기",
+      confirmed: "확정",
+      cancelled: "취소완료",
+      completed: "수업완료",
+      no_show: "노쇼",
+    }[b.status],
+  );
 }
 
 export function statusTone(b: Pick<Booking, "status" | "cancel_requested">) {

@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, EmptyState, ListSkeleton, Section, StatCard, StatSkeleton, StatusPill } from "@/components/pt/kit";
-import { nameMap, useMyMembers } from "@/lib/pt";
+import { fmtMonthYear, nameMap, useMyMembers } from "@/lib/pt";
+import { useI18n } from "@/lib/i18n";
 import { useTrainerBookings } from "./home";
 
 export const Route = createFileRoute("/_authenticated/trainer/dashboard")({
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/_authenticated/trainer/dashboard")({
 });
 
 function DashboardPage() {
+  const { t } = useI18n();
   const me = useRoleGate("trainer");
   const trainerId = me.data?.user.id;
   const bookings = useTrainerBookings(trainerId);
@@ -59,37 +61,37 @@ function DashboardPage() {
     .sort((a, b) => a.remaining - b.remaining);
 
   return (
-    <AppShell title="대시보드" subtitle={`${now.getMonth() + 1}월 운영 현황`} role="trainer">
+    <AppShell title={t("대시보드")} subtitle={t("{month} 운영 현황", { month: fmtMonthYear(now) })} role="trainer">
       {bookings.isLoading ? (
         <StatSkeleton />
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3">
-            <StatCard label="이번 달 수업" value={done} unit="회" hint={`예약 ${thisMonth.length}건`} />
-            <StatCard label="노쇼율" value={rate} unit="%" hint={`노쇼 ${noShow}회`} />
+            <StatCard label={t("이번 달 수업")} value={done} unit={t("회")} hint={t("예약 {n}건", { n: thisMonth.length })} />
+            <StatCard label={t("노쇼율")} value={rate} unit="%" hint={t("노쇼 {n}회", { n: noShow })} />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <StatCard label="담당 회원" value={members.data?.length ?? 0} unit="명" />
-            <StatCard label="재등록 임박" value={renewSoon.length} unit="명" hint="남은 2회 이하" />
+            <StatCard label={t("담당 회원")} value={members.data?.length ?? 0} unit={t("명")} />
+            <StatCard label={t("재등록 임박")} value={renewSoon.length} unit={t("명")} hint={t("남은 2회 이하")} />
           </div>
         </>
       )}
 
-      <Section title="재등록 임박 회원">
+      <Section title={t("재등록 임박 회원")}>
         {members.isLoading || credits.isLoading ? (
           <ListSkeleton rows={2} />
         ) : renewSoon.length === 0 ? (
-          <EmptyState title="임박한 회원이 없어요" description="남은 횟수가 2회 이하가 되면 여기에 표시됩니다." />
+          <EmptyState title={t("임박한 회원이 없어요")} description={t("남은 횟수가 2회 이하가 되면 여기에 표시됩니다.")} />
         ) : (
           <div className="space-y-2">
             {renewSoon.map((row) => (
               <Card key={row.member.id} className="flex items-center justify-between gap-3 py-3">
                 <div>
                   <p className="font-bold">{names.get(row.member.id) ?? row.member.full_name}</p>
-                  <p className="text-sm text-muted-foreground">{row.member.phone ?? "연락처 미등록"}</p>
+                  <p className="text-sm text-muted-foreground">{row.member.phone ?? t("연락처 미등록")}</p>
                 </div>
                 <StatusPill tone={row.remaining <= 0 ? "danger" : "warn"}>
-                  남은 {row.remaining}회
+                  {t("남은 {n}회", { n: row.remaining })}
                 </StatusPill>
               </Card>
             ))}
