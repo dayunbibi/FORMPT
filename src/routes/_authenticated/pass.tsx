@@ -22,10 +22,22 @@ export const Route = createFileRoute("/_authenticated/pass")({
 type Entry = {
   id: string;
   delta: number;
-  reason: string;
-  amount_krw: number | null;
+  kind: string;
+  note: string | null;
+  amount_paid: number | null;
   created_at: string;
 };
+
+const KIND_LABEL: Record<string, string> = {
+  charge: "이용권 충전",
+  deduct: "수업 차감",
+  adjust: "횟수 조정",
+  refund: "환불",
+};
+
+function label(e: Entry) {
+  return e.note?.trim() || KIND_LABEL[e.kind] || e.kind;
+}
 
 function PassPage() {
   const me = useRoleGate("member");
@@ -35,7 +47,7 @@ function PassPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("credit_entries")
-        .select("id, delta, reason, amount_krw, created_at")
+        .select("id, delta, kind, note, amount_paid, created_at")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as Entry[];
@@ -47,7 +59,7 @@ function PassPage() {
   const remaining = list.reduce((sum, e) => sum + e.delta, 0);
   const charged = list.filter((e) => e.delta > 0).reduce((s, e) => s + e.delta, 0);
   const used = charged - remaining;
-  const payments = list.filter((e) => (e.amount_krw ?? 0) > 0);
+  const payments = list.filter((e) => (e.amount_paid ?? 0) > 0);
 
   return (
     <AppShell title="이용권" subtitle="남은 횟수와 사용 이력" role="member">
@@ -78,7 +90,7 @@ function PassPage() {
             {list.map((e) => (
               <Card key={e.id} className="flex items-center justify-between gap-3 py-3">
                 <div>
-                  <p className="text-sm font-bold">{e.reason}</p>
+                  <p className="text-sm font-bold">{label(e)}</p>
                   <p className="text-xs text-muted-foreground">{fmtDate(e.created_at)}</p>
                 </div>
                 <p
@@ -104,13 +116,13 @@ function PassPage() {
             {payments.map((e) => (
               <Card key={e.id} className="flex items-center justify-between gap-3 py-3">
                 <div>
-                  <p className="text-sm font-bold">{e.reason}</p>
+                  <p className="text-sm font-bold">{label(e)}</p>
                   <p className="text-xs text-muted-foreground">
                     {fmtDate(e.created_at)} · {e.delta}회 충전
                   </p>
                 </div>
                 <p className="text-base font-extrabold">
-                  {(e.amount_krw ?? 0).toLocaleString("ko-KR")}원
+                  {(e.amount_paid ?? 0).toLocaleString("ko-KR")}원
                 </p>
               </Card>
             ))}
