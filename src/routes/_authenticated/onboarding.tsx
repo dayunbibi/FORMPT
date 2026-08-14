@@ -47,10 +47,8 @@ function OnboardingPage() {
   const trainers = useQuery({
     queryKey: ["trainer-directory"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, full_name")
-        .order("full_name");
+      // 이름만 반환하는 전용 함수 사용 (다른 트레이너의 연락처·부상이력은 노출되지 않음)
+      const { data, error } = await supabase.rpc("list_trainers");
       if (error) throw error;
       return (data ?? []).filter((t) => t.id !== me.data?.user.id);
     },
