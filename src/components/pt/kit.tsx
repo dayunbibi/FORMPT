@@ -8,10 +8,10 @@ export function Section({
   children,
   className,
 }: {
-  title?: string;
-  action?: ReactNode;
+  title?: string | undefined;
+  action?: ReactNode | undefined;
   children: ReactNode;
-  className?: string;
+  className?: string | undefined;
 }) {
   return (
     <section className={cn("space-y-3", className)}>
@@ -32,8 +32,8 @@ export function Card({
   dark,
 }: {
   children: ReactNode;
-  className?: string;
-  dark?: boolean;
+  className?: string | undefined;
+  dark?: boolean | undefined;
 }) {
   return (
     <div
@@ -58,9 +58,9 @@ export function StatCard({
 }: {
   label: string;
   value: string | number;
-  unit?: string;
-  hint?: string;
-  className?: string;
+  unit?: string | undefined;
+  hint?: string | undefined;
+  className?: string | undefined;
 }) {
   return (
     <Card dark className={cn("flex flex-col gap-1", className)}>
@@ -106,7 +106,7 @@ export function EmptyState({
 }: {
   title: string;
   description: string;
-  action?: ReactNode;
+  action?: ReactNode | undefined;
 }) {
   return (
     <div className="rounded-2xl border-2 border-dashed border-border-strong bg-card/60 px-6 py-10 text-center">

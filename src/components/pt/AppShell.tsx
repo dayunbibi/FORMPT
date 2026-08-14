@@ -41,10 +41,10 @@ export function AppShell({
   banner,
 }: {
   title: string;
-  subtitle?: string;
+  subtitle?: string | undefined;
   role: Role;
   children: ReactNode;
-  banner?: ReactNode;
+  banner?: ReactNode | undefined;
 }) {
   const nav = role === "trainer" ? trainerNav : memberNav;
   const pathname = useRouterState({ select: (s) => s.location.pathname });

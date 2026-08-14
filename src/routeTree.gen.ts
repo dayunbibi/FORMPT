@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as TrainerLoginRouteImport } from './routes/trainer-login'
+import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 
 const IndexRoute = IndexRouteImport.update({
@@ -28,6 +29,11 @@ const TrainerLoginRoute = TrainerLoginRouteImport.update({
   path: '/trainer-login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -37,11 +43,13 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/trainer-login': typeof TrainerLoginRoute
+  '/home': typeof AuthenticatedHomeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/trainer-login': typeof TrainerLoginRoute
+  '/home': typeof AuthenticatedHomeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
 }
 export interface FileRoutesById {
@@ -49,18 +57,20 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/trainer-login': typeof TrainerLoginRoute
+  '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/trainer-login' | '/onboarding'
+  fullPaths: '/' | '/trainer-login' | '/home' | '/onboarding'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/trainer-login' | '/onboarding'
+  to: '/' | '/trainer-login' | '/home' | '/onboarding'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/trainer-login'
+    | '/_authenticated/home'
     | '/_authenticated/onboarding'
   fileRoutesById: FileRoutesById
 }
@@ -93,6 +103,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrainerLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/home': {
+      id: '/_authenticated/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AuthenticatedHomeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/onboarding': {
       id: '/_authenticated/onboarding'
       path: '/onboarding'
@@ -104,10 +121,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
 }
 
