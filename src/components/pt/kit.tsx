@@ -150,3 +150,24 @@ export function FieldLabel({ children, htmlFor }: { children: ReactNode; htmlFor
     </label>
   );
 }
+
+/** 항상 보이는 라벨 + 입력 필드 묶음 */
+export function Field({
+  label,
+  htmlFor,
+  hint,
+  children,
+}: {
+  label: string;
+  htmlFor?: string | undefined;
+  hint?: string | undefined;
+  children: ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <FieldLabel htmlFor={htmlFor}>{label}</FieldLabel>
+      {children}
+      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+    </div>
+  );
+}
