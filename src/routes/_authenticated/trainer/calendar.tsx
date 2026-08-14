@@ -154,7 +154,30 @@ function TrainerCalendar() {
                     {names.get(b.member_id) ?? "회원"} · {b.duration_min}분
                   </p>
                 </div>
-                <StatusPill tone={statusTone(b)}>{statusLabel(b)}</StatusPill>
+                <div className="flex items-center gap-2">
+                  <StatusPill tone={statusTone(b)}>{statusLabel(b)}</StatusPill>
+                  {b.status === "confirmed" &&
+                    +new Date(b.start_at) + b.duration_min * 60_000 < Date.now() && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="rounded-2xl border-2"
+                          onClick={() => tag.mutate({ id: b.id, status: "completed" })}
+                        >
+                          완료
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="rounded-2xl border-2 border-destructive text-destructive"
+                          onClick={() => tag.mutate({ id: b.id, status: "no_show" })}
+                        >
+                          노쇼
+                        </Button>
+                      </>
+                    )}
+                </div>
               </Card>
             ))}
           </div>
