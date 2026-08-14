@@ -222,16 +222,27 @@ function TrainerHome() {
                 </div>
                 <div className="flex items-center gap-2">
                   <StatusPill tone={statusTone(b)}>{statusLabel(b)}</StatusPill>
-                  {b.status === "confirmed" && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="rounded-2xl border-2"
-                      onClick={() => act.mutate({ id: b.id, patch: { status: "completed" } })}
-                    >
-                      완료
-                    </Button>
-                  )}
+                  {b.status === "confirmed" &&
+                    +new Date(b.start_at) + b.duration_min * 60_000 < now && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="rounded-2xl border-2"
+                          onClick={() => act.mutate({ id: b.id, patch: { status: "completed" } })}
+                        >
+                          완료
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="rounded-2xl border-2 border-destructive text-destructive"
+                          onClick={() => act.mutate({ id: b.id, patch: { status: "no_show" } })}
+                        >
+                          노쇼
+                        </Button>
+                      </>
+                    )}
                 </div>
               </Card>
             ))}
