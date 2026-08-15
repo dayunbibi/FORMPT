@@ -202,10 +202,8 @@ function MembersPage() {
     total: active.length,
     normal: active.filter((m) => memberState(m, remainingOf(m.id)) === "active").length,
     low: active.filter((m) => memberState(m, remainingOf(m.id)) === "low").length,
-    empty: active.filter((m) => memberState(m, remainingOf(m.id)) === "empty").length,
-    suspended: active.filter((m) => m.suspended).length,
-    renewal: renewals.data?.length ?? 0,
   };
+
 
   const visible = active
     .filter((m) => {
