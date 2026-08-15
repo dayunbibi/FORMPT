@@ -127,7 +127,7 @@ function MembersPage() {
       delta: number;
       note: string;
       appliedAt: string;
-      renewalId?: string | null;
+      renewalId?: string | null | undefined;
     }) => {
       const { error } = await supabase.from("credit_entries").insert({
         member_id: input.memberId,
