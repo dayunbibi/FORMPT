@@ -7,6 +7,7 @@ import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { MemberAvatar } from "@/components/pt/MemberAvatar";
 import { Card, EmptyState, ListSkeleton, Section, StatCard, StatSkeleton, StatusPill } from "@/components/pt/kit";
+import { WithdrawalRequestsSection } from "@/components/pt/WithdrawalRequests";
 import {
   dayKey,
   fmtDateTime,
