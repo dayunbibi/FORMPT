@@ -10,12 +10,16 @@ import { useRoleGate } from "@/components/pt/guards";
 import { Card, Field, ListSkeleton, Section } from "@/components/pt/kit";
 import { cn } from "@/lib/utils";
 import { DEFAULT_SETTINGS, fetchSettings } from "@/lib/pt";
+import { unblockEndedAccounts } from "@/lib/members.functions";
 
 export const Route = createFileRoute("/_authenticated/trainer/settings")({
   head: () => ({
     meta: [
       { title: "운영시간 · 예약 정책 — FORMFIT 트레이너" },
-      { name: "description", content: "수업 시간, 예약·취소 마감 시간, 휴무일을 설정해 예약 가능 시간을 관리하세요." },
+      {
+        name: "description",
+        content: "수업 시간, 예약·취소 마감 시간, 휴무일을 설정해 예약 가능 시간을 관리하세요.",
+      },
       { property: "og:title", content: "운영시간 · 예약 정책 — FORMFIT 트레이너" },
       { property: "og:description", content: "예약 가능 시간에 즉시 반영되는 운영 정책." },
     ],
@@ -132,7 +136,11 @@ function SettingsPage() {
               className="flex-1 rounded-2xl border-2 border-destructive text-destructive"
               disabled={regenerate.isPending}
               onClick={() => {
-                if (!window.confirm("코드를 재발급하면 기존 코드는 더 이상 사용할 수 없습니다. 계속할까요?"))
+                if (
+                  !window.confirm(
+                    "코드를 재발급하면 기존 코드는 더 이상 사용할 수 없습니다. 계속할까요?",
+                  )
+                )
                   return;
                 regenerate.mutate();
               }}
@@ -269,8 +277,6 @@ function SettingsPage() {
 
       <BlockedAccountRecovery />
 
-
-
       <Button
         className="w-full rounded-2xl"
         disabled={save.isPending}
@@ -279,5 +285,77 @@ function SettingsPage() {
         {save.isPending ? "저장 중..." : "설정 저장"}
       </Button>
     </AppShell>
+  );
+}
+
+/** 과거 탈퇴 처리로 인증이 차단된 이용 종료 회원 계정을 확인하고 안전하게 복구한다. */
+function BlockedAccountRecovery() {
+  const [result, setResult] = useState<{
+    applied: boolean;
+    count: number;
+    targets: { id: string; full_name: string; email: string | null; blockedUntil: string | null }[];
+  } | null>(null);
+
+  const run = useMutation({
+    mutationFn: async (apply: boolean) => unblockEndedAccounts({ data: { apply } }),
+    onSuccess: (data) => {
+      setResult(data);
+      if (data.applied) {
+        toast.success(
+          data.count > 0
+            ? `${data.count}개 계정의 로그인 차단을 해제했습니다`
+            : "차단된 계정이 없습니다",
+        );
+      }
+    },
+    onError: (error: Error) => toast.error(error.message || "확인에 실패했습니다"),
+  });
+
+  return (
+    <Section title="차단된 이용 종료 계정 복구">
+      <Card className="space-y-3">
+        <p className="text-sm text-muted-foreground">
+          과거 탈퇴 처리로 로그인이 차단된 담당 회원 계정을 확인합니다. 먼저 대상을 확인한 뒤
+          복구하면 이용 종료 상태는 그대로 유지되고 로그인만 다시 가능해집니다. 이용 종료 상태가
+          아닌 계정은 대상에서 제외됩니다.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            className="flex-1 rounded-2xl border-2"
+            disabled={run.isPending}
+            onClick={() => run.mutate(false)}
+          >
+            대상 확인하기
+          </Button>
+          <Button
+            className="flex-1 rounded-2xl"
+            disabled={run.isPending || !result || result.applied || result.count === 0}
+            onClick={() => run.mutate(true)}
+          >
+            차단 해제 적용
+          </Button>
+        </div>
+        {result && (
+          <div className="space-y-2 rounded-2xl bg-secondary px-3 py-2 text-sm">
+            <p className="font-bold">
+              {result.applied ? "복구 완료" : "복구 대상"} {result.count}건
+            </p>
+            {result.targets.length === 0 ? (
+              <p className="text-muted-foreground">차단된 이용 종료 계정이 없습니다.</p>
+            ) : (
+              <ul className="space-y-1 text-muted-foreground">
+                {result.targets.map((t) => (
+                  <li key={t.id}>
+                    {t.full_name || "이름 미입력"} · {t.email ?? "이메일 없음"} ·{" "}
+                    {result.applied ? "차단 해제됨" : "로그인 차단 상태"}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </Card>
+    </Section>
   );
 }
