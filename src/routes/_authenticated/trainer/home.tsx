@@ -8,6 +8,7 @@ import { useRoleGate } from "@/components/pt/guards";
 import { MemberAvatar } from "@/components/pt/MemberAvatar";
 import { Card, EmptyState, ListSkeleton, Section, StatCard, StatSkeleton, StatusPill } from "@/components/pt/kit";
 import { WithdrawalRequestsSection } from "@/components/pt/WithdrawalRequests";
+import { ReuseRequestsSection, type ReuseRequest } from "@/components/pt/ReuseRequests";
 import {
   dayKey,
   fmtDateTime,
@@ -66,6 +67,11 @@ function TrainerHome() {
     },
     enabled: !!trainerId,
   });
+
+  const allRequests = (requests.data ?? []) as ReuseRequest[];
+  // 이용이 종료된 회원의 요청은 재이용 신청으로 따로 처리한다.
+  const reuseRequests = allRequests.filter((r) => !!r.ended_at);
+  const newRequests = allRequests.filter((r) => !r.ended_at);
 
   const decide = useMutation({
     mutationFn: async (input: { id: string; memberId: string; approve: boolean }) => {
@@ -386,14 +392,14 @@ function TrainerHome() {
         </Section>
       )}
 
-      <Section title={`가입 요청 (${requests.data?.length ?? 0})`}>
+      <Section title={`가입 요청 (${newRequests.length})`}>
         {requests.isLoading ? (
           <ListSkeleton rows={1} />
-        ) : (requests.data ?? []).length === 0 ? (
+        ) : newRequests.length === 0 ? (
           <EmptyState title="새 가입 요청이 없어요" description="회원이 검색으로 요청을 보내면 여기에 표시됩니다." />
         ) : (
           <div className="space-y-3">
-            {(requests.data ?? []).map((r) => (
+            {newRequests.map((r) => (
               <Card key={r.id} className="space-y-3">
                 <div className="flex items-start gap-3">
                   <MemberAvatar name={r.full_name || "?"} photoPath={r.photo_path} size="md" />
@@ -446,6 +452,8 @@ function TrainerHome() {
           </div>
         )}
       </Section>
+
+      <ReuseRequestsSection requests={reuseRequests} />
     </AppShell>
   );
 }
