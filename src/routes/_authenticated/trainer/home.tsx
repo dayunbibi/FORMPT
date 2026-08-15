@@ -7,6 +7,7 @@ import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { MemberAvatar } from "@/components/pt/MemberAvatar";
 import { Card, EmptyState, ListSkeleton, Section, StatCard, StatSkeleton, StatusPill } from "@/components/pt/kit";
+import { WithdrawalRequestsSection } from "@/components/pt/WithdrawalRequests";
 import {
   dayKey,
   fmtDateTime,
@@ -162,6 +163,8 @@ function TrainerHome() {
           <StatCard label="오늘 수업" value={today.length} unit="건" hint="취소 제외" />
         </div>
       )}
+
+      <WithdrawalRequestsSection trainerId={trainerId} members={members.data ?? []} />
 
       <Section title={`재등록 요청 (${renewals.data?.length ?? 0})`}>
         {renewals.isLoading ? (

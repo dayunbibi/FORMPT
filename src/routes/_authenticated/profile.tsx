@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -28,7 +28,13 @@ import {
 import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { MemberAvatar } from "@/components/pt/MemberAvatar";
-import { Card, Section } from "@/components/pt/kit";
+import { Card, Section, StatusPill } from "@/components/pt/kit";
+import {
+  OPEN_WITHDRAWAL_STATUSES,
+  WITHDRAWAL_STATUS_LABEL,
+  WITHDRAWAL_STATUS_TONE,
+  useMyWithdrawal,
+} from "@/lib/withdrawal";
 import { removeMemberPhoto, uploadMemberPhoto, validatePhoto } from "@/lib/memberPhoto";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -57,6 +63,7 @@ function ProfilePage() {
   const [editing, setEditing] = useState(false);
 
   const profile = me.data?.profile ?? null;
+  const withdrawal = useMyWithdrawal(profile?.id).data ?? null;
 
   const refresh = () => {
     queryClient.invalidateQueries({ queryKey: ["me"] });
@@ -64,8 +71,7 @@ function ProfilePage() {
   };
 
   const upload = useMutation({
-    mutationFn: async (file: File) =>
-      uploadMemberPhoto(profile!.id, file, profile!.photo_path),
+    mutationFn: async (file: File) => uploadMemberPhoto(profile!.id, file, profile!.photo_path),
     onSuccess: () => {
       refresh();
       toast.success("프로필 사진을 저장했습니다");
@@ -185,6 +191,20 @@ function ProfilePage() {
           <Row label="선호 시간대" value={profile?.preferred_time ?? "미등록"} />
         </Card>
       </Section>
+
+      <div className="flex flex-col items-center gap-2 pt-2 text-center">
+        {withdrawal && OPEN_WITHDRAWAL_STATUSES.includes(withdrawal.status) && (
+          <StatusPill tone={WITHDRAWAL_STATUS_TONE[withdrawal.status]}>
+            {WITHDRAWAL_STATUS_LABEL[withdrawal.status]}
+          </StatusPill>
+        )}
+        <Link
+          to="/withdraw"
+          className="text-xs font-bold text-destructive underline underline-offset-4"
+        >
+          회원 탈퇴 요청
+        </Link>
+      </div>
 
       {profile && (
         <EditProfileDialog
