@@ -182,6 +182,7 @@ function DashboardPage() {
               label="이번 달 매출"
               value={total.toLocaleString("ko-KR")}
               unit="원"
+              valueClassName="text-2xl sm:text-3xl"
               hint={`${revenue.data?.length ?? 0}건 기록`}
             />
           </div>

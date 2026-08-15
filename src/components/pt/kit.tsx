@@ -55,12 +55,14 @@ export function StatCard({
   unit,
   hint,
   className,
+  valueClassName,
 }: {
   label: string;
   value: string | number;
   unit?: string | undefined;
   hint?: string | undefined;
   className?: string | undefined;
+  valueClassName?: string | undefined;
 }) {
   return (
     <Card dark className={cn("flex flex-col gap-1", className)}>
@@ -68,7 +70,7 @@ export function StatCard({
         {label}
       </span>
       <span className="flex items-baseline gap-1">
-        <span className="num-lime text-4xl">{value}</span>
+        <span className={cn("num-lime text-4xl", valueClassName)}>{value}</span>
         {unit && <span className="text-sm font-semibold text-ink-foreground/70">{unit}</span>}
       </span>
       {hint && <span className="text-xs text-ink-foreground/60">{hint}</span>}
