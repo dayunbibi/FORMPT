@@ -557,8 +557,10 @@ export type Database = {
         Args: never
         Returns: {
           created_at: string
+          ended_at: string
           full_name: string
           goal: string
+          held_credits: number
           id: string
           injuries: string
           member_id: string
