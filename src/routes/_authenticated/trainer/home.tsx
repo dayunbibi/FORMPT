@@ -54,17 +54,13 @@ function TrainerHome() {
   const members = useMyMembers(trainerId);
   const names = nameMap(members.data);
 
+  // 아직 담당 회원이 아니어서 프로필을 직접 읽을 수 없으므로, 전용 함수로 신청자 정보까지 함께 받는다.
   const requests = useQuery({
     queryKey: ["join-requests", trainerId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("join_requests")
-        .select("id, member_id, message, status, created_at")
-        .eq("trainer_id", trainerId!)
-        .eq("status", "pending")
-        .order("created_at", { ascending: true });
+      const { data, error } = await supabase.rpc("incoming_join_requests");
       if (error) throw error;
-      return (data ?? []) as { id: string; member_id: string; message: string | null }[];
+      return data ?? [];
     },
     enabled: !!trainerId,
   });
@@ -139,7 +135,7 @@ function TrainerHome() {
     onError: () => toast.error("변경에 실패했습니다"),
   });
 
-  const requestNames = names;
+  
   const all = bookings.data ?? [];
   const pending = all.filter((b) => b.status === "pending");
   const cancelReq = all.filter((b) => b.cancel_requested && b.status === "confirmed");
@@ -395,10 +391,37 @@ function TrainerHome() {
           <div className="space-y-3">
             {(requests.data ?? []).map((r) => (
               <Card key={r.id} className="space-y-3">
-                <div>
-                  <p className="font-extrabold">{requestNames.get(r.member_id) ?? "회원"}</p>
-                  {r.message && <p className="text-sm text-muted-foreground">{r.message}</p>}
+                <div className="flex items-start gap-3">
+                  <MemberAvatar name={r.full_name || "?"} photoPath={r.photo_path} size="md" />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-extrabold">{r.full_name?.trim() || "이름 미입력"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {r.phone?.trim() || "연락처 미입력"} · 요청 {fmtDateTime(r.created_at)}
+                    </p>
+                  </div>
                 </div>
+
+                <dl className="space-y-2 rounded-2xl bg-secondary px-4 py-3 text-sm">
+                  <div>
+                    <dt className="text-xs font-bold text-muted-foreground">운동 목표</dt>
+                    <dd className="leading-relaxed">{r.goal?.trim() || "작성하지 않았어요"}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-bold text-muted-foreground">부상 이력 · 주의사항</dt>
+                    <dd className="leading-relaxed">{r.injuries?.trim() || "작성하지 않았어요"}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-bold text-muted-foreground">선호 시간대</dt>
+                    <dd className="leading-relaxed">{r.preferred_time?.trim() || "작성하지 않았어요"}</dd>
+                  </div>
+                  {r.message?.trim() && (
+                    <div>
+                      <dt className="text-xs font-bold text-muted-foreground">요청 메시지</dt>
+                      <dd className="leading-relaxed">{r.message}</dd>
+                    </div>
+                  )}
+                </dl>
+
                 <div className="flex gap-2">
                   <Button
                     className="flex-1 rounded-2xl"

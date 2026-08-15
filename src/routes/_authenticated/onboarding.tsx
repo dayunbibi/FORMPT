@@ -1,13 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, EmptyState, FieldLabel, ListSkeleton, StatusPill } from "@/components/pt/kit";
+import { Card, FieldLabel, StatusPill } from "@/components/pt/kit";
+import { inviteErrorMessage } from "@/lib/connect";
 import { useMe } from "@/lib/pt";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
@@ -28,77 +28,47 @@ function OnboardingPage() {
   const me = useMe();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [name, setName] = useState("");
   const [goal, setGoal] = useState("");
   const [injuries, setInjuries] = useState("");
   const [preferred, setPreferred] = useState("");
   const [phone, setPhone] = useState("");
-  const [term, setTerm] = useState("");
   const [code, setCode] = useState("");
+  const [preview, setPreview] = useState<{ trainer_id: string; trainer_name: string } | null>(null);
+  const [nameError, setNameError] = useState("");
   const linkedTrainerId = me.data?.profile?.trainer_id ?? null;
-
-  const redeem = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.rpc("redeem_invite_code", { _code: code.trim() });
-      if (error) throw error;
-      const row = (data ?? [])[0];
-      if (!row) throw new Error("invalid code");
-      return row;
-    },
-    onSuccess: async (row) => {
-      setCode("");
-      await queryClient.invalidateQueries({ queryKey: ["me"] });
-      queryClient.invalidateQueries({ queryKey: ["my-join-requests"] });
-      toast.success(`${row.trainer_name} 트레이너와 연결되었습니다`);
-    },
-    onError: (error: { message?: string }) => {
-      const message = error?.message ?? "";
-      if (message.includes("already linked")) {
-        toast.error("이미 다른 트레이너와 연결되어 있어 코드로 재연결할 수 없습니다");
-      } else {
-        toast.error("초대 코드가 올바르지 않습니다");
-      }
-    },
-  });
 
   useEffect(() => {
     if (me.data?.role === "trainer") navigate({ to: "/trainer/home", replace: true });
   }, [me.data?.role, navigate]);
 
   useEffect(() => {
-    const linked = typeof window !== "undefined" ? window.sessionStorage.getItem("pt_trainer") : null;
-    if (linked) setTerm("");
-    void linked;
-  }, []);
+    const current = me.data?.profile;
+    if (!current) return;
+    setName((prev) => (prev ? prev : current.full_name ?? ""));
+    setGoal((prev) => (prev ? prev : current.goal ?? ""));
+    setInjuries((prev) => (prev ? prev : current.injuries ?? ""));
+    setPreferred((prev) => (prev ? prev : current.preferred_time ?? ""));
+    setPhone((prev) => (prev ? prev : current.phone ?? ""));
+  }, [me.data?.profile]);
 
-  const trainers = useQuery({
-    queryKey: ["trainer-directory"],
-    queryFn: async () => {
-      // 이름만 반환하는 전용 함수 사용 (다른 트레이너의 연락처·부상이력은 노출되지 않음)
-      const { data, error } = await supabase.rpc("list_trainers");
-      if (error) throw error;
-      return (data ?? []).filter((t) => t.id !== me.data?.user.id);
-    },
-    enabled: !!me.data,
-  });
-
-  const myRequests = useQuery({
-    queryKey: ["my-join-requests"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("join_requests")
-        .select("id, trainer_id, status")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data ?? [];
-    },
-    enabled: !!me.data,
-  });
+  /** 이름은 트레이너가 요청함에서 확인하는 정보라 필수로 받는다. */
+  function requireName() {
+    if (!name.trim()) {
+      setNameError("이름을 입력해 주세요.");
+      toast.error("이름을 먼저 입력해 주세요.");
+      return false;
+    }
+    setNameError("");
+    return true;
+  }
 
   const saveSurvey = useMutation({
     mutationFn: async () => {
       const { error } = await supabase
         .from("profiles")
         .update({
+          full_name: name.trim().slice(0, 40),
           goal: goal.trim().slice(0, 300) || null,
           injuries: injuries.trim().slice(0, 300) || null,
           preferred_time: preferred || null,
@@ -110,32 +80,46 @@ function OnboardingPage() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["me"] });
-      toast.success("설문이 저장되었습니다");
-      navigate({ to: "/home", replace: true });
     },
     onError: () => toast.error("저장에 실패했습니다"),
   });
 
-  const request = useMutation({
-    mutationFn: async (trainerId: string) => {
-      const { error } = await supabase.from("join_requests").insert({
-        member_id: me.data!.user.id,
-        trainer_id: trainerId,
-        message: goal.trim().slice(0, 200) || null,
-      });
+  const check = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.rpc("preview_invite_code", { _code: code.trim() });
       if (error) throw error;
+      const row = (data ?? [])[0];
+      if (!row) throw new Error("invalid code");
+      return row;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["my-join-requests"] });
-      toast.success("가입 요청을 보냈습니다");
-    },
-    onError: () => toast.error("요청을 보내지 못했습니다"),
+    onSuccess: (row) => setPreview(row),
+    onError: (error: { message?: string }) => toast.error(inviteErrorMessage(error)),
   });
 
-  const filtered = (trainers.data ?? []).filter((t) =>
-    term.trim() ? t.full_name.includes(term.trim()) : true,
-  );
-  const requestFor = (id: string) => myRequests.data?.find((r) => r.trainer_id === id);
+  const redeem = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.rpc("redeem_invite_code", { _code: code.trim() });
+      if (error) throw error;
+      const row = (data ?? [])[0];
+      if (!row) throw new Error("invalid code");
+      return row;
+    },
+    onSuccess: async (row) => {
+      setCode("");
+      setPreview(null);
+      await queryClient.invalidateQueries({ queryKey: ["me"] });
+      queryClient.invalidateQueries({ queryKey: ["my-join-requests"] });
+      toast.success(`${row.trainer_name} 트레이너와 연결되었습니다`);
+    },
+    onError: (error: { message?: string }) => toast.error(inviteErrorMessage(error)),
+  });
+
+  async function finish() {
+    if (!requireName()) return;
+    await saveSurvey.mutateAsync();
+    toast.success("설문이 저장되었습니다");
+    navigate({ to: "/home", replace: true });
+  }
 
   return (
     <div className="min-h-screen bg-background px-5 py-10">
@@ -151,6 +135,21 @@ function OnboardingPage() {
         </div>
 
         <Card className="space-y-4">
+          <div>
+            <FieldLabel htmlFor="name">이름 (필수)</FieldLabel>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (nameError) setNameError("");
+              }}
+              placeholder="실명을 입력해 주세요"
+              maxLength={40}
+              className="rounded-2xl"
+            />
+            {nameError && <p className="mt-1 text-xs font-bold text-destructive">{nameError}</p>}
+          </div>
           <div>
             <FieldLabel htmlFor="goal">운동 목표</FieldLabel>
             <Textarea
@@ -204,7 +203,7 @@ function OnboardingPage() {
         </Card>
 
         <div className="space-y-3">
-          <h2 className="text-lg font-extrabold">초대 코드로 연결하기</h2>
+          <h2 className="text-lg font-extrabold">트레이너 연결</h2>
           {linkedTrainerId ? (
             <Card className="flex items-center justify-between gap-3">
               <div>
@@ -215,13 +214,38 @@ function OnboardingPage() {
               </div>
               <StatusPill tone="lime">연결됨</StatusPill>
             </Card>
+          ) : preview ? (
+            <Card className="space-y-3">
+              <p className="text-sm text-muted-foreground">아래 트레이너와 연결할까요?</p>
+              <p className="text-2xl font-extrabold">{preview.trainer_name}</p>
+              <div className="flex gap-2">
+                <Button
+                  className="flex-1 rounded-2xl"
+                  disabled={redeem.isPending}
+                  onClick={() => {
+                    if (!requireName()) return;
+                    redeem.mutate();
+                  }}
+                >
+                  {redeem.isPending ? "연결 중..." : "연결하기"}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1 rounded-2xl border-2"
+                  onClick={() => setPreview(null)}
+                >
+                  다시 입력
+                </Button>
+              </div>
+            </Card>
           ) : (
             <Card className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                이미 오프라인에서 함께 운동하는 트레이너가 있다면, 받은 초대 코드를 입력하면 승인
-                절차 없이 바로 연결됩니다.
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                트레이너에게 받은 초대코드를 입력하면 대상 트레이너를 확인한 뒤 연결됩니다. 코드가
+                없다면 나중에 홈에서 트레이너를 찾아 연결 요청을 보낼 수 있어요.
               </p>
-              <div className="flex gap-2">
+              <div>
+                <FieldLabel htmlFor="invite">초대코드</FieldLabel>
                 <Input
                   id="invite"
                   value={code}
@@ -230,71 +254,33 @@ function OnboardingPage() {
                   maxLength={12}
                   className="rounded-2xl tracking-[0.25em]"
                 />
-                <Button
-                  className="rounded-2xl"
-                  disabled={redeem.isPending || code.trim().length < 4}
-                  onClick={() => redeem.mutate()}
-                >
-                  {redeem.isPending ? "연결 중..." : "연결"}
-                </Button>
               </div>
+              <Button
+                className="w-full rounded-2xl"
+                disabled={check.isPending || code.trim().length < 4}
+                onClick={() => {
+                  if (!requireName()) return;
+                  check.mutate();
+                }}
+              >
+                {check.isPending ? "확인 중..." : "초대코드로 연결하기"}
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full rounded-2xl border-2"
+                disabled={saveSurvey.isPending}
+                onClick={() => void finish()}
+              >
+                나중에 연결하기
+              </Button>
             </Card>
-          )}
-        </div>
-
-        <div className="space-y-3">
-          <h2 className="text-lg font-extrabold">트레이너 찾기</h2>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={term}
-              onChange={(e) => setTerm(e.target.value)}
-              placeholder="트레이너 이름 검색"
-              className="rounded-2xl pl-9"
-            />
-          </div>
-          {trainers.isLoading ? (
-            <ListSkeleton rows={2} />
-          ) : filtered.length === 0 ? (
-            <EmptyState
-              title="트레이너를 찾지 못했어요"
-              description="이름을 다시 확인하거나, 트레이너에게 초대 링크를 요청해 주세요. 설문만 먼저 저장해도 됩니다."
-            />
-          ) : (
-            <div className="space-y-2">
-              {filtered.map((t) => {
-                const req = requestFor(t.id);
-                return (
-                  <Card key={t.id} className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="font-bold">{t.full_name}</p>
-                      <p className="text-xs text-muted-foreground">퍼스널 트레이너</p>
-                    </div>
-                    {req ? (
-                      <StatusPill tone={req.status === "approved" ? "lime" : req.status === "rejected" ? "danger" : "warn"}>
-                        {req.status === "approved" ? "승인됨" : req.status === "rejected" ? "거절" : "요청 대기"}
-                      </StatusPill>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        className="rounded-2xl border-2"
-                        disabled={request.isPending}
-                        onClick={() => request.mutate(t.id)}
-                      >
-                        가입 요청
-                      </Button>
-                    )}
-                  </Card>
-                );
-              })}
-            </div>
           )}
         </div>
 
         <Button
           className="w-full rounded-2xl py-6 text-base font-extrabold"
           disabled={saveSurvey.isPending}
-          onClick={() => saveSurvey.mutate()}
+          onClick={() => void finish()}
         >
           저장하고 홈으로
         </Button>
