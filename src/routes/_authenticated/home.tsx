@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, EmptyState, ListSkeleton, Section, StatCard, StatSkeleton, StatusPill } from "@/components/pt/kit";
+import { RenewalBanner } from "@/components/pt/RenewalBanner";
 import { fetchRemaining, fmtDateTime, statusLabel, statusTone, type Booking } from "@/lib/pt";
 
 export const Route = createFileRoute("/_authenticated/home")({
@@ -82,6 +83,12 @@ function MemberHome() {
         ) : undefined
       }
     >
+      <RenewalBanner
+        memberId={userId}
+        trainerId={me.data?.profile?.trainer_id}
+        remaining={remaining.data ?? 0}
+      />
+
       {remaining.isLoading ? (
         <StatSkeleton />
       ) : (

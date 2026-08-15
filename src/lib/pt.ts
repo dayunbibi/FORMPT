@@ -15,6 +15,56 @@ export type Profile = {
   suspended: boolean;
   trainer_id: string | null;
   created_at: string;
+  photo_path: string | null;
+  deleted_at: string | null;
+  renewal_dismissed_at: string | null;
+};
+
+/** 회원 상태: 삭제 > 정지 > 잔여 횟수 순으로 판정한다. */
+export type MemberState = "deleted" | "suspended" | "empty" | "low" | "active";
+
+export function memberState(p: Pick<Profile, "suspended" | "deleted_at">, remaining: number): MemberState {
+  if (p.deleted_at) return "deleted";
+  if (p.suspended) return "suspended";
+  if (remaining <= 0) return "empty";
+  if (remaining <= 2) return "low";
+  return "active";
+}
+
+export const MEMBER_STATE_LABEL: Record<MemberState, string> = {
+  deleted: "삭제된 회원",
+  suspended: "이용정지",
+  empty: "남은 0회",
+  low: "소진 임박",
+  active: "정상 이용 중",
+};
+
+export const MEMBER_STATE_TONE: Record<MemberState, "lime" | "warn" | "alert" | "danger" | "muted"> = {
+  deleted: "muted",
+  suspended: "danger",
+  empty: "alert",
+  low: "warn",
+  active: "lime",
+};
+
+export const RENEWAL_STATUS_LABEL: Record<string, string> = {
+  requested: "상담 요청",
+  contacted: "연락 완료",
+  renewed: "재등록 완료",
+  declined: "재등록 안 함",
+};
+
+export type RenewalStatus = "requested" | "contacted" | "renewed" | "declined";
+
+export type RenewalRequest = {
+  id: string;
+  member_id: string;
+  trainer_id: string;
+  remaining_at_request: number;
+  status: RenewalStatus;
+  created_at: string;
+  updated_at: string;
+  resolved_at: string | null;
 };
 
 export type Booking = {
@@ -104,6 +154,12 @@ export async function getMe() {
     }
   }
 
+  // 소프트 삭제된 회원은 남아 있는 세션도 즉시 종료한다.
+  if (role === "member" && (profile as Profile | null)?.deleted_at) {
+    await supabase.auth.signOut();
+    return null;
+  }
+
   return { user, profile: profile as Profile | null, role, email: user.email ?? "" };
 }
 
@@ -174,19 +230,41 @@ export function isUpcoming(b: Booking) {
 }
 
 /** 트레이너의 회원 목록 (프로필 전체) */
-export function useMyMembers(trainerId?: string) {
+/**
+ * 트레이너의 회원 목록.
+ * 기본은 활동 회원만 반환하고, 삭제된 회원은 includeDeleted 로만 조회한다.
+ */
+export function useMyMembers(trainerId?: string, options?: { includeDeleted?: boolean }) {
+  const includeDeleted = options?.includeDeleted ?? false;
   return useQuery({
-    queryKey: ["trainer-members", trainerId],
+    queryKey: ["trainer-members", trainerId, includeDeleted],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("trainer_id", trainerId!)
-        .order("created_at", { ascending: false });
+      let query = supabase.from("profiles").select("*").eq("trainer_id", trainerId!);
+      if (!includeDeleted) query = query.is("deleted_at", null);
+      const { data, error } = await query.order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as Profile[];
     },
     enabled: !!trainerId,
+  });
+}
+
+/** 담당 회원별 잔여 횟수 합계 */
+export function useMemberCredits(trainerId?: string, memberIds: string[] = []) {
+  const key = [...memberIds].sort().join(",");
+  return useQuery({
+    queryKey: ["trainer-credits", trainerId, key],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("credit_entries")
+        .select("member_id, delta")
+        .in("member_id", memberIds);
+      if (error) throw error;
+      const map = new Map<string, number>();
+      (data ?? []).forEach((row) => map.set(row.member_id, (map.get(row.member_id) ?? 0) + row.delta));
+      return map;
+    },
+    enabled: !!trainerId && memberIds.length > 0,
   });
 }
 

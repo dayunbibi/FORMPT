@@ -146,37 +146,49 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           full_name: string
           goal: string | null
           id: string
           injuries: string | null
           onboarded: boolean
           phone: string | null
+          photo_path: string | null
           preferred_time: string | null
+          renewal_dismissed_at: string | null
           suspended: boolean
           trainer_id: string | null
         }
         Insert: {
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           full_name?: string
           goal?: string | null
           id: string
           injuries?: string | null
           onboarded?: boolean
           phone?: string | null
+          photo_path?: string | null
           preferred_time?: string | null
+          renewal_dismissed_at?: string | null
           suspended?: boolean
           trainer_id?: string | null
         }
         Update: {
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           full_name?: string
           goal?: string | null
           id?: string
           injuries?: string | null
           onboarded?: boolean
           phone?: string | null
+          photo_path?: string | null
           preferred_time?: string | null
+          renewal_dismissed_at?: string | null
           suspended?: boolean
           trainer_id?: string | null
         }
@@ -189,6 +201,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      renewal_requests: {
+        Row: {
+          created_at: string
+          id: string
+          member_id: string
+          member_note: string | null
+          remaining_at_request: number
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["renewal_status"]
+          trainer_id: string
+          trainer_note: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_id: string
+          member_note?: string | null
+          remaining_at_request?: number
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["renewal_status"]
+          trainer_id: string
+          trainer_note?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_id?: string
+          member_note?: string | null
+          remaining_at_request?: number
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["renewal_status"]
+          trainer_id?: string
+          trainer_note?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       trainer_invite_codes: {
         Row: {
@@ -380,6 +431,7 @@ export type Database = {
         | "completed"
         | "no_show"
       currency_code: "KRW" | "CAD"
+      renewal_status: "requested" | "contacted" | "renewed" | "declined"
       request_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
@@ -517,6 +569,7 @@ export const Constants = {
         "no_show",
       ],
       currency_code: ["KRW", "CAD"],
+      renewal_status: ["requested", "contacted", "renewed", "declined"],
       request_status: ["pending", "approved", "rejected"],
     },
   },

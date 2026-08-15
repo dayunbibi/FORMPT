@@ -100,6 +100,45 @@ function TrainerHome() {
     onError: () => toast.error("변경에 실패했습니다"),
   });
 
+  const renewals = useQuery({
+    queryKey: ["renewal-requests", trainerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("renewal_requests")
+        .select("id, member_id, status, remaining_at_request, created_at")
+        .eq("trainer_id", trainerId!)
+        .in("status", ["requested", "contacted"])
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as {
+        id: string;
+        member_id: string;
+        status: "requested" | "contacted";
+        remaining_at_request: number;
+        created_at: string;
+      }[];
+    },
+    enabled: !!trainerId,
+  });
+
+  const renewalAct = useMutation({
+    mutationFn: async (input: { id: string; status: "contacted" | "renewed" | "declined" }) => {
+      const { error } = await supabase
+        .from("renewal_requests")
+        .update({
+          status: input.status,
+          resolved_at: input.status === "contacted" ? null : new Date().toISOString(),
+        })
+        .eq("id", input.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["renewal-requests"] });
+      toast.success("재등록 요청 상태를 변경했습니다");
+    },
+    onError: () => toast.error("변경에 실패했습니다"),
+  });
+
   const requestNames = names;
   const all = bookings.data ?? [];
   const pending = all.filter((b) => b.status === "pending");
@@ -126,6 +165,67 @@ function TrainerHome() {
           <StatCard label="오늘 수업" value={today.length} unit="건" hint="취소 제외" />
         </div>
       )}
+
+      <Section title={`재등록 요청 (${renewals.data?.length ?? 0})`}>
+        {renewals.isLoading ? (
+          <ListSkeleton rows={1} />
+        ) : (renewals.data ?? []).length === 0 ? (
+          <EmptyState
+            title="재등록 상담 요청이 없어요"
+            description="남은 횟수가 1회 이하인 회원이 요청하면 여기에 표시됩니다."
+            action={
+              <Button asChild variant="outline" className="rounded-2xl border-2">
+                <Link to="/trainer/members">회원 관리로</Link>
+              </Button>
+            }
+          />
+        ) : (
+          <div className="space-y-2">
+            {(renewals.data ?? []).map((r) => (
+              <Card key={r.id} className="space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-extrabold">{names.get(r.member_id) ?? "회원"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      요청 시 남은 {r.remaining_at_request}회 · {fmtDateTime(r.created_at)}
+                    </p>
+                  </div>
+                  <StatusPill tone={r.status === "contacted" ? "warn" : "alert"}>
+                    {r.status === "contacted" ? "연락 완료" : "상담 요청"}
+                  </StatusPill>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {r.status === "requested" && (
+                    <Button
+                      size="sm"
+                      className="flex-1 rounded-2xl"
+                      onClick={() => renewalAct.mutate({ id: r.id, status: "contacted" })}
+                    >
+                      연락 완료
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1 rounded-2xl border-2"
+                    onClick={() => renewalAct.mutate({ id: r.id, status: "renewed" })}
+                  >
+                    재등록 완료
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="flex-1 rounded-2xl"
+                    onClick={() => renewalAct.mutate({ id: r.id, status: "declined" })}
+                  >
+                    안 함
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+      </Section>
 
       <Section title={`승인 대기 (${pending.length})`}>
         {bookings.isLoading ? (

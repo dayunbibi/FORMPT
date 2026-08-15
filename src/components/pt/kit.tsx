@@ -76,7 +76,7 @@ export function StatCard({
   );
 }
 
-export type Tone = "lime" | "ink" | "muted" | "warn" | "danger";
+export type Tone = "lime" | "ink" | "muted" | "warn" | "danger" | "alert" | "success";
 
 /** 상태 배지: 채워진 pill 형태 (버튼과 명확히 구분) */
 export function StatusPill({ tone = "muted", children }: { tone?: Tone; children: ReactNode }) {
@@ -86,6 +86,8 @@ export function StatusPill({ tone = "muted", children }: { tone?: Tone; children
     muted: "bg-secondary text-muted-foreground",
     warn: "bg-warn text-warn-foreground",
     danger: "bg-destructive text-destructive-foreground",
+    alert: "bg-alert text-alert-foreground",
+    success: "bg-success text-success-foreground",
   };
   return (
     <span
