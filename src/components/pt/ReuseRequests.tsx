@@ -25,6 +25,9 @@ export type ReuseRequest = {
   photo_path: string | null;
   message: string | null;
   created_at: string;
+  goal?: string | null;
+  injuries?: string | null;
+  preferred_time?: string | null;
   ended_at: string | null;
   held_credits: number | null;
 };
