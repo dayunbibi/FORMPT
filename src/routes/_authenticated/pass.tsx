@@ -10,9 +10,9 @@ import { fmtDate } from "@/lib/pt";
 export const Route = createFileRoute("/_authenticated/pass")({
   head: () => ({
     meta: [
-      { title: "이용권 · 결제 이력 — FORMFIT" },
+      { title: "이용권 · 사용 이력 — FORMFIT" },
       { name: "description", content: "남은 PT 횟수와 충전·차감 이력을 확인하세요." },
-      { property: "og:title", content: "이용권 · 결제 이력 — FORMFIT" },
+      { property: "og:title", content: "이용권 · 사용 이력 — FORMFIT" },
       { property: "og:description", content: "남은 횟수와 사용 이력이 항상 일치합니다." },
     ],
   }),
