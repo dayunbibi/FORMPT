@@ -165,36 +165,16 @@ function MembersPage() {
     onError: () => toast.error("저장에 실패했습니다"),
   });
 
-  const suspend = useMutation({
-    mutationFn: async (input: { memberId: string; suspended: boolean }) => {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ suspended: input.suspended })
-        .eq("id", input.memberId);
-      if (error) throw error;
+  const noteSave = useMutation({
+    mutationFn: async (input: { memberId: string; note: string }) =>
+      saveMemberNote(trainerId!, input.memberId, input.note),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["member-notes"] });
+      toast.success("메모를 저장했습니다");
     },
-    onSuccess: (_, input) => {
-      invalidateAll();
-      toast.success(input.suspended ? "이용을 정지했습니다" : "정지를 해제했습니다");
-    },
-    onError: () => toast.error("변경에 실패했습니다"),
+    onError: () => toast.error("메모 저장에 실패했습니다"),
   });
 
-  const photo = useMutation({
-    mutationFn: async (input: { member: Profile; file: File | null }) => {
-      if (input.file) {
-        await uploadMemberPhoto(input.member.id, input.file, input.member.photo_path);
-      } else {
-        await removeMemberPhoto(input.member.id, input.member.photo_path);
-      }
-    },
-    onSuccess: (_, input) => {
-      queryClient.invalidateQueries({ queryKey: ["trainer-members"] });
-      queryClient.invalidateQueries({ queryKey: ["member-photo"] });
-      toast.success(input.file ? "사진을 저장했습니다" : "사진을 삭제했습니다");
-    },
-    onError: (error: Error) => toast.error(error.message || "사진 처리에 실패했습니다"),
-  });
 
   const remove = useMutation({
     mutationFn: async (memberId: string) => softDeleteMember({ data: { memberId } }),
@@ -222,10 +202,8 @@ function MembersPage() {
     total: active.length,
     normal: active.filter((m) => memberState(m, remainingOf(m.id)) === "active").length,
     low: active.filter((m) => memberState(m, remainingOf(m.id)) === "low").length,
-    empty: active.filter((m) => memberState(m, remainingOf(m.id)) === "empty").length,
-    suspended: active.filter((m) => m.suspended).length,
-    renewal: renewals.data?.length ?? 0,
   };
+
 
   const visible = active
     .filter((m) => {
@@ -243,13 +221,11 @@ function MembersPage() {
 
   return (
     <AppShell title="회원 관리" subtitle={`활동 회원 ${active.length}명`} role="trainer">
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2">
         <SummaryTile label="전체 회원" value={summary.total} />
         <SummaryTile label="정상 이용 중" value={summary.normal} tone="lime" />
         <SummaryTile label="소진 임박" value={summary.low} tone="warn" />
-        <SummaryTile label="남은 0회" value={summary.empty} tone="alert" />
-        <SummaryTile label="이용정지" value={summary.suspended} tone="danger" />
-        <SummaryTile label="재등록 요청" value={summary.renewal} tone="ink" />
+
       </div>
 
       <div className="flex flex-col gap-2 sm:flex-row">
@@ -297,14 +273,15 @@ function MembersPage() {
                 key={m.id}
                 member={m}
                 remaining={remainingOf(m.id)}
-                busy={adjust.isPending || photo.isPending || remove.isPending}
+                busy={adjust.isPending || remove.isPending}
                 renewalId={renewalByMember.get(m.id) ?? null}
+                note={notes.data?.get(m.id) ?? ""}
                 onAdjust={(delta, note, appliedAt, renewalId) =>
                   adjust.mutate({ memberId: m.id, delta, note, appliedAt, renewalId })
                 }
                 onSaveInfo={(patch) => saveInfo.mutate({ memberId: m.id, patch })}
-                onSuspend={(suspended) => suspend.mutate({ memberId: m.id, suspended })}
-                onPhoto={(file) => photo.mutate({ member: m, file })}
+                onSaveNote={(value) => noteSave.mutate({ memberId: m.id, note: value })}
+
                 onDelete={() => remove.mutate(m.id)}
               />
             ))}
@@ -396,20 +373,20 @@ function MemberCard({
   remaining,
   busy,
   renewalId,
+  note: savedNote,
   onAdjust,
   onSaveInfo,
-  onSuspend,
-  onPhoto,
+  onSaveNote,
   onDelete,
 }: {
   member: Profile;
   remaining: number;
   busy: boolean;
   renewalId: string | null;
+  note: string;
   onAdjust: (delta: number, note: string, appliedAt: string, renewalId?: string | null) => void;
   onSaveInfo: (patch: Partial<Profile>) => void;
-  onSuspend: (suspended: boolean) => void;
-  onPhoto: (file: File | null) => void;
+  onSaveNote: (note: string) => void;
   onDelete: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -417,11 +394,13 @@ function MemberCard({
   const [count, setCount] = useState("1");
   const [date, setDate] = useState(() => dayKey(new Date()));
   const [note, setNote] = useState("");
+  const [memo, setMemo] = useState(savedNote);
   const [editOpen, setEditOpen] = useState(false);
   const [confirmName, setConfirmName] = useState("");
   const [deleteStep, setDeleteStep] = useState(false);
   const [renewalAsk, setRenewalAsk] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => setMemo(savedNote), [savedNote]);
 
   const state = memberState(member, remaining);
   const n = Math.abs(Math.trunc(Number(count) || 0));
@@ -435,17 +414,6 @@ function MemberCard({
     setCount("1");
   }
 
-  function pickPhoto(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-    const error = validatePhoto(file);
-    if (error) {
-      toast.error(error);
-      return;
-    }
-    onPhoto(file);
-  }
 
   return (
     <Card className="space-y-3">
@@ -481,19 +449,6 @@ function MemberCard({
               <DropdownMenuItem onSelect={() => setEditOpen(true)}>
                 <Pencil className="mr-2 size-4" /> 회원 정보 수정
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => fileRef.current?.click()}>
-                <ImageIcon className="mr-2 size-4" />
-                {member.photo_path ? "사진 변경" : "사진 추가"}
-              </DropdownMenuItem>
-              {member.photo_path && (
-                <DropdownMenuItem onSelect={() => onPhoto(null)}>
-                  <Trash2 className="mr-2 size-4" /> 사진 삭제
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem onSelect={() => onSuspend(!member.suspended)}>
-                <Ban className="mr-2 size-4" />
-                {member.suspended ? "이용 정지 해제" : "이용 정지"}
-              </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
                 onSelect={(e) => {
@@ -509,13 +464,6 @@ function MemberCard({
         </div>
       </div>
 
-      <input
-        ref={fileRef}
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        className="hidden"
-        onChange={pickPhoto}
-      />
 
       <div
         className={cn(
