@@ -277,7 +277,7 @@ function MembersPage() {
                   adjust.mutate({ memberId: m.id, delta, note, appliedAt, renewalId })
                 }
                 onSaveInfo={(patch) => saveInfo.mutate({ memberId: m.id, patch })}
-                note={notes.data?.get(m.id) ?? ""}
+                trainerNote={notes.data?.get(m.id) ?? ""}
                 onSaveNote={(body) => note.mutate({ memberId: m.id, body })}
                 noteSaving={note.isPending}
                 onDelete={() => remove.mutate(m.id)}
@@ -373,7 +373,7 @@ function MemberCard({
   renewalId,
   onAdjust,
   onSaveInfo,
-  note,
+  trainerNote,
   onSaveNote,
   noteSaving,
   onDelete,
@@ -384,7 +384,7 @@ function MemberCard({
   renewalId: string | null;
   onAdjust: (delta: number, note: string, appliedAt: string, renewalId?: string | null) => void;
   onSaveInfo: (patch: Partial<Profile>) => void;
-  note: string;
+  trainerNote: string;
   onSaveNote: (body: string) => void;
   noteSaving: boolean;
   onDelete: () => void;
@@ -399,11 +399,11 @@ function MemberCard({
   const [deleteStep, setDeleteStep] = useState(false);
   const [renewalAsk, setRenewalAsk] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
-  const [noteDraft, setNoteDraft] = useState(note);
+  const [noteDraft, setNoteDraft] = useState(trainerNote);
 
   useEffect(() => {
-    if (noteOpen) setNoteDraft(note);
-  }, [noteOpen, note]);
+    if (noteOpen) setNoteDraft(trainerNote);
+  }, [noteOpen, trainerNote]);
 
   const state = memberState(member, remaining);
   const n = Math.abs(Math.trunc(Number(count) || 0));
@@ -428,10 +428,10 @@ function MemberCard({
             <StatusPill tone={MEMBER_STATE_TONE[state]}>{MEMBER_STATE_LABEL[state]}</StatusPill>
             <span className="text-sm font-bold">남은 {remaining}회</span>
           </div>
-          {!!note && (
+          {!!trainerNote && (
             <p className="mt-1 truncate text-xs text-muted-foreground">
               <StickyNote className="mr-1 inline size-3" />
-              {note.split("\n")[0]}
+              {trainerNote.split("\n")[0]}
             </p>
           )}
         </div>
@@ -441,12 +441,12 @@ function MemberCard({
             size="icon"
             variant="ghost"
             className="relative size-9 rounded-2xl"
-            aria-label={note ? "트레이너 메모 보기 (작성됨)" : "트레이너 메모 작성"}
-            title={note ? note : "트레이너 전용 메모"}
+            aria-label={trainerNote ? "트레이너 메모 보기 (작성됨)" : "트레이너 메모 작성"}
+            title={trainerNote || "트레이너 전용 메모"}
             onClick={() => setNoteOpen(true)}
           >
             <StickyNote className="size-4" />
-            {!!note && (
+            {!!trainerNote && (
               <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-lime ring-2 ring-card" />
             )}
           </Button>
