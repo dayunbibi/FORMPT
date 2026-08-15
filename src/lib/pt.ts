@@ -159,8 +159,6 @@ export async function getMe() {
 }
 
 
-  return { user, profile: profile as Profile | null, role, email: user.email ?? "" };
-}
 
 export function useMe() {
   return useQuery({ queryKey: ["me"], queryFn: getMe, staleTime: 30_000 });
