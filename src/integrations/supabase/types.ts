@@ -505,6 +505,22 @@ export type Database = {
         }
         Returns: boolean
       }
+      incoming_join_requests: {
+        Args: never
+        Returns: {
+          created_at: string
+          full_name: string
+          goal: string
+          id: string
+          injuries: string
+          member_id: string
+          message: string
+          phone: string
+          photo_path: string
+          preferred_time: string
+          status: Database["public"]["Enums"]["request_status"]
+        }[]
+      }
       is_my_member: { Args: { _member_id: string }; Returns: boolean }
       list_trainers: {
         Args: never
@@ -515,6 +531,13 @@ export type Database = {
       }
       my_invite_code: { Args: never; Returns: string }
       my_trainer_id: { Args: never; Returns: string }
+      preview_invite_code: {
+        Args: { _code: string }
+        Returns: {
+          trainer_id: string
+          trainer_name: string
+        }[]
+      }
       redeem_invite_code: {
         Args: { _code: string }
         Returns: {
@@ -523,6 +546,13 @@ export type Database = {
         }[]
       }
       regenerate_invite_code: { Args: never; Returns: string }
+      search_trainers: {
+        Args: { _term: string }
+        Returns: {
+          full_name: string
+          id: string
+        }[]
+      }
       taken_slots: {
         Args: { _day: string; _trainer_id: string }
         Returns: {

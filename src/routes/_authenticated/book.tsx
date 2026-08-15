@@ -1,13 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, EmptyState, ListSkeleton, Section } from "@/components/pt/kit";
+import { ConnectRequired } from "@/components/pt/ConnectNotice";
 import { cn } from "@/lib/utils";
 import { dayKey, fetchSettings, fmtTime } from "@/lib/pt";
 
@@ -101,15 +101,7 @@ function BookPage() {
   if (!trainerId) {
     return (
       <AppShell title="예약하기" role="member">
-        <EmptyState
-          title="담당 트레이너가 필요해요"
-          description="트레이너를 검색해 가입 요청을 보내고 승인되면 바로 예약할 수 있습니다."
-          action={
-            <Button asChild className="rounded-2xl">
-              <Link to="/onboarding">트레이너 찾기</Link>
-            </Button>
-          }
-        />
+        <ConnectRequired description="초대코드를 입력하거나 트레이너를 찾아 연결하면 바로 예약할 수 있어요." />
       </AppShell>
     );
   }

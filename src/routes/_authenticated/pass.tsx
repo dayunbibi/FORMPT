@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, EmptyState, ListSkeleton, Section, StatCard, StatSkeleton } from "@/components/pt/kit";
+import { ConnectRequired } from "@/components/pt/ConnectNotice";
 import { fmtDate } from "@/lib/pt";
 
 export const Route = createFileRoute("/_authenticated/pass")({
@@ -58,6 +59,14 @@ function PassPage() {
   const remaining = list.reduce((sum, e) => sum + e.delta, 0);
   const charged = list.filter((e) => e.delta > 0).reduce((s, e) => s + e.delta, 0);
   const used = charged - remaining;
+
+  if (me.data && !me.data.profile?.trainer_id) {
+    return (
+      <AppShell title="이용권" role="member">
+        <ConnectRequired description="담당 트레이너와 연결되면 충전·사용 이력과 남은 횟수를 볼 수 있어요." />
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell title="이용권" subtitle="남은 횟수와 사용 이력" role="member">
