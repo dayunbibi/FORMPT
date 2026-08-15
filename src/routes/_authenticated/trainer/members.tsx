@@ -273,14 +273,15 @@ function MembersPage() {
                 key={m.id}
                 member={m}
                 remaining={remainingOf(m.id)}
-                busy={adjust.isPending || photo.isPending || remove.isPending}
+                busy={adjust.isPending || remove.isPending}
                 renewalId={renewalByMember.get(m.id) ?? null}
+                note={notes.data?.get(m.id) ?? ""}
                 onAdjust={(delta, note, appliedAt, renewalId) =>
                   adjust.mutate({ memberId: m.id, delta, note, appliedAt, renewalId })
                 }
                 onSaveInfo={(patch) => saveInfo.mutate({ memberId: m.id, patch })}
-                onSuspend={(suspended) => suspend.mutate({ memberId: m.id, suspended })}
-                onPhoto={(file) => photo.mutate({ member: m, file })}
+                onSaveNote={(value) => noteSave.mutate({ memberId: m.id, note: value })}
+
                 onDelete={() => remove.mutate(m.id)}
               />
             ))}
