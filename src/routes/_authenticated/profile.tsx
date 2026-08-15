@@ -28,7 +28,13 @@ import {
 import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { MemberAvatar } from "@/components/pt/MemberAvatar";
-import { Card, Section } from "@/components/pt/kit";
+import { Card, Section, StatusPill } from "@/components/pt/kit";
+import {
+  OPEN_WITHDRAWAL_STATUSES,
+  WITHDRAWAL_STATUS_LABEL,
+  WITHDRAWAL_STATUS_TONE,
+  useMyWithdrawal,
+} from "@/lib/withdrawal";
 import { removeMemberPhoto, uploadMemberPhoto, validatePhoto } from "@/lib/memberPhoto";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -57,6 +63,7 @@ function ProfilePage() {
   const [editing, setEditing] = useState(false);
 
   const profile = me.data?.profile ?? null;
+  const withdrawal = useMyWithdrawal(profile?.id).data ?? null;
 
   const refresh = () => {
     queryClient.invalidateQueries({ queryKey: ["me"] });
