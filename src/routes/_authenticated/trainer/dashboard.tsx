@@ -180,7 +180,8 @@ function DashboardPage() {
             <StatCard label="이번 달 수업" value={done} unit="회" hint={`예약 ${selectedMonth.length}건`} />
             <StatCard
               label="이번 달 매출"
-              value={formatKRW(total)}
+              value={total.toLocaleString("ko-KR")}
+              unit="원"
               hint={`${revenue.data?.length ?? 0}건 기록`}
             />
           </div>
