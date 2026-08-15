@@ -154,6 +154,12 @@ export async function getMe() {
     }
   }
 
+  // 소프트 삭제된 회원은 남아 있는 세션도 즉시 종료한다.
+  if (role === "member" && (profile as Profile | null)?.deleted_at) {
+    await supabase.auth.signOut();
+    return null;
+  }
+
   return { user, profile: profile as Profile | null, role, email: user.email ?? "" };
 }
 
