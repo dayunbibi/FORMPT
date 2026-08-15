@@ -85,7 +85,7 @@ function ProfilePage() {
 
   return (
     <AppShell title="내 정보" subtitle="프로필 사진과 기본 정보" role="member">
-      <Section title="프로필 사진" description="본인만 등록·삭제할 수 있어요. JPG·PNG·WEBP, 5MB 이하.">
+      <Section title="프로필 사진">
         <Card className="flex flex-col items-center gap-4 py-6 sm:flex-row sm:items-center sm:gap-6">
           <MemberAvatar
             name={profile?.full_name ?? "회원"}
@@ -126,7 +126,7 @@ function ProfilePage() {
         </Card>
       </Section>
 
-      <Section title="기본 정보" description="정보 변경이 필요하면 담당 트레이너에게 알려주세요.">
+      <Section title="기본 정보">
         <Card className="space-y-3">
           <Row label="이름" value={profile?.full_name ?? "-"} />
           <Row label="이메일" value={me.data?.email ?? "-"} />
