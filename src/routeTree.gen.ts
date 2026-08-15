@@ -18,6 +18,7 @@ import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } fr
 import { Route as AuthenticatedBookRouteImport } from './routes/_authenticated/book'
 import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticated/bookings'
 import { Route as AuthenticatedConnectRouteImport } from './routes/_authenticated/connect'
+import { Route as AuthenticatedEndedRouteImport } from './routes/_authenticated/ended'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedPassRouteImport } from './routes/_authenticated/pass'
@@ -77,6 +78,11 @@ const AuthenticatedBookingsRoute = AuthenticatedBookingsRouteImport.update({
 const AuthenticatedConnectRoute = AuthenticatedConnectRouteImport.update({
   id: '/connect',
   path: '/connect',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEndedRoute = AuthenticatedEndedRouteImport.update({
+  id: '/ended',
+  path: '/ended',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
@@ -166,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/book': typeof AuthenticatedBookRoute
   '/bookings': typeof AuthenticatedBookingsRoute
   '/connect': typeof AuthenticatedConnectRoute
+  '/ended': typeof AuthenticatedEndedRoute
   '/home': typeof AuthenticatedHomeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pass': typeof AuthenticatedPassRoute
@@ -190,6 +197,7 @@ export interface FileRoutesByTo {
   '/book': typeof AuthenticatedBookRoute
   '/bookings': typeof AuthenticatedBookingsRoute
   '/connect': typeof AuthenticatedConnectRoute
+  '/ended': typeof AuthenticatedEndedRoute
   '/home': typeof AuthenticatedHomeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pass': typeof AuthenticatedPassRoute
@@ -216,6 +224,7 @@ export interface FileRoutesById {
   '/_authenticated/book': typeof AuthenticatedBookRoute
   '/_authenticated/bookings': typeof AuthenticatedBookingsRoute
   '/_authenticated/connect': typeof AuthenticatedConnectRoute
+  '/_authenticated/ended': typeof AuthenticatedEndedRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/pass': typeof AuthenticatedPassRoute
@@ -242,6 +251,7 @@ export interface FileRouteTypes {
     | '/book'
     | '/bookings'
     | '/connect'
+    | '/ended'
     | '/home'
     | '/onboarding'
     | '/pass'
@@ -266,6 +276,7 @@ export interface FileRouteTypes {
     | '/book'
     | '/bookings'
     | '/connect'
+    | '/ended'
     | '/home'
     | '/onboarding'
     | '/pass'
@@ -291,6 +302,7 @@ export interface FileRouteTypes {
     | '/_authenticated/book'
     | '/_authenticated/bookings'
     | '/_authenticated/connect'
+    | '/_authenticated/ended'
     | '/_authenticated/home'
     | '/_authenticated/onboarding'
     | '/_authenticated/pass'
@@ -381,6 +393,13 @@ declare module '@tanstack/react-router' {
       path: '/connect'
       fullPath: '/connect'
       preLoaderRoute: typeof AuthenticatedConnectRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ended': {
+      id: '/_authenticated/ended'
+      path: '/ended'
+      fullPath: '/ended'
+      preLoaderRoute: typeof AuthenticatedEndedRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/home': {
@@ -488,6 +507,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBookRoute: typeof AuthenticatedBookRoute
   AuthenticatedBookingsRoute: typeof AuthenticatedBookingsRoute
   AuthenticatedConnectRoute: typeof AuthenticatedConnectRoute
+  AuthenticatedEndedRoute: typeof AuthenticatedEndedRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPassRoute: typeof AuthenticatedPassRoute
@@ -506,6 +526,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBookRoute: AuthenticatedBookRoute,
   AuthenticatedBookingsRoute: AuthenticatedBookingsRoute,
   AuthenticatedConnectRoute: AuthenticatedConnectRoute,
+  AuthenticatedEndedRoute: AuthenticatedEndedRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPassRoute: AuthenticatedPassRoute,
