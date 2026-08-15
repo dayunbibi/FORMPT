@@ -373,20 +373,20 @@ function MemberCard({
   remaining,
   busy,
   renewalId,
+  note: savedNote,
   onAdjust,
   onSaveInfo,
-  onSuspend,
-  onPhoto,
+  onSaveNote,
   onDelete,
 }: {
   member: Profile;
   remaining: number;
   busy: boolean;
   renewalId: string | null;
+  note: string;
   onAdjust: (delta: number, note: string, appliedAt: string, renewalId?: string | null) => void;
   onSaveInfo: (patch: Partial<Profile>) => void;
-  onSuspend: (suspended: boolean) => void;
-  onPhoto: (file: File | null) => void;
+  onSaveNote: (note: string) => void;
   onDelete: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -394,11 +394,13 @@ function MemberCard({
   const [count, setCount] = useState("1");
   const [date, setDate] = useState(() => dayKey(new Date()));
   const [note, setNote] = useState("");
+  const [memo, setMemo] = useState(savedNote);
   const [editOpen, setEditOpen] = useState(false);
   const [confirmName, setConfirmName] = useState("");
   const [deleteStep, setDeleteStep] = useState(false);
   const [renewalAsk, setRenewalAsk] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => setMemo(savedNote), [savedNote]);
 
   const state = memberState(member, remaining);
   const n = Math.abs(Math.trunc(Number(count) || 0));
@@ -412,17 +414,6 @@ function MemberCard({
     setCount("1");
   }
 
-  function pickPhoto(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-    const error = validatePhoto(file);
-    if (error) {
-      toast.error(error);
-      return;
-    }
-    onPhoto(file);
-  }
 
   return (
     <Card className="space-y-3">
