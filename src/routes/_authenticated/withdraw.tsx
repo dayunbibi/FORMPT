@@ -401,7 +401,7 @@ function WithdrawPage() {
             <p className="text-sm text-muted-foreground">
               남은 PT {remaining.data ?? 0}회 · 예정 예약 {bookings.data?.length ?? 0}건
             </p>
-            <Field label='확인을 위해 "탈퇴"를 입력해 주세요' htmlFor="withdraw-word">
+            <Field label='확인을 위해 "종료"를 입력해 주세요' htmlFor="withdraw-word">
               <Input
                 id="withdraw-word"
                 value={confirmWord}
