@@ -116,6 +116,33 @@ export type Database = {
         }
         Relationships: []
       }
+      member_notes: {
+        Row: {
+          created_at: string
+          id: string
+          member_id: string
+          note: string
+          trainer_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_id: string
+          note?: string
+          trainer_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_id?: string
+          note?: string
+          trainer_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null
@@ -257,6 +284,27 @@ export type Database = {
         Update: {
           code?: string
           created_at?: string
+          trainer_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      trainer_metrics: {
+        Row: {
+          created_at: string
+          total_revenue: number
+          trainer_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          total_revenue?: number
+          trainer_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          total_revenue?: number
           trainer_id?: string
           updated_at?: string
         }
