@@ -37,7 +37,7 @@ export const Route = createFileRoute("/_authenticated/connect")({
 });
 
 function ConnectPage() {
-  const me = useRoleGate("member", { skipOnboarding: true });
+  const me = useRoleGate("member", { skipOnboarding: true, allowEnded: true });
   const navigate = useNavigate();
   const { tab } = Route.useSearch();
   const queryClient = useQueryClient();

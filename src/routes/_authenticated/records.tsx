@@ -24,7 +24,7 @@ type Item = { exercise: string; weight_kg: number | null; reps: number | null; s
 type Log = { id: string; log_date: string; feedback: string | null; workout_items: Item[] };
 
 export function RecordsPage() {
-  const me = useRoleGate("member");
+  const me = useRoleGate("member", { allowEnded: true });
 
   const logs = useQuery({
     queryKey: ["my-logs", me.data?.user.id],

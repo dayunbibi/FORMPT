@@ -40,7 +40,7 @@ function label(e: Entry) {
 }
 
 function PassPage() {
-  const me = useRoleGate("member");
+  const me = useRoleGate("member", { allowEnded: true });
 
   const entries = useQuery({
     queryKey: ["my-credits", me.data?.user.id],
