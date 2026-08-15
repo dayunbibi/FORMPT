@@ -268,6 +268,39 @@ export type Database = {
         }
         Relationships: []
       }
+      revenue_entries: {
+        Row: {
+          amount: number
+          created_at: string
+          entry_date: string
+          id: string
+          member_id: string | null
+          note: string | null
+          trainer_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          entry_date?: string
+          id?: string
+          member_id?: string | null
+          note?: string | null
+          trainer_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          entry_date?: string
+          id?: string
+          member_id?: string | null
+          note?: string | null
+          trainer_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       trainer_invite_codes: {
         Row: {
           code: string
@@ -284,6 +317,33 @@ export type Database = {
         Update: {
           code?: string
           created_at?: string
+          trainer_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      trainer_member_notes: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          member_id: string
+          trainer_id: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          member_id: string
+          trainer_id: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          member_id?: string
           trainer_id?: string
           updated_at?: string
         }
