@@ -171,9 +171,9 @@ function MembersPage() {
     mutationFn: async (memberId: string) => softDeleteMember({ data: { memberId } }),
     onSuccess: () => {
       invalidateAll();
-      toast.success("회원을 삭제했습니다. 기록은 보존됩니다.");
+      toast.success("PT 이용을 종료했습니다. 기록은 보존됩니다.");
     },
-    onError: (error: Error) => toast.error(error.message || "삭제에 실패했습니다"),
+    onError: (error: Error) => toast.error(error.message || "이용 종료 처리에 실패했습니다"),
   });
 
   const notes = useTrainerNotes(trainerId);
@@ -192,7 +192,7 @@ function MembersPage() {
     mutationFn: async (memberId: string) => restoreMember({ data: { memberId } }),
     onSuccess: () => {
       invalidateAll();
-      toast.success("회원을 복구했습니다");
+      toast.success("회원 이용을 다시 시작했습니다");
     },
     onError: (error: Error) => toast.error(error.message || "복구에 실패했습니다"),
   });
@@ -291,7 +291,7 @@ function MembersPage() {
       </Section>
 
       <Section
-        title={`삭제된 회원 (${deleted.length})`}
+        title={`이용 종료 회원 (${deleted.length})`}
         action={
           <Button
             variant="outline"
@@ -305,7 +305,10 @@ function MembersPage() {
       >
         {showDeleted &&
           (deleted.length === 0 ? (
-            <EmptyState title="삭제된 회원이 없어요" description="삭제한 회원은 이곳에서 복구할 수 있어요." />
+            <EmptyState
+              title="이용 종료 회원이 없어요"
+              description="이용을 종료한 회원은 이곳에서 다시 시작할 수 있어요."
+            />
           ) : (
             <div className="space-y-2">
               {deleted.map((m) => (
@@ -320,7 +323,7 @@ function MembersPage() {
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <StatusPill tone="muted">삭제된 회원</StatusPill>
+                    <StatusPill tone="muted">이용 종료</StatusPill>
                     <Button
                       size="sm"
                       variant="outline"
@@ -329,7 +332,7 @@ function MembersPage() {
                       disabled={restore.isPending}
                     >
                       <RotateCcw className="mr-1 size-3" />
-                      복구
+                      이용 재개
                     </Button>
                   </div>
                 </Card>
@@ -707,10 +710,10 @@ function MemberCard({
         <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-destructive">
-              {member.full_name} 회원을 삭제할까요?
+              {member.full_name} 회원의 PT 이용을 종료할까요?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              예약, PT 사용 이력, 운동 기록은 모두 보존되지만 로그인과 신규 예약이 즉시 차단됩니다.
+              예약, PT 사용 이력, 운동 기록, 프로필과 사진은 모두 보존됩니다. 계정은 차단되지 않고 신규 예약과 PT 이용만 제한되며, 남은 횟수는 보류됩니다.
               확인을 위해 회원 이름 <b>{member.full_name}</b> 을 입력해 주세요.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -731,7 +734,7 @@ function MemberCard({
                 setDeleteStep(false);
               }}
             >
-              삭제
+              이용 종료
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
