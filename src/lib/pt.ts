@@ -266,6 +266,62 @@ export function useMemberCredits(trainerId?: string, memberIds: string[] = []) {
   });
 }
 
+/** 트레이너 본인만 보고 쓰는 회원 메모 (member_id → note) */
+export function useMemberNotes(trainerId?: string) {
+  return useQuery({
+    queryKey: ["member-notes", trainerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("member_notes")
+        .select("member_id, note")
+        .eq("trainer_id", trainerId!);
+      if (error) throw error;
+      const map = new Map<string, string>();
+      (data ?? []).forEach((row) => map.set(row.member_id, row.note ?? ""));
+      return map;
+    },
+    enabled: !!trainerId,
+  });
+}
+
+/** 메모 저장 (없으면 생성, 있으면 갱신) */
+export async function saveMemberNote(trainerId: string, memberId: string, note: string) {
+  const { error } = await supabase
+    .from("member_notes")
+    .upsert({ trainer_id: trainerId, member_id: memberId, note }, { onConflict: "trainer_id,member_id" });
+  if (error) throw error;
+}
+
+/** 트레이너가 직접 입력하는 총매출 (원화) */
+export function useTrainerRevenue(trainerId?: string) {
+  return useQuery({
+    queryKey: ["trainer-revenue", trainerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("trainer_metrics")
+        .select("total_revenue")
+        .eq("trainer_id", trainerId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data?.total_revenue ?? 0;
+    },
+    enabled: !!trainerId,
+  });
+}
+
+export async function saveTrainerRevenue(trainerId: string, amount: number) {
+  const { error } = await supabase
+    .from("trainer_metrics")
+    .upsert({ trainer_id: trainerId, total_revenue: amount }, { onConflict: "trainer_id" });
+  if (error) throw error;
+}
+
+/** 원화 포맷 (₩1,200,000) */
+export function fmtKRW(amount: number) {
+  return `₩${Math.trunc(amount).toLocaleString("ko-KR")}`;
+}
+
+
 export function nameMap(profiles: Profile[] | undefined) {
   const map = new Map<string, string>();
   (profiles ?? []).forEach((p) => map.set(p.id, p.full_name));
