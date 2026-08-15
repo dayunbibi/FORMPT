@@ -163,6 +163,8 @@ function TrainerHome() {
         </div>
       )}
 
+      <WithdrawalRequestsSection trainerId={trainerId} members={members.data ?? []} />
+
       <Section title={`재등록 요청 (${renewals.data?.length ?? 0})`}>
         {renewals.isLoading ? (
           <ListSkeleton rows={1} />
