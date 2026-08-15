@@ -267,6 +267,10 @@ function SettingsPage() {
         </Card>
       </Section>
 
+      <BlockedAccountRecovery />
+
+
+
       <Button
         className="w-full rounded-2xl"
         disabled={save.isPending}
