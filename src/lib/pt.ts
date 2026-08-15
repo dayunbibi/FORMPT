@@ -20,7 +20,7 @@ export type Profile = {
   renewal_dismissed_at: string | null;
 };
 
-/** 회원 상태: 삭제 > 잔여 횟수(3회 미만은 소진 임박) 순으로 판정한다. */
+/** 회원 상태: 이용 종료 > 잔여 횟수(3회 미만은 소진 임박) 순으로 판정한다. */
 export type MemberState = "deleted" | "low" | "active";
 
 export function memberState(p: Pick<Profile, "deleted_at">, remaining: number): MemberState {
@@ -29,11 +29,17 @@ export function memberState(p: Pick<Profile, "deleted_at">, remaining: number): 
   return "active";
 }
 
+/** 이용이 종료된 회원인지 (계정은 유지되며 예약·PT 기능만 제한된다) */
+export function isEndedMember(p: Pick<Profile, "deleted_at"> | null | undefined) {
+  return !!p?.deleted_at;
+}
+
 export const MEMBER_STATE_LABEL: Record<MemberState, string> = {
-  deleted: "삭제된 회원",
+  deleted: "이용 종료 회원",
   low: "소진 임박",
   active: "정상 이용 중",
 };
+
 
 export const MEMBER_STATE_TONE: Record<MemberState, "lime" | "warn" | "muted"> = {
   deleted: "muted",
