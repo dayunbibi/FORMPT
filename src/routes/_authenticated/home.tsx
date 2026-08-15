@@ -7,6 +7,7 @@ import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, EmptyState, ListSkeleton, Section, StatCard, StatSkeleton, StatusPill } from "@/components/pt/kit";
 import { RenewalBanner } from "@/components/pt/RenewalBanner";
+import { ConnectPrompt } from "@/components/pt/ConnectNotice";
 import { fetchRemaining, fmtDateTime, statusLabel, statusTone, type Booking } from "@/lib/pt";
 
 export const Route = createFileRoute("/_authenticated/home")({
@@ -83,6 +84,8 @@ function MemberHome() {
         ) : undefined
       }
     >
+      {!linked && <ConnectPrompt />}
+
       <RenewalBanner
         memberId={userId}
         trainerId={me.data?.profile?.trainer_id}
@@ -124,7 +127,10 @@ function MemberHome() {
             }
             action={
               <Button asChild className="rounded-2xl">
-                <Link to={linked ? "/book" : "/onboarding"}>
+                <Link
+                  to={linked ? "/book" : "/connect"}
+                  {...(linked ? {} : { search: { tab: "search" as const } })}
+                >
                   {linked ? "예약하기" : "트레이너 찾기"}
                 </Link>
               </Button>
