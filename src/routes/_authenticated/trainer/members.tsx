@@ -449,19 +449,6 @@ function MemberCard({
               <DropdownMenuItem onSelect={() => setEditOpen(true)}>
                 <Pencil className="mr-2 size-4" /> 회원 정보 수정
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => fileRef.current?.click()}>
-                <ImageIcon className="mr-2 size-4" />
-                {member.photo_path ? "사진 변경" : "사진 추가"}
-              </DropdownMenuItem>
-              {member.photo_path && (
-                <DropdownMenuItem onSelect={() => onPhoto(null)}>
-                  <Trash2 className="mr-2 size-4" /> 사진 삭제
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem onSelect={() => onSuspend(!member.suspended)}>
-                <Ban className="mr-2 size-4" />
-                {member.suspended ? "이용 정지 해제" : "이용 정지"}
-              </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
                 onSelect={(e) => {
@@ -477,13 +464,6 @@ function MemberCard({
         </div>
       </div>
 
-      <input
-        ref={fileRef}
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        className="hidden"
-        onChange={pickPhoto}
-      />
 
       <div
         className={cn(
