@@ -105,6 +105,12 @@ function MembersPage() {
   const [sort, setSort] = useState<SortKey>("recent");
   const [showDeleted, setShowDeleted] = useState(false);
 
+  const renewalByMember = useMemo(() => {
+    const map = new Map<string, string>();
+    (renewals.data ?? []).forEach((r) => map.set(r.member_id, r.id));
+    return map;
+  }, [renewals.data]);
+
   function remainingOf(id: string) {
     return credits.data?.get(id) ?? 0;
   }
@@ -121,6 +127,7 @@ function MembersPage() {
       delta: number;
       note: string;
       appliedAt: string;
+      renewalId?: string | null;
     }) => {
       const { error } = await supabase.from("credit_entries").insert({
         member_id: input.memberId,
@@ -131,6 +138,13 @@ function MembersPage() {
         created_at: new Date(`${input.appliedAt}T12:00:00`).toISOString(),
       });
       if (error) throw error;
+      if (input.renewalId) {
+        const { error: renewalError } = await supabase
+          .from("renewal_requests")
+          .update({ status: "renewed", resolved_at: new Date().toISOString() })
+          .eq("id", input.renewalId);
+        if (renewalError) throw renewalError;
+      }
     },
     onSuccess: () => {
       invalidateAll();
@@ -284,8 +298,9 @@ function MembersPage() {
                 member={m}
                 remaining={remainingOf(m.id)}
                 busy={adjust.isPending || photo.isPending || remove.isPending}
-                onAdjust={(delta, note, appliedAt) =>
-                  adjust.mutate({ memberId: m.id, delta, note, appliedAt })
+                renewalId={renewalByMember.get(m.id) ?? null}
+                onAdjust={(delta, note, appliedAt, renewalId) =>
+                  adjust.mutate({ memberId: m.id, delta, note, appliedAt, renewalId })
                 }
                 onSaveInfo={(patch) => saveInfo.mutate({ memberId: m.id, patch })}
                 onSuspend={(suspended) => suspend.mutate({ memberId: m.id, suspended })}
@@ -380,6 +395,7 @@ function MemberCard({
   member,
   remaining,
   busy,
+  renewalId,
   onAdjust,
   onSaveInfo,
   onSuspend,
@@ -389,7 +405,8 @@ function MemberCard({
   member: Profile;
   remaining: number;
   busy: boolean;
-  onAdjust: (delta: number, note: string, appliedAt: string) => void;
+  renewalId: string | null;
+  onAdjust: (delta: number, note: string, appliedAt: string, renewalId?: string | null) => void;
   onSaveInfo: (patch: Partial<Profile>) => void;
   onSuspend: (suspended: boolean) => void;
   onPhoto: (file: File | null) => void;
@@ -403,6 +420,7 @@ function MemberCard({
   const [editOpen, setEditOpen] = useState(false);
   const [confirmName, setConfirmName] = useState("");
   const [deleteStep, setDeleteStep] = useState(false);
+  const [renewalAsk, setRenewalAsk] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const state = memberState(member, remaining);
@@ -410,6 +428,12 @@ function MemberCard({
   const delta = mode === "add" ? n : -n;
   const nextRemaining = remaining + delta;
   const invalid = n <= 0 ? "조정 횟수를 1 이상으로 입력해 주세요." : nextRemaining < 0 ? "차감 후 남은 횟수가 0회보다 작아질 수 없어요." : null;
+
+  function apply(renewal: string | null) {
+    onAdjust(delta, note.trim(), date, renewal);
+    setNote("");
+    setCount("1");
+  }
 
   function pickPhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -564,9 +588,11 @@ function MemberCard({
               className="w-full rounded-2xl"
               disabled={!!invalid || busy}
               onClick={() => {
-                onAdjust(delta, note.trim(), date);
-                setNote("");
-                setCount("1");
+                if (delta > 0 && renewalId) {
+                  setRenewalAsk(true);
+                  return;
+                }
+                apply(null);
               }}
             >
               적용
@@ -584,6 +610,38 @@ function MemberCard({
           setEditOpen(false);
         }}
       />
+
+      <AlertDialog open={renewalAsk} onOpenChange={setRenewalAsk}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>재등록 완료로 처리할까요?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {member.full_name} 회원의 재등록 상담 요청이 열려 있어요. PT {n}회를 추가하면서 요청을
+              재등록 완료로 함께 정리할 수 있습니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              className="rounded-2xl"
+              onClick={() => {
+                setRenewalAsk(false);
+                apply(null);
+              }}
+            >
+              충전만 하기
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="rounded-2xl"
+              onClick={() => {
+                setRenewalAsk(false);
+                apply(renewalId);
+              }}
+            >
+              재등록 완료 처리
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={deleteStep} onOpenChange={setDeleteStep}>
         <AlertDialogContent className="rounded-2xl">
