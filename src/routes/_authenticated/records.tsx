@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { Card, EmptyState, ListSkeleton, Section } from "@/components/pt/kit";
+import { ConnectRequired } from "@/components/pt/ConnectNotice";
 
 export const Route = createFileRoute("/_authenticated/records")({
   head: () => ({
@@ -48,6 +49,14 @@ export function RecordsPage() {
       return (item.weight_kg ?? 0) > (prev.weight_kg ?? 0) || (item.reps ?? 0) > (prev.reps ?? 0);
     }
     return false;
+  }
+
+  if (me.data && !me.data.profile?.trainer_id) {
+    return (
+      <AppShell title="운동기록" role="member">
+        <ConnectRequired description="담당 트레이너와 연결되면 수업 기록과 피드백이 여기에 쌓여요." />
+      </AppShell>
+    );
   }
 
   return (
