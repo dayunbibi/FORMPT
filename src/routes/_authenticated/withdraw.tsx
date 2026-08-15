@@ -255,7 +255,9 @@ function WithdrawPage() {
                   시도해 주세요.
                 </p>
                 <Button asChild variant="outline" className="w-full rounded-2xl border-2">
-                  <Link to="/connect">트레이너 연결하기</Link>
+                  <Link to="/connect" search={{ tab: "code" }}>
+                    트레이너 연결하기
+                  </Link>
                 </Button>
               </Card>
             </Section>
