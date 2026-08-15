@@ -173,6 +173,18 @@ function MembersPage() {
     onError: (error: Error) => toast.error(error.message || "삭제에 실패했습니다"),
   });
 
+  const notes = useTrainerNotes(trainerId);
+
+  const note = useMutation({
+    mutationFn: async (input: { memberId: string; body: string }) =>
+      saveTrainerNote({ trainerId: trainerId!, memberId: input.memberId, body: input.body }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trainer-notes"] });
+      toast.success("메모를 저장했습니다");
+    },
+    onError: () => toast.error("메모 저장에 실패했습니다"),
+  });
+
   const restore = useMutation({
     mutationFn: async (memberId: string) => restoreMember({ data: { memberId } }),
     onSuccess: () => {
@@ -389,6 +401,10 @@ function MemberCard({
   const [noteOpen, setNoteOpen] = useState(false);
   const [noteDraft, setNoteDraft] = useState(note);
 
+  useEffect(() => {
+    if (noteOpen) setNoteDraft(note);
+  }, [noteOpen, note]);
+
   const state = memberState(member, remaining);
   const n = Math.abs(Math.trunc(Number(count) || 0));
   const delta = mode === "add" ? n : -n;
@@ -412,9 +428,28 @@ function MemberCard({
             <StatusPill tone={MEMBER_STATE_TONE[state]}>{MEMBER_STATE_LABEL[state]}</StatusPill>
             <span className="text-sm font-bold">남은 {remaining}회</span>
           </div>
+          {!!note && (
+            <p className="mt-1 truncate text-xs text-muted-foreground">
+              <StickyNote className="mr-1 inline size-3" />
+              {note.split("\n")[0]}
+            </p>
+          )}
         </div>
 
         <div className="flex shrink-0 items-center gap-1">
+          <Button
+            size="icon"
+            variant="ghost"
+            className="relative size-9 rounded-2xl"
+            aria-label={note ? "트레이너 메모 보기 (작성됨)" : "트레이너 메모 작성"}
+            title={note ? note : "트레이너 전용 메모"}
+            onClick={() => setNoteOpen(true)}
+          >
+            <StickyNote className="size-4" />
+            {!!note && (
+              <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-lime ring-2 ring-card" />
+            )}
+          </Button>
           <Button
             size="sm"
             variant="outline"
@@ -536,6 +571,45 @@ function MemberCard({
           </div>
         </div>
       </div>
+
+      <Dialog open={noteOpen} onOpenChange={setNoteOpen}>
+        <DialogContent className="rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>{member.full_name} 회원 메모</DialogTitle>
+            <DialogDescription>
+              트레이너만 볼 수 있는 메모입니다. 회원에게는 표시되지 않아요.
+            </DialogDescription>
+          </DialogHeader>
+          <Field label="트레이너 전용 메모" htmlFor={`note-memo-${member.id}`}>
+            <Textarea
+              id={`note-memo-${member.id}`}
+              rows={6}
+              placeholder={"예: 허리 부상 주의\n하체 운동 선호\n평일 저녁 가능"}
+              value={noteDraft}
+              onChange={(e) => setNoteDraft(e.target.value)}
+            />
+          </Field>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              className="rounded-2xl border-2"
+              onClick={() => setNoteOpen(false)}
+            >
+              취소
+            </Button>
+            <Button
+              className="rounded-2xl"
+              disabled={noteSaving}
+              onClick={() => {
+                onSaveNote(noteDraft.trim());
+                setNoteOpen(false);
+              }}
+            >
+              메모 저장
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <EditMemberDialog
         member={member}
