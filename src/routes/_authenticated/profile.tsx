@@ -202,7 +202,7 @@ function ProfilePage() {
           to="/withdraw"
           className="text-xs font-bold text-destructive underline underline-offset-4"
         >
-          회원 탈퇴 요청
+          PT 이용 종료 요청
         </Link>
       </div>
 

@@ -194,7 +194,7 @@ function MembersPage() {
       invalidateAll();
       toast.success("회원 이용을 다시 시작했습니다");
     },
-    onError: (error: Error) => toast.error(error.message || "복구에 실패했습니다"),
+    onError: (error: Error) => toast.error(error.message || "이용 재개에 실패했습니다"),
   });
 
   const list = all.data ?? [];
