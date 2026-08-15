@@ -112,7 +112,7 @@ function ProfilePage() {
             {profile?.photo_path && (
               <Button
                 variant="outline"
-                className="rounded-2xl border-2 text-danger"
+                className="rounded-2xl border-2 text-destructive"
                 disabled={busy}
                 onClick={() => setConfirmRemove(true)}
               >
@@ -148,7 +148,7 @@ function ProfilePage() {
           <AlertDialogFooter>
             <AlertDialogCancel className="rounded-2xl border-2">취소</AlertDialogCancel>
             <AlertDialogAction
-              className="rounded-2xl bg-danger text-danger-foreground"
+              className="rounded-2xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => remove.mutate()}
             >
               삭제
