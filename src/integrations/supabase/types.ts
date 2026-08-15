@@ -175,6 +175,7 @@ export type Database = {
           created_at: string
           deleted_at: string | null
           deleted_by: string | null
+          deleted_reason: string | null
           full_name: string
           goal: string | null
           id: string
@@ -191,6 +192,7 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           deleted_by?: string | null
+          deleted_reason?: string | null
           full_name?: string
           goal?: string | null
           id: string
@@ -207,6 +209,7 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           deleted_by?: string | null
+          deleted_reason?: string | null
           full_name?: string
           goal?: string | null
           id?: string
@@ -427,6 +430,51 @@ export type Database = {
         }
         Relationships: []
       }
+      withdrawal_requests: {
+        Row: {
+          created_at: string
+          id: string
+          member_id: string
+          reason_code: string | null
+          reason_text: string | null
+          remaining_at_request: number
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["withdrawal_status"]
+          trainer_id: string
+          trainer_note: string | null
+          upcoming_at_request: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_id: string
+          reason_code?: string | null
+          reason_text?: string | null
+          remaining_at_request?: number
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["withdrawal_status"]
+          trainer_id: string
+          trainer_note?: string | null
+          upcoming_at_request?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_id?: string
+          reason_code?: string | null
+          reason_text?: string | null
+          remaining_at_request?: number
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["withdrawal_status"]
+          trainer_id?: string
+          trainer_note?: string | null
+          upcoming_at_request?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       workout_items: {
         Row: {
           exercise: string
@@ -571,6 +619,12 @@ export type Database = {
       currency_code: "KRW" | "CAD"
       renewal_status: "requested" | "contacted" | "renewed" | "declined"
       request_status: "pending" | "approved" | "rejected"
+      withdrawal_status:
+        | "requested"
+        | "needs_info"
+        | "approved"
+        | "rejected"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -709,6 +763,13 @@ export const Constants = {
       currency_code: ["KRW", "CAD"],
       renewal_status: ["requested", "contacted", "renewed", "declined"],
       request_status: ["pending", "approved", "rejected"],
+      withdrawal_status: [
+        "requested",
+        "needs_info",
+        "approved",
+        "rejected",
+        "cancelled",
+      ],
     },
   },
 } as const
