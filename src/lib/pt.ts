@@ -20,30 +20,32 @@ export type Profile = {
   renewal_dismissed_at: string | null;
 };
 
-/** 회원 상태: 삭제 여부와 잔여 횟수(3회 미만은 소진 임박)로만 판정한다. */
-export type MemberState = "deleted" | "low" | "active";
+/** 회원 상태: 삭제 > 정지 > 잔여 횟수 순으로 판정한다. */
+export type MemberState = "deleted" | "suspended" | "empty" | "low" | "active";
 
-/** 소진 임박 기준: 남은 횟수 3회 미만(0~2회) */
-export const LOW_CREDIT_THRESHOLD = 3;
-
-export function memberState(p: Pick<Profile, "deleted_at">, remaining: number): MemberState {
+export function memberState(p: Pick<Profile, "suspended" | "deleted_at">, remaining: number): MemberState {
   if (p.deleted_at) return "deleted";
-  if (remaining < LOW_CREDIT_THRESHOLD) return "low";
+  if (p.suspended) return "suspended";
+  if (remaining <= 0) return "empty";
+  if (remaining <= 2) return "low";
   return "active";
 }
 
 export const MEMBER_STATE_LABEL: Record<MemberState, string> = {
   deleted: "삭제된 회원",
+  suspended: "이용정지",
+  empty: "남은 0회",
   low: "소진 임박",
   active: "정상 이용 중",
 };
 
-export const MEMBER_STATE_TONE: Record<MemberState, "lime" | "warn" | "muted"> = {
+export const MEMBER_STATE_TONE: Record<MemberState, "lime" | "warn" | "alert" | "danger" | "muted"> = {
   deleted: "muted",
+  suspended: "danger",
+  empty: "alert",
   low: "warn",
   active: "lime",
 };
-
 
 export const RENEWAL_STATUS_LABEL: Record<string, string> = {
   requested: "상담 요청",
@@ -265,62 +267,6 @@ export function useMemberCredits(trainerId?: string, memberIds: string[] = []) {
     enabled: !!trainerId && memberIds.length > 0,
   });
 }
-
-/** 트레이너 본인만 보고 쓰는 회원 메모 (member_id → note) */
-export function useMemberNotes(trainerId?: string) {
-  return useQuery({
-    queryKey: ["member-notes", trainerId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("member_notes")
-        .select("member_id, note")
-        .eq("trainer_id", trainerId!);
-      if (error) throw error;
-      const map = new Map<string, string>();
-      (data ?? []).forEach((row) => map.set(row.member_id, row.note ?? ""));
-      return map;
-    },
-    enabled: !!trainerId,
-  });
-}
-
-/** 메모 저장 (없으면 생성, 있으면 갱신) */
-export async function saveMemberNote(trainerId: string, memberId: string, note: string) {
-  const { error } = await supabase
-    .from("member_notes")
-    .upsert({ trainer_id: trainerId, member_id: memberId, note }, { onConflict: "trainer_id,member_id" });
-  if (error) throw error;
-}
-
-/** 트레이너가 직접 입력하는 총매출 (원화) */
-export function useTrainerRevenue(trainerId?: string) {
-  return useQuery({
-    queryKey: ["trainer-revenue", trainerId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("trainer_metrics")
-        .select("total_revenue")
-        .eq("trainer_id", trainerId!)
-        .maybeSingle();
-      if (error) throw error;
-      return data?.total_revenue ?? 0;
-    },
-    enabled: !!trainerId,
-  });
-}
-
-export async function saveTrainerRevenue(trainerId: string, amount: number) {
-  const { error } = await supabase
-    .from("trainer_metrics")
-    .upsert({ trainer_id: trainerId, total_revenue: amount }, { onConflict: "trainer_id" });
-  if (error) throw error;
-}
-
-/** 원화 포맷 (₩1,200,000) */
-export function fmtKRW(amount: number) {
-  return `₩${Math.trunc(amount).toLocaleString("ko-KR")}`;
-}
-
 
 export function nameMap(profiles: Profile[] | undefined) {
   const map = new Map<string, string>();
