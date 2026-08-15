@@ -71,8 +71,7 @@ function ProfilePage() {
   };
 
   const upload = useMutation({
-    mutationFn: async (file: File) =>
-      uploadMemberPhoto(profile!.id, file, profile!.photo_path),
+    mutationFn: async (file: File) => uploadMemberPhoto(profile!.id, file, profile!.photo_path),
     onSuccess: () => {
       refresh();
       toast.success("프로필 사진을 저장했습니다");

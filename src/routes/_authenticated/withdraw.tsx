@@ -234,8 +234,8 @@ function WithdrawPage() {
                   </p>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  트레이너가 최종 처리하기 전까지는 언제든 취소할 수 있고, 요청만으로 PT 횟수·예약·결제
-                  내용이 변경되지는 않습니다.
+                  트레이너가 최종 처리하기 전까지는 언제든 취소할 수 있고, 요청만으로 PT
+                  횟수·예약·결제 내용이 변경되지는 않습니다.
                 </p>
                 <Button
                   variant="outline"
@@ -333,7 +333,11 @@ function WithdrawPage() {
 
                 {step === 2 && (
                   <>
-                    <Field label="현재 비밀번호" htmlFor="withdraw-password" hint="본인 확인을 위해 다시 입력해 주세요.">
+                    <Field
+                      label="현재 비밀번호"
+                      htmlFor="withdraw-password"
+                      hint="본인 확인을 위해 다시 입력해 주세요."
+                    >
                       <Input
                         id="withdraw-password"
                         type="password"
@@ -364,10 +368,13 @@ function WithdrawPage() {
                 {step === 3 && (
                   <>
                     <p className="text-sm font-bold">본인 확인이 완료되었습니다.</p>
-                    <p className="text-sm text-muted-foreground">사유: {reasonSummary({
-                      reason_code: reason === "직접 작성" ? null : reason || null,
-                      reason_text: reason === "직접 작성" ? reasonText.trim() || null : null,
-                    })}</p>
+                    <p className="text-sm text-muted-foreground">
+                      사유:{" "}
+                      {reasonSummary({
+                        reason_code: reason === "직접 작성" ? null : reason || null,
+                        reason_text: reason === "직접 작성" ? reasonText.trim() || null : null,
+                      })}
+                    </p>
                     <Button
                       className="w-full rounded-2xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       onClick={() => setConfirmOpen(true)}
@@ -382,16 +389,11 @@ function WithdrawPage() {
         </>
       )}
 
-      <Dialog
-        open={confirmOpen}
-        onOpenChange={(next) => !submit.isPending && setConfirmOpen(next)}
-      >
+      <Dialog open={confirmOpen} onOpenChange={(next) => !submit.isPending && setConfirmOpen(next)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl sm:max-w-md">
           <DialogHeader>
             <DialogTitle>정말 탈퇴를 요청할까요?</DialogTitle>
-            <DialogDescription className="leading-relaxed">
-              {WITHDRAWAL_NOTICE}
-            </DialogDescription>
+            <DialogDescription className="leading-relaxed">{WITHDRAWAL_NOTICE}</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">

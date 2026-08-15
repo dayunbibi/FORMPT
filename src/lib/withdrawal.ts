@@ -1,12 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export type WithdrawalStatus =
-  | "requested"
-  | "needs_info"
-  | "approved"
-  | "rejected"
-  | "cancelled";
+export type WithdrawalStatus = "requested" | "needs_info" | "approved" | "rejected" | "cancelled";
 
 export type WithdrawalRequest = {
   id: string;
