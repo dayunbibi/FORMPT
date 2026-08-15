@@ -221,13 +221,11 @@ function MembersPage() {
 
   return (
     <AppShell title="회원 관리" subtitle={`활동 회원 ${active.length}명`} role="trainer">
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2">
         <SummaryTile label="전체 회원" value={summary.total} />
         <SummaryTile label="정상 이용 중" value={summary.normal} tone="lime" />
         <SummaryTile label="소진 임박" value={summary.low} tone="warn" />
-        <SummaryTile label="남은 0회" value={summary.empty} tone="alert" />
-        <SummaryTile label="이용정지" value={summary.suspended} tone="danger" />
-        <SummaryTile label="재등록 요청" value={summary.renewal} tone="ink" />
+
       </div>
 
       <div className="flex flex-col gap-2 sm:flex-row">
