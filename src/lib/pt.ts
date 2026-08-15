@@ -224,19 +224,41 @@ export function isUpcoming(b: Booking) {
 }
 
 /** 트레이너의 회원 목록 (프로필 전체) */
-export function useMyMembers(trainerId?: string) {
+/**
+ * 트레이너의 회원 목록.
+ * 기본은 활동 회원만 반환하고, 삭제된 회원은 includeDeleted 로만 조회한다.
+ */
+export function useMyMembers(trainerId?: string, options?: { includeDeleted?: boolean }) {
+  const includeDeleted = options?.includeDeleted ?? false;
   return useQuery({
-    queryKey: ["trainer-members", trainerId],
+    queryKey: ["trainer-members", trainerId, includeDeleted],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("trainer_id", trainerId!)
-        .order("created_at", { ascending: false });
+      let query = supabase.from("profiles").select("*").eq("trainer_id", trainerId!);
+      if (!includeDeleted) query = query.is("deleted_at", null);
+      const { data, error } = await query.order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as Profile[];
     },
     enabled: !!trainerId,
+  });
+}
+
+/** 담당 회원별 잔여 횟수 합계 */
+export function useMemberCredits(trainerId?: string, memberIds: string[] = []) {
+  const key = [...memberIds].sort().join(",");
+  return useQuery({
+    queryKey: ["trainer-credits", trainerId, key],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("credit_entries")
+        .select("member_id, delta")
+        .in("member_id", memberIds);
+      if (error) throw error;
+      const map = new Map<string, number>();
+      (data ?? []).forEach((row) => map.set(row.member_id, (map.get(row.member_id) ?? 0) + row.delta));
+      return map;
+    },
+    enabled: !!trainerId && memberIds.length > 0,
   });
 }
 
