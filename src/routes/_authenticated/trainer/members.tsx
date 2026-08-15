@@ -1,14 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   ChevronDown,
-  Image as ImageIcon,
   MoreVertical,
   Pencil,
   RotateCcw,
-  Ban,
+  StickyNote,
   Trash2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -60,7 +59,7 @@ import {
   useMyMembers,
   type Profile,
 } from "@/lib/pt";
-import { removeMemberPhoto, uploadMemberPhoto, validatePhoto } from "@/lib/memberPhoto";
+import { saveTrainerNote, useTrainerNotes } from "@/lib/trainerNotes";
 import { restoreMember, softDeleteMember } from "@/lib/members.functions";
 import { cn } from "@/lib/utils";
 
@@ -165,37 +164,6 @@ function MembersPage() {
     onError: () => toast.error("저장에 실패했습니다"),
   });
 
-  const suspend = useMutation({
-    mutationFn: async (input: { memberId: string; suspended: boolean }) => {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ suspended: input.suspended })
-        .eq("id", input.memberId);
-      if (error) throw error;
-    },
-    onSuccess: (_, input) => {
-      invalidateAll();
-      toast.success(input.suspended ? "이용을 정지했습니다" : "정지를 해제했습니다");
-    },
-    onError: () => toast.error("변경에 실패했습니다"),
-  });
-
-  const photo = useMutation({
-    mutationFn: async (input: { member: Profile; file: File | null }) => {
-      if (input.file) {
-        await uploadMemberPhoto(input.member.id, input.file, input.member.photo_path);
-      } else {
-        await removeMemberPhoto(input.member.id, input.member.photo_path);
-      }
-    },
-    onSuccess: (_, input) => {
-      queryClient.invalidateQueries({ queryKey: ["trainer-members"] });
-      queryClient.invalidateQueries({ queryKey: ["member-photo"] });
-      toast.success(input.file ? "사진을 저장했습니다" : "사진을 삭제했습니다");
-    },
-    onError: (error: Error) => toast.error(error.message || "사진 처리에 실패했습니다"),
-  });
-
   const remove = useMutation({
     mutationFn: async (memberId: string) => softDeleteMember({ data: { memberId } }),
     onSuccess: () => {
@@ -203,6 +171,18 @@ function MembersPage() {
       toast.success("회원을 삭제했습니다. 기록은 보존됩니다.");
     },
     onError: (error: Error) => toast.error(error.message || "삭제에 실패했습니다"),
+  });
+
+  const notes = useTrainerNotes(trainerId);
+
+  const note = useMutation({
+    mutationFn: async (input: { memberId: string; body: string }) =>
+      saveTrainerNote({ trainerId: trainerId!, memberId: input.memberId, body: input.body }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trainer-notes"] });
+      toast.success("메모를 저장했습니다");
+    },
+    onError: () => toast.error("메모 저장에 실패했습니다"),
   });
 
   const restore = useMutation({
@@ -220,11 +200,8 @@ function MembersPage() {
 
   const summary = {
     total: active.length,
-    normal: active.filter((m) => memberState(m, remainingOf(m.id)) === "active").length,
-    low: active.filter((m) => memberState(m, remainingOf(m.id)) === "low").length,
-    empty: active.filter((m) => memberState(m, remainingOf(m.id)) === "empty").length,
-    suspended: active.filter((m) => m.suspended).length,
-    renewal: renewals.data?.length ?? 0,
+    normal: active.filter((m) => remainingOf(m.id) >= 3).length,
+    low: active.filter((m) => remainingOf(m.id) < 3).length,
   };
 
   const visible = active
@@ -243,13 +220,10 @@ function MembersPage() {
 
   return (
     <AppShell title="회원 관리" subtitle={`활동 회원 ${active.length}명`} role="trainer">
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2">
         <SummaryTile label="전체 회원" value={summary.total} />
         <SummaryTile label="정상 이용 중" value={summary.normal} tone="lime" />
         <SummaryTile label="소진 임박" value={summary.low} tone="warn" />
-        <SummaryTile label="남은 0회" value={summary.empty} tone="alert" />
-        <SummaryTile label="이용정지" value={summary.suspended} tone="danger" />
-        <SummaryTile label="재등록 요청" value={summary.renewal} tone="ink" />
       </div>
 
       <div className="flex flex-col gap-2 sm:flex-row">
@@ -297,14 +271,15 @@ function MembersPage() {
                 key={m.id}
                 member={m}
                 remaining={remainingOf(m.id)}
-                busy={adjust.isPending || photo.isPending || remove.isPending}
+                busy={adjust.isPending || remove.isPending}
                 renewalId={renewalByMember.get(m.id) ?? null}
                 onAdjust={(delta, note, appliedAt, renewalId) =>
                   adjust.mutate({ memberId: m.id, delta, note, appliedAt, renewalId })
                 }
                 onSaveInfo={(patch) => saveInfo.mutate({ memberId: m.id, patch })}
-                onSuspend={(suspended) => suspend.mutate({ memberId: m.id, suspended })}
-                onPhoto={(file) => photo.mutate({ member: m, file })}
+                trainerNote={notes.data?.get(m.id) ?? ""}
+                onSaveNote={(body) => note.mutate({ memberId: m.id, body })}
+                noteSaving={note.isPending}
                 onDelete={() => remove.mutate(m.id)}
               />
             ))}
@@ -398,8 +373,9 @@ function MemberCard({
   renewalId,
   onAdjust,
   onSaveInfo,
-  onSuspend,
-  onPhoto,
+  trainerNote,
+  onSaveNote,
+  noteSaving,
   onDelete,
 }: {
   member: Profile;
@@ -408,8 +384,9 @@ function MemberCard({
   renewalId: string | null;
   onAdjust: (delta: number, note: string, appliedAt: string, renewalId?: string | null) => void;
   onSaveInfo: (patch: Partial<Profile>) => void;
-  onSuspend: (suspended: boolean) => void;
-  onPhoto: (file: File | null) => void;
+  trainerNote: string;
+  onSaveNote: (body: string) => void;
+  noteSaving: boolean;
   onDelete: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -421,7 +398,12 @@ function MemberCard({
   const [confirmName, setConfirmName] = useState("");
   const [deleteStep, setDeleteStep] = useState(false);
   const [renewalAsk, setRenewalAsk] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [noteDraft, setNoteDraft] = useState(trainerNote);
+
+  useEffect(() => {
+    if (noteOpen) setNoteDraft(trainerNote);
+  }, [noteOpen, trainerNote]);
 
   const state = memberState(member, remaining);
   const n = Math.abs(Math.trunc(Number(count) || 0));
@@ -435,18 +417,6 @@ function MemberCard({
     setCount("1");
   }
 
-  function pickPhoto(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-    const error = validatePhoto(file);
-    if (error) {
-      toast.error(error);
-      return;
-    }
-    onPhoto(file);
-  }
-
   return (
     <Card className="space-y-3">
       <div className="flex items-start gap-3">
@@ -458,9 +428,28 @@ function MemberCard({
             <StatusPill tone={MEMBER_STATE_TONE[state]}>{MEMBER_STATE_LABEL[state]}</StatusPill>
             <span className="text-sm font-bold">남은 {remaining}회</span>
           </div>
+          {!!trainerNote && (
+            <p className="mt-1 truncate text-xs text-muted-foreground">
+              <StickyNote className="mr-1 inline size-3" />
+              {trainerNote.split("\n")[0]}
+            </p>
+          )}
         </div>
 
         <div className="flex shrink-0 items-center gap-1">
+          <Button
+            size="icon"
+            variant="ghost"
+            className="relative size-9 rounded-2xl"
+            aria-label={trainerNote ? "트레이너 메모 보기 (작성됨)" : "트레이너 메모 작성"}
+            title={trainerNote || "트레이너 전용 메모"}
+            onClick={() => setNoteOpen(true)}
+          >
+            <StickyNote className="size-4" />
+            {!!trainerNote && (
+              <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-lime ring-2 ring-card" />
+            )}
+          </Button>
           <Button
             size="sm"
             variant="outline"
@@ -481,18 +470,8 @@ function MemberCard({
               <DropdownMenuItem onSelect={() => setEditOpen(true)}>
                 <Pencil className="mr-2 size-4" /> 회원 정보 수정
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => fileRef.current?.click()}>
-                <ImageIcon className="mr-2 size-4" />
-                {member.photo_path ? "사진 변경" : "사진 추가"}
-              </DropdownMenuItem>
-              {member.photo_path && (
-                <DropdownMenuItem onSelect={() => onPhoto(null)}>
-                  <Trash2 className="mr-2 size-4" /> 사진 삭제
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem onSelect={() => onSuspend(!member.suspended)}>
-                <Ban className="mr-2 size-4" />
-                {member.suspended ? "이용 정지 해제" : "이용 정지"}
+              <DropdownMenuItem onSelect={() => setNoteOpen(true)}>
+                <StickyNote className="mr-2 size-4" /> 트레이너 메모
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
@@ -508,14 +487,6 @@ function MemberCard({
           </DropdownMenu>
         </div>
       </div>
-
-      <input
-        ref={fileRef}
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        className="hidden"
-        onChange={pickPhoto}
-      />
 
       <div
         className={cn(
@@ -600,6 +571,45 @@ function MemberCard({
           </div>
         </div>
       </div>
+
+      <Dialog open={noteOpen} onOpenChange={setNoteOpen}>
+        <DialogContent className="rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>{member.full_name} 회원 메모</DialogTitle>
+            <DialogDescription>
+              트레이너만 볼 수 있는 메모입니다. 회원에게는 표시되지 않아요.
+            </DialogDescription>
+          </DialogHeader>
+          <Field label="트레이너 전용 메모" htmlFor={`note-memo-${member.id}`}>
+            <Textarea
+              id={`note-memo-${member.id}`}
+              rows={6}
+              placeholder={"예: 허리 부상 주의\n하체 운동 선호\n평일 저녁 가능"}
+              value={noteDraft}
+              onChange={(e) => setNoteDraft(e.target.value)}
+            />
+          </Field>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              className="rounded-2xl border-2"
+              onClick={() => setNoteOpen(false)}
+            >
+              취소
+            </Button>
+            <Button
+              className="rounded-2xl"
+              disabled={noteSaving}
+              onClick={() => {
+                onSaveNote(noteDraft.trim());
+                setNoteOpen(false);
+              }}
+            >
+              메모 저장
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <EditMemberDialog
         member={member}

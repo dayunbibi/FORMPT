@@ -1,0 +1,1 @@
+DELETE FROM public.revenue_entries WHERE note = '10회권 재등록';

@@ -20,6 +20,7 @@ import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedPassRouteImport } from './routes/_authenticated/pass'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedRecordsRouteImport } from './routes/_authenticated/records'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -86,6 +87,11 @@ const AuthenticatedPassRoute = AuthenticatedPassRouteImport.update({
   path: '/pass',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedRecordsRoute = AuthenticatedRecordsRouteImport.update({
   id: '/records',
   path: '/records',
@@ -150,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof AuthenticatedHomeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pass': typeof AuthenticatedPassRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/records': typeof AuthenticatedRecordsRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/home': typeof AuthenticatedHomeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pass': typeof AuthenticatedPassRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/records': typeof AuthenticatedRecordsRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/pass': typeof AuthenticatedPassRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/records': typeof AuthenticatedRecordsRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -217,6 +226,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/onboarding'
     | '/pass'
+    | '/profile'
     | '/records'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -238,6 +248,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/onboarding'
     | '/pass'
+    | '/profile'
     | '/records'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/_authenticated/home'
     | '/_authenticated/onboarding'
     | '/_authenticated/pass'
+    | '/_authenticated/profile'
     | '/_authenticated/records'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -361,6 +373,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPassRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/records': {
       id: '/_authenticated/records'
       path: '/records'
@@ -433,6 +452,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPassRoute: typeof AuthenticatedPassRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedRecordsRoute: typeof AuthenticatedRecordsRoute
   AuthenticatedTrainerCalendarRoute: typeof AuthenticatedTrainerCalendarRoute
   AuthenticatedTrainerDashboardRoute: typeof AuthenticatedTrainerDashboardRoute
@@ -448,6 +468,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPassRoute: AuthenticatedPassRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedRecordsRoute: AuthenticatedRecordsRoute,
   AuthenticatedTrainerCalendarRoute: AuthenticatedTrainerCalendarRoute,
   AuthenticatedTrainerDashboardRoute: AuthenticatedTrainerDashboardRoute,

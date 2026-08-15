@@ -9,6 +9,7 @@ import {
   LogOut,
   Settings,
   Ticket,
+  User,
   Users,
   BarChart3,
 } from "lucide-react";
@@ -22,6 +23,7 @@ const memberNav = [
   { to: "/bookings", label: "예약목록", icon: ClipboardList },
   { to: "/records", label: "운동기록", icon: Dumbbell },
   { to: "/pass", label: "이용권", icon: Ticket },
+  { to: "/profile", label: "내 정보", icon: User },
 ] as const;
 
 const trainerNav = [

@@ -20,29 +20,23 @@ export type Profile = {
   renewal_dismissed_at: string | null;
 };
 
-/** 회원 상태: 삭제 > 정지 > 잔여 횟수 순으로 판정한다. */
-export type MemberState = "deleted" | "suspended" | "empty" | "low" | "active";
+/** 회원 상태: 삭제 > 잔여 횟수(3회 미만은 소진 임박) 순으로 판정한다. */
+export type MemberState = "deleted" | "low" | "active";
 
-export function memberState(p: Pick<Profile, "suspended" | "deleted_at">, remaining: number): MemberState {
+export function memberState(p: Pick<Profile, "deleted_at">, remaining: number): MemberState {
   if (p.deleted_at) return "deleted";
-  if (p.suspended) return "suspended";
-  if (remaining <= 0) return "empty";
-  if (remaining <= 2) return "low";
+  if (remaining < 3) return "low";
   return "active";
 }
 
 export const MEMBER_STATE_LABEL: Record<MemberState, string> = {
   deleted: "삭제된 회원",
-  suspended: "이용정지",
-  empty: "남은 0회",
   low: "소진 임박",
   active: "정상 이용 중",
 };
 
-export const MEMBER_STATE_TONE: Record<MemberState, "lime" | "warn" | "alert" | "danger" | "muted"> = {
+export const MEMBER_STATE_TONE: Record<MemberState, "lime" | "warn" | "muted"> = {
   deleted: "muted",
-  suspended: "danger",
-  empty: "alert",
   low: "warn",
   active: "lime",
 };
