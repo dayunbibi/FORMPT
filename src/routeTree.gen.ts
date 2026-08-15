@@ -23,6 +23,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPassRouteImport } from './routes/_authenticated/pass'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedRecordsRouteImport } from './routes/_authenticated/records'
+import { Route as AuthenticatedWithdrawRouteImport } from './routes/_authenticated/withdraw'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as AuthenticatedTrainerCalendarRouteImport } from './routes/_authenticated/trainer/calendar'
@@ -103,6 +104,11 @@ const AuthenticatedRecordsRoute = AuthenticatedRecordsRouteImport.update({
   path: '/records',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedWithdrawRoute = AuthenticatedWithdrawRouteImport.update({
+  id: '/withdraw',
+  path: '/withdraw',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   id: '/.lovable/oauth/consent',
   path: '/.lovable/oauth/consent',
@@ -165,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/pass': typeof AuthenticatedPassRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/records': typeof AuthenticatedRecordsRoute
+  '/withdraw': typeof AuthenticatedWithdrawRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/pass': typeof AuthenticatedPassRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/records': typeof AuthenticatedRecordsRoute
+  '/withdraw': typeof AuthenticatedWithdrawRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
@@ -213,6 +221,7 @@ export interface FileRoutesById {
   '/_authenticated/pass': typeof AuthenticatedPassRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/records': typeof AuthenticatedRecordsRoute
+  '/_authenticated/withdraw': typeof AuthenticatedWithdrawRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/trainer/calendar': typeof AuthenticatedTrainerCalendarRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/pass'
     | '/profile'
     | '/records'
+    | '/withdraw'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/trainer/calendar'
@@ -261,6 +271,7 @@ export interface FileRouteTypes {
     | '/pass'
     | '/profile'
     | '/records'
+    | '/withdraw'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/trainer/calendar'
@@ -285,6 +296,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pass'
     | '/_authenticated/profile'
     | '/_authenticated/records'
+    | '/_authenticated/withdraw'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/trainer/calendar'
@@ -406,6 +418,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRecordsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/withdraw': {
+      id: '/_authenticated/withdraw'
+      path: '/withdraw'
+      fullPath: '/withdraw'
+      preLoaderRoute: typeof AuthenticatedWithdrawRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/.lovable/oauth/consent': {
       id: '/.lovable/oauth/consent'
       path: '/.lovable/oauth/consent'
@@ -474,6 +493,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPassRoute: typeof AuthenticatedPassRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedRecordsRoute: typeof AuthenticatedRecordsRoute
+  AuthenticatedWithdrawRoute: typeof AuthenticatedWithdrawRoute
   AuthenticatedTrainerCalendarRoute: typeof AuthenticatedTrainerCalendarRoute
   AuthenticatedTrainerDashboardRoute: typeof AuthenticatedTrainerDashboardRoute
   AuthenticatedTrainerHomeRoute: typeof AuthenticatedTrainerHomeRoute
@@ -491,6 +511,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPassRoute: AuthenticatedPassRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedRecordsRoute: AuthenticatedRecordsRoute,
+  AuthenticatedWithdrawRoute: AuthenticatedWithdrawRoute,
   AuthenticatedTrainerCalendarRoute: AuthenticatedTrainerCalendarRoute,
   AuthenticatedTrainerDashboardRoute: AuthenticatedTrainerDashboardRoute,
   AuthenticatedTrainerHomeRoute: AuthenticatedTrainerHomeRoute,
