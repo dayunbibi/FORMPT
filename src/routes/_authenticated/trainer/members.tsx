@@ -420,25 +420,23 @@ function MemberCard({
     setCount("1");
   }
 
+  const phone = member.phone?.trim() || "";
+
+  async function copyPhone() {
+    try {
+      await navigator.clipboard.writeText(phone);
+      toast.success("전화번호가 복사되었습니다");
+    } catch {
+      toast.error("복사에 실패했습니다");
+    }
+  }
+
   return (
     <Card className="space-y-3">
-      <div className="flex items-start gap-3">
+      {/* 1줄: 사진 · 이름 · 관리 · 더보기 */}
+      <div className="flex items-center gap-2">
         <MemberAvatar name={member.full_name} photoPath={member.photo_path} size="md" />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-base font-extrabold">{member.full_name}</p>
-          <p className="truncate text-sm text-muted-foreground">{member.phone ?? "연락처 미등록"}</p>
-          <div className="mt-1.5 flex flex-wrap items-center gap-2">
-            <StatusPill tone={MEMBER_STATE_TONE[state]}>{MEMBER_STATE_LABEL[state]}</StatusPill>
-            <span className="text-sm font-bold">남은 {remaining}회</span>
-          </div>
-          {!!trainerNote && (
-            <p className="mt-1 truncate text-xs text-muted-foreground">
-              <StickyNote className="mr-1 inline size-3" />
-              {trainerNote.split("\n")[0]}
-            </p>
-          )}
-        </div>
-
+        <p className="min-w-0 flex-1 truncate text-base font-extrabold">{member.full_name}</p>
         <div className="flex shrink-0 items-center gap-1">
           <Button
             size="icon"
@@ -456,7 +454,7 @@ function MemberCard({
           <Button
             size="sm"
             variant="outline"
-            className="rounded-2xl border-2"
+            className="rounded-2xl border-2 px-2.5"
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
           >
@@ -484,12 +482,61 @@ function MemberCard({
                   setConfirmName("");
                 }}
               >
-                <Trash2 className="mr-2 size-4" /> 회원 삭제
+                <PauseCircle className="mr-2 size-4" /> PT 이용 종료
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
+
+      {/* 2줄: 전체 전화번호 · 전화 · 복사 */}
+      <div className="flex items-center gap-2">
+        {phone ? (
+          <>
+            <a
+              href={`tel:${phone.replace(/[^0-9+]/g, "")}`}
+              className="min-w-0 flex-1 text-sm font-bold tabular-nums underline-offset-4 hover:underline"
+            >
+              {phone}
+            </a>
+            <Button
+              asChild
+              size="icon"
+              variant="outline"
+              className="size-9 shrink-0 rounded-2xl border-2"
+            >
+              <a href={`tel:${phone.replace(/[^0-9+]/g, "")}`} aria-label={`${phone} 전화 걸기`}>
+                <Phone className="size-4" />
+              </a>
+            </Button>
+            <Button
+              size="icon"
+              variant="outline"
+              className="size-9 shrink-0 rounded-2xl border-2"
+              aria-label="전화번호 복사"
+              onClick={copyPhone}
+            >
+              <Copy className="size-4" />
+            </Button>
+          </>
+        ) : (
+          <p className="text-sm text-muted-foreground">전화번호 없음</p>
+        )}
+      </div>
+
+      {/* 3줄: 상태 · 남은 횟수 */}
+      <div className="flex flex-wrap items-center gap-2">
+        <StatusPill tone={MEMBER_STATE_TONE[state]}>{MEMBER_STATE_LABEL[state]}</StatusPill>
+        <span className="text-sm font-bold">남은 {remaining}회</span>
+      </div>
+
+      {!!trainerNote && (
+        <p className="truncate text-xs text-muted-foreground">
+          <StickyNote className="mr-1 inline size-3" />
+          {trainerNote.split("\n")[0]}
+        </p>
+      )}
+
 
       <div
         className={cn(
