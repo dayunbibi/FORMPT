@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/pass")({
   head: () => ({
     meta: [
       { title: "이용권 · 결제 이력 — FORMFIT" },
-      { name: "description", content: "남은 PT 횟수와 충전·차감 이력, 결제 내역을 확인하세요." },
+      { name: "description", content: "남은 PT 횟수와 충전·차감 이력을 확인하세요." },
       { property: "og:title", content: "이용권 · 결제 이력 — FORMFIT" },
       { property: "og:description", content: "남은 횟수와 사용 이력이 항상 일치합니다." },
     ],
@@ -24,7 +24,6 @@ type Entry = {
   delta: number;
   kind: string;
   note: string | null;
-  amount_paid: number | null;
   created_at: string;
 };
 
@@ -47,7 +46,7 @@ function PassPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("credit_entries")
-        .select("id, delta, kind, note, amount_paid, created_at")
+        .select("id, delta, kind, note, created_at")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as Entry[];
@@ -59,7 +58,6 @@ function PassPage() {
   const remaining = list.reduce((sum, e) => sum + e.delta, 0);
   const charged = list.filter((e) => e.delta > 0).reduce((s, e) => s + e.delta, 0);
   const used = charged - remaining;
-  const payments = list.filter((e) => (e.amount_paid ?? 0) > 0);
 
   return (
     <AppShell title="이용권" subtitle="남은 횟수와 사용 이력" role="member">
@@ -108,27 +106,6 @@ function PassPage() {
         )}
       </Section>
 
-      <Section title={`결제 · 충전 이력 (${payments.length})`}>
-        {payments.length === 0 ? (
-          <EmptyState title="결제 이력이 없어요" description="결제와 함께 충전되면 금액이 함께 표시됩니다." />
-        ) : (
-          <div className="space-y-2">
-            {payments.map((e) => (
-              <Card key={e.id} className="flex items-center justify-between gap-3 py-3">
-                <div>
-                  <p className="text-sm font-bold">{label(e)}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {fmtDate(e.created_at)} · {e.delta}회 충전
-                  </p>
-                </div>
-                <p className="text-base font-extrabold">
-                  {(e.amount_paid ?? 0).toLocaleString("ko-KR")}원
-                </p>
-              </Card>
-            ))}
-          </div>
-        )}
-      </Section>
     </AppShell>
   );
 }
