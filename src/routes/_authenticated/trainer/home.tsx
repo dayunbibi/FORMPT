@@ -6,7 +6,15 @@ import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
 import { MemberAvatar } from "@/components/pt/MemberAvatar";
-import { Card, EmptyState, ListSkeleton, Section, StatCard, StatSkeleton, StatusPill } from "@/components/pt/kit";
+import {
+  Card,
+  EmptyState,
+  ListSkeleton,
+  Section,
+  StatCard,
+  StatSkeleton,
+  StatusPill,
+} from "@/components/pt/kit";
 import { WithdrawalRequestsSection } from "@/components/pt/WithdrawalRequests";
 import { ReuseRequestsSection, type ReuseRequest } from "@/components/pt/ReuseRequests";
 import {
@@ -24,7 +32,10 @@ export const Route = createFileRoute("/_authenticated/trainer/home")({
   head: () => ({
     meta: [
       { title: "트레이너 홈 — FORMFIT" },
-      { name: "description", content: "승인 대기와 취소 요청, 오늘 예약된 수업을 가장 먼저 처리하세요." },
+      {
+        name: "description",
+        content: "승인 대기와 취소 요청, 오늘 예약된 수업을 가장 먼저 처리하세요.",
+      },
       { property: "og:title", content: "트레이너 홈 — FORMFIT" },
       { property: "og:description", content: "오늘 처리할 일과 수업 일정을 한 화면에서." },
     ],
@@ -81,7 +92,10 @@ function TrainerHome() {
         .eq("id", input.id);
       if (error) throw error;
       if (input.approve) {
-        await supabase.from("profiles").update({ trainer_id: trainerId ?? null }).eq("id", input.memberId);
+        await supabase
+          .from("profiles")
+          .update({ trainer_id: trainerId ?? null })
+          .eq("id", input.memberId);
       }
     },
     onSuccess: () => {
@@ -143,7 +157,6 @@ function TrainerHome() {
     onError: () => toast.error("변경에 실패했습니다"),
   });
 
-  
   const all = bookings.data ?? [];
   const pending = all.filter((b) => b.status === "pending");
   const cancelReq = all.filter((b) => b.cancel_requested && b.status === "confirmed");
@@ -165,7 +178,12 @@ function TrainerHome() {
         <StatSkeleton />
       ) : (
         <div className="grid grid-cols-2 gap-3">
-          <StatCard label="처리 대기" value={pending.length + cancelReq.length} unit="건" hint="승인·취소요청" />
+          <StatCard
+            label="처리 대기"
+            value={pending.length + cancelReq.length}
+            unit="건"
+            hint="승인·취소요청"
+          />
           <StatCard label="오늘 수업" value={today.length} unit="건" hint="취소 제외" />
         </div>
       )}
@@ -237,7 +255,10 @@ function TrainerHome() {
         {bookings.isLoading ? (
           <ListSkeleton rows={2} />
         ) : pending.length === 0 ? (
-          <EmptyState title="대기 중인 예약이 없어요" description="새 예약 요청이 오면 여기에 표시됩니다." />
+          <EmptyState
+            title="대기 중인 예약이 없어요"
+            description="새 예약 요청이 오면 여기에 표시됩니다."
+          />
         ) : (
           <div className="space-y-3">
             {pending.map((b) => (
@@ -327,7 +348,9 @@ function TrainerHome() {
               <Card key={b.id} className="flex items-center justify-between gap-3 py-3">
                 <div>
                   <p className="font-bold">{fmtTime(b.start_at)}</p>
-                  <p className="text-sm text-muted-foreground">{names.get(b.member_id) ?? "회원"}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {names.get(b.member_id) ?? "회원"}
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <StatusPill tone={statusTone(b)}>{statusLabel(b)}</StatusPill>
@@ -366,7 +389,9 @@ function TrainerHome() {
               <Card key={b.id} className="flex items-center justify-between gap-3 py-3">
                 <div>
                   <p className="font-bold">{fmtDateTime(b.start_at)}</p>
-                  <p className="text-sm text-muted-foreground">{names.get(b.member_id) ?? "회원"}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {names.get(b.member_id) ?? "회원"}
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
@@ -396,7 +421,10 @@ function TrainerHome() {
         {requests.isLoading ? (
           <ListSkeleton rows={1} />
         ) : newRequests.length === 0 ? (
-          <EmptyState title="새 가입 요청이 없어요" description="회원이 검색으로 요청을 보내면 여기에 표시됩니다." />
+          <EmptyState
+            title="새 가입 요청이 없어요"
+            description="회원이 검색으로 요청을 보내면 여기에 표시됩니다."
+          />
         ) : (
           <div className="space-y-3">
             {newRequests.map((r) => (
@@ -417,12 +445,16 @@ function TrainerHome() {
                     <dd className="leading-relaxed">{r.goal?.trim() || "작성하지 않았어요"}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs font-bold text-muted-foreground">부상 이력 · 주의사항</dt>
+                    <dt className="text-xs font-bold text-muted-foreground">
+                      부상 이력 · 주의사항
+                    </dt>
                     <dd className="leading-relaxed">{r.injuries?.trim() || "작성하지 않았어요"}</dd>
                   </div>
                   <div>
                     <dt className="text-xs font-bold text-muted-foreground">선호 시간대</dt>
-                    <dd className="leading-relaxed">{r.preferred_time?.trim() || "작성하지 않았어요"}</dd>
+                    <dd className="leading-relaxed">
+                      {r.preferred_time?.trim() || "작성하지 않았어요"}
+                    </dd>
                   </div>
                   {r.message?.trim() && (
                     <div>
@@ -435,14 +467,18 @@ function TrainerHome() {
                 <div className="flex gap-2">
                   <Button
                     className="flex-1 rounded-2xl"
-                    onClick={() => decide.mutate({ id: r.id, memberId: r.member_id, approve: true })}
+                    onClick={() =>
+                      decide.mutate({ id: r.id, memberId: r.member_id, approve: true })
+                    }
                   >
                     승인
                   </Button>
                   <Button
                     variant="outline"
                     className="flex-1 rounded-2xl border-2"
-                    onClick={() => decide.mutate({ id: r.id, memberId: r.member_id, approve: false })}
+                    onClick={() =>
+                      decide.mutate({ id: r.id, memberId: r.member_id, approve: false })
+                    }
                   >
                     거절
                   </Button>

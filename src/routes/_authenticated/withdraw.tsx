@@ -35,7 +35,8 @@ export const Route = createFileRoute("/_authenticated/withdraw")({
       { title: "PT 이용 종료 요청 — FORMFIT" },
       {
         name: "description",
-        content: "남은 PT 횟수와 예정된 예약을 확인한 뒤 트레이너에게 PT 이용 종료 요청을 보냅니다.",
+        content:
+          "남은 PT 횟수와 예정된 예약을 확인한 뒤 트레이너에게 PT 이용 종료 요청을 보냅니다.",
       },
       { property: "og:title", content: "PT 이용 종료 요청 — FORMFIT" },
       { property: "og:description", content: "이용 종료 전 확인 사항과 요청 진행 상태." },
@@ -167,7 +168,11 @@ function WithdrawPage() {
   const loading = remaining.isLoading || bookings.isLoading || request.isLoading;
 
   return (
-    <AppShell title="PT 이용 종료 요청" subtitle="이용 종료 전 아래 내용을 확인해 주세요" role="member">
+    <AppShell
+      title="PT 이용 종료 요청"
+      subtitle="이용 종료 전 아래 내용을 확인해 주세요"
+      role="member"
+    >
       {loading ? (
         <ListSkeleton rows={3} />
       ) : (
@@ -253,8 +258,8 @@ function WithdrawPage() {
             <Section title="이용 종료 요청">
               <Card className="space-y-3">
                 <p className="text-sm text-muted-foreground">
-                  연결된 트레이너가 없어 이용 종료 요청을 보낼 수 없습니다. 트레이너와 연결한 뒤 다시
-                  시도해 주세요.
+                  연결된 트레이너가 없어 이용 종료 요청을 보낼 수 없습니다. 트레이너와 연결한 뒤
+                  다시 시도해 주세요.
                 </p>
                 <Button asChild variant="outline" className="w-full rounded-2xl border-2">
                   <Link to="/connect" search={{ tab: "code" }}>

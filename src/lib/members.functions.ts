@@ -19,7 +19,10 @@ function parseReactivate(data: unknown): ReactivateInput {
     throw new Error("invalid member id");
   }
   if (typeof raw.keepCredits !== "boolean") throw new Error("invalid credit option");
-  if (raw.requestId !== undefined && (typeof raw.requestId !== "string" || !UUID.test(raw.requestId))) {
+  if (
+    raw.requestId !== undefined &&
+    (typeof raw.requestId !== "string" || !UUID.test(raw.requestId))
+  ) {
     throw new Error("invalid request id");
   }
   return { memberId: raw.memberId, keepCredits: raw.keepCredits, requestId: raw.requestId };

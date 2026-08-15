@@ -70,7 +70,10 @@ export const Route = createFileRoute("/_authenticated/trainer/members")({
   head: () => ({
     meta: [
       { title: "회원 관리 — FORMFIT 트레이너" },
-      { name: "description", content: "회원별 남은 횟수와 연락처, 이용 현황을 확인하고 PT 횟수를 조정하세요." },
+      {
+        name: "description",
+        content: "회원별 남은 횟수와 연락처, 이용 현황을 확인하고 PT 횟수를 조정하세요.",
+      },
       { property: "og:title", content: "회원 관리 — FORMFIT 트레이너" },
       { property: "og:description", content: "요약형 카드와 아코디언으로 간소화된 회원 관리." },
     ],
@@ -157,7 +160,10 @@ function MembersPage() {
 
   const saveInfo = useMutation({
     mutationFn: async (input: { memberId: string; patch: Partial<Profile> }) => {
-      const { error } = await supabase.from("profiles").update(input.patch).eq("id", input.memberId);
+      const { error } = await supabase
+        .from("profiles")
+        .update(input.patch)
+        .eq("id", input.memberId);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -211,9 +217,7 @@ function MembersPage() {
     .filter((m) => {
       const q = query.trim().toLowerCase();
       if (!q) return true;
-      return (
-        m.full_name.toLowerCase().includes(q) || (m.phone ?? "").toLowerCase().includes(q)
-      );
+      return m.full_name.toLowerCase().includes(q) || (m.phone ?? "").toLowerCase().includes(q);
     })
     .sort((a, b) => {
       if (sort === "name") return a.full_name.localeCompare(b.full_name, "ko");
@@ -415,7 +419,12 @@ function MemberCard({
   const n = Math.abs(Math.trunc(Number(count) || 0));
   const delta = mode === "add" ? n : -n;
   const nextRemaining = remaining + delta;
-  const invalid = n <= 0 ? "조정 횟수를 1 이상으로 입력해 주세요." : nextRemaining < 0 ? "차감 후 남은 횟수가 0회보다 작아질 수 없어요." : null;
+  const invalid =
+    n <= 0
+      ? "조정 횟수를 1 이상으로 입력해 주세요."
+      : nextRemaining < 0
+        ? "차감 후 남은 횟수가 0회보다 작아질 수 없어요."
+        : null;
 
   function apply(renewal: string | null) {
     onAdjust(delta, note.trim(), date, renewal);
@@ -466,7 +475,12 @@ function MemberCard({
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="icon" variant="ghost" className="size-9 rounded-2xl" aria-label="더보기">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="size-9 rounded-2xl"
+                aria-label="더보기"
+              >
                 <MoreVertical className="size-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -539,7 +553,6 @@ function MemberCard({
           {trainerNote.split("\n")[0]}
         </p>
       )}
-
 
       <div
         className={cn(
@@ -713,8 +726,9 @@ function MemberCard({
               {member.full_name} 회원의 PT 이용을 종료할까요?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              예약, PT 사용 이력, 운동 기록, 프로필과 사진은 모두 보존됩니다. 계정은 차단되지 않고 신규 예약과 PT 이용만 제한되며, 남은 횟수는 보류됩니다.
-              확인을 위해 회원 이름 <b>{member.full_name}</b> 을 입력해 주세요.
+              예약, PT 사용 이력, 운동 기록, 프로필과 사진은 모두 보존됩니다. 계정은 차단되지 않고
+              신규 예약과 PT 이용만 제한되며, 남은 횟수는 보류됩니다. 확인을 위해 회원 이름{" "}
+              <b>{member.full_name}</b> 을 입력해 주세요.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <Input
@@ -807,7 +821,11 @@ function EditMemberDialog({
           </Field>
         </div>
         <DialogFooter>
-          <Button variant="outline" className="rounded-2xl border-2" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            className="rounded-2xl border-2"
+            onClick={() => onOpenChange(false)}
+          >
             취소
           </Button>
           <Button

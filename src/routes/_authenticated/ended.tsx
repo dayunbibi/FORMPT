@@ -177,7 +177,8 @@ function EndedPage() {
                 </Button>
                 {!trainerId && (
                   <p className="text-sm text-muted-foreground">
-                    이전 트레이너 정보가 없어요. 초대코드를 입력하거나 트레이너를 찾아 연결해 주세요.
+                    이전 트레이너 정보가 없어요. 초대코드를 입력하거나 트레이너를 찾아 연결해
+                    주세요.
                   </p>
                 )}
                 <div className="grid gap-2">

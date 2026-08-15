@@ -40,7 +40,6 @@ export const MEMBER_STATE_LABEL: Record<MemberState, string> = {
   active: "정상 이용 중",
 };
 
-
 export const MEMBER_STATE_TONE: Record<MemberState, "lime" | "warn" | "muted"> = {
   deleted: "muted",
   low: "warn",
@@ -125,7 +124,7 @@ export async function getMe() {
       .from("profiles")
       .insert({
         id: user.id,
-        full_name: meta.full_name ?? (user.email?.split("@")[0] ?? "회원"),
+        full_name: meta.full_name ?? user.email?.split("@")[0] ?? "회원",
         onboarded: role === "trainer",
       })
       .select("*")
@@ -157,8 +156,6 @@ export async function getMe() {
   // 이용이 종료된 회원도 로그인 세션을 유지한다 (제한 화면에서 과거 기록 조회 · 재이용 신청).
   return { user, profile: profile as Profile | null, role, email: user.email ?? "" };
 }
-
-
 
 export function useMe() {
   return useQuery({ queryKey: ["me"], queryFn: getMe, staleTime: 30_000 });
@@ -258,7 +255,9 @@ export function useMemberCredits(trainerId?: string, memberIds: string[] = []) {
         .in("member_id", memberIds);
       if (error) throw error;
       const map = new Map<string, number>();
-      (data ?? []).forEach((row) => map.set(row.member_id, (map.get(row.member_id) ?? 0) + row.delta));
+      (data ?? []).forEach((row) =>
+        map.set(row.member_id, (map.get(row.member_id) ?? 0) + row.delta),
+      );
       return map;
     },
     enabled: !!trainerId && memberIds.length > 0,
