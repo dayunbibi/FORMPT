@@ -56,7 +56,7 @@ export const Route = createFileRoute("/_authenticated/profile")({
 });
 
 function ProfilePage() {
-  const me = useRoleGate("member");
+  const me = useRoleGate("member", { allowEnded: true });
   const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [confirmRemove, setConfirmRemove] = useState(false);
@@ -202,7 +202,7 @@ function ProfilePage() {
           to="/withdraw"
           className="text-xs font-bold text-destructive underline underline-offset-4"
         >
-          회원 탈퇴 요청
+          PT 이용 종료 요청
         </Link>
       </div>
 

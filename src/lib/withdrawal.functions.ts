@@ -14,9 +14,11 @@ function parseInput(data: unknown): Input {
 }
 
 /**
- * 탈퇴 요청 최종 승인.
+ * PT 이용 종료 처리(구 탈퇴 승인).
  * - 호출자가 해당 요청의 담당 트레이너인지 RLS 클라이언트로 먼저 검증한다.
- * - 승인 후에도 예약/운동기록/PT이력/매출 기록은 삭제하지 않고 보존한다.
+ * - 인증 계정은 삭제·차단하지 않는다. 회원은 같은 이메일로 로그인해 과거 기록을 볼 수 있다.
+ * - 예약/운동기록/PT이력/매출/프로필/사진/트레이너 메모는 모두 보존한다.
+ * - 남은 PT 횟수도 삭제하지 않고 보류된 횟수로 유지한다.
  */
 export const approveWithdrawal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -65,43 +67,28 @@ export const approveWithdrawal = createServerFn({ method: "POST" })
       .in("status", ["requested", "contacted"]);
     if (renewalError) throw new Error(renewalError.message);
 
-    // 3) 사진 및 불필요한 개인정보 제거 + 소프트 삭제(로그인/신규 예약 차단)
-    const { data: profile } = await supabaseAdmin
-      .from("profiles")
-      .select("photo_path")
-      .eq("id", memberId)
-      .maybeSingle();
-    if (profile?.photo_path) {
-      await supabaseAdmin.storage.from("member-photos").remove([profile.photo_path]);
-    }
-
+    // 3) 이용 관계만 종료 상태로 표시 (프로필·사진·개인정보·보류 횟수 유지)
     const { error: profileError } = await supabaseAdmin
       .from("profiles")
       .update({
-        full_name: "탈퇴 회원",
-        phone: null,
-        goal: null,
-        injuries: null,
-        preferred_time: null,
-        photo_path: null,
         deleted_at: nowIso,
         deleted_by: context.userId,
-        deleted_reason: "withdrawal",
+        deleted_reason: "ended",
       })
       .eq("id", memberId);
     if (profileError) throw new Error(profileError.message);
-
-    // 4) 인증 계정은 하드 삭제하지 않고 차단만 한다(과거 기록 연쇄 삭제 방지)
-    const { error: banError } = await supabaseAdmin.auth.admin.updateUserById(memberId, {
-      ban_duration: "876000h",
-    });
-    if (banError) throw new Error(banError.message);
 
     const { error: statusError } = await supabaseAdmin
       .from("withdrawal_requests")
       .update({ status: "approved", resolved_at: nowIso })
       .eq("id", data.requestId);
     if (statusError) throw new Error(statusError.message);
+
+    await supabaseAdmin.from("notifications").insert({
+      user_id: memberId,
+      title: "PT 이용이 종료되었습니다",
+      body: "로그인과 과거 기록 조회는 계속 가능합니다. 다시 이용하려면 재이용 신청을 보내주세요.",
+    });
 
     return { ok: true as const };
   });

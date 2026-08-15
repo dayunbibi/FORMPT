@@ -4,12 +4,15 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   ChevronDown,
+  Copy,
   MoreVertical,
+  PauseCircle,
   Pencil,
+  Phone,
   RotateCcw,
   StickyNote,
-  Trash2,
 } from "lucide-react";
+
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,7 +70,10 @@ export const Route = createFileRoute("/_authenticated/trainer/members")({
   head: () => ({
     meta: [
       { title: "회원 관리 — FORMFIT 트레이너" },
-      { name: "description", content: "회원별 남은 횟수와 연락처, 이용 현황을 확인하고 PT 횟수를 조정하세요." },
+      {
+        name: "description",
+        content: "회원별 남은 횟수와 연락처, 이용 현황을 확인하고 PT 횟수를 조정하세요.",
+      },
       { property: "og:title", content: "회원 관리 — FORMFIT 트레이너" },
       { property: "og:description", content: "요약형 카드와 아코디언으로 간소화된 회원 관리." },
     ],
@@ -154,7 +160,10 @@ function MembersPage() {
 
   const saveInfo = useMutation({
     mutationFn: async (input: { memberId: string; patch: Partial<Profile> }) => {
-      const { error } = await supabase.from("profiles").update(input.patch).eq("id", input.memberId);
+      const { error } = await supabase
+        .from("profiles")
+        .update(input.patch)
+        .eq("id", input.memberId);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -168,9 +177,9 @@ function MembersPage() {
     mutationFn: async (memberId: string) => softDeleteMember({ data: { memberId } }),
     onSuccess: () => {
       invalidateAll();
-      toast.success("회원을 삭제했습니다. 기록은 보존됩니다.");
+      toast.success("PT 이용을 종료했습니다. 기록은 보존됩니다.");
     },
-    onError: (error: Error) => toast.error(error.message || "삭제에 실패했습니다"),
+    onError: (error: Error) => toast.error(error.message || "이용 종료 처리에 실패했습니다"),
   });
 
   const notes = useTrainerNotes(trainerId);
@@ -189,9 +198,9 @@ function MembersPage() {
     mutationFn: async (memberId: string) => restoreMember({ data: { memberId } }),
     onSuccess: () => {
       invalidateAll();
-      toast.success("회원을 복구했습니다");
+      toast.success("회원 이용을 다시 시작했습니다");
     },
-    onError: (error: Error) => toast.error(error.message || "복구에 실패했습니다"),
+    onError: (error: Error) => toast.error(error.message || "이용 재개에 실패했습니다"),
   });
 
   const list = all.data ?? [];
@@ -208,9 +217,7 @@ function MembersPage() {
     .filter((m) => {
       const q = query.trim().toLowerCase();
       if (!q) return true;
-      return (
-        m.full_name.toLowerCase().includes(q) || (m.phone ?? "").toLowerCase().includes(q)
-      );
+      return m.full_name.toLowerCase().includes(q) || (m.phone ?? "").toLowerCase().includes(q);
     })
     .sort((a, b) => {
       if (sort === "name") return a.full_name.localeCompare(b.full_name, "ko");
@@ -288,7 +295,7 @@ function MembersPage() {
       </Section>
 
       <Section
-        title={`삭제된 회원 (${deleted.length})`}
+        title={`이용 종료 회원 (${deleted.length})`}
         action={
           <Button
             variant="outline"
@@ -302,7 +309,10 @@ function MembersPage() {
       >
         {showDeleted &&
           (deleted.length === 0 ? (
-            <EmptyState title="삭제된 회원이 없어요" description="삭제한 회원은 이곳에서 복구할 수 있어요." />
+            <EmptyState
+              title="이용 종료 회원이 없어요"
+              description="이용을 종료한 회원은 이곳에서 다시 시작할 수 있어요."
+            />
           ) : (
             <div className="space-y-2">
               {deleted.map((m) => (
@@ -317,7 +327,7 @@ function MembersPage() {
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <StatusPill tone="muted">삭제된 회원</StatusPill>
+                    <StatusPill tone="muted">이용 종료</StatusPill>
                     <Button
                       size="sm"
                       variant="outline"
@@ -326,7 +336,7 @@ function MembersPage() {
                       disabled={restore.isPending}
                     >
                       <RotateCcw className="mr-1 size-3" />
-                      복구
+                      이용 재개
                     </Button>
                   </div>
                 </Card>
@@ -409,7 +419,12 @@ function MemberCard({
   const n = Math.abs(Math.trunc(Number(count) || 0));
   const delta = mode === "add" ? n : -n;
   const nextRemaining = remaining + delta;
-  const invalid = n <= 0 ? "조정 횟수를 1 이상으로 입력해 주세요." : nextRemaining < 0 ? "차감 후 남은 횟수가 0회보다 작아질 수 없어요." : null;
+  const invalid =
+    n <= 0
+      ? "조정 횟수를 1 이상으로 입력해 주세요."
+      : nextRemaining < 0
+        ? "차감 후 남은 횟수가 0회보다 작아질 수 없어요."
+        : null;
 
   function apply(renewal: string | null) {
     onAdjust(delta, note.trim(), date, renewal);
@@ -417,25 +432,23 @@ function MemberCard({
     setCount("1");
   }
 
+  const phone = member.phone?.trim() || "";
+
+  async function copyPhone() {
+    try {
+      await navigator.clipboard.writeText(phone);
+      toast.success("전화번호가 복사되었습니다");
+    } catch {
+      toast.error("복사에 실패했습니다");
+    }
+  }
+
   return (
     <Card className="space-y-3">
-      <div className="flex items-start gap-3">
+      {/* 1줄: 사진 · 이름 · 관리 · 더보기 */}
+      <div className="flex items-center gap-2">
         <MemberAvatar name={member.full_name} photoPath={member.photo_path} size="md" />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-base font-extrabold">{member.full_name}</p>
-          <p className="truncate text-sm text-muted-foreground">{member.phone ?? "연락처 미등록"}</p>
-          <div className="mt-1.5 flex flex-wrap items-center gap-2">
-            <StatusPill tone={MEMBER_STATE_TONE[state]}>{MEMBER_STATE_LABEL[state]}</StatusPill>
-            <span className="text-sm font-bold">남은 {remaining}회</span>
-          </div>
-          {!!trainerNote && (
-            <p className="mt-1 truncate text-xs text-muted-foreground">
-              <StickyNote className="mr-1 inline size-3" />
-              {trainerNote.split("\n")[0]}
-            </p>
-          )}
-        </div>
-
+        <p className="min-w-0 flex-1 truncate text-base font-extrabold">{member.full_name}</p>
         <div className="flex shrink-0 items-center gap-1">
           <Button
             size="icon"
@@ -453,7 +466,7 @@ function MemberCard({
           <Button
             size="sm"
             variant="outline"
-            className="rounded-2xl border-2"
+            className="rounded-2xl border-2 px-2.5"
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
           >
@@ -462,7 +475,12 @@ function MemberCard({
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="icon" variant="ghost" className="size-9 rounded-2xl" aria-label="더보기">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="size-9 rounded-2xl"
+                aria-label="더보기"
+              >
                 <MoreVertical className="size-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -481,12 +499,60 @@ function MemberCard({
                   setConfirmName("");
                 }}
               >
-                <Trash2 className="mr-2 size-4" /> 회원 삭제
+                <PauseCircle className="mr-2 size-4" /> PT 이용 종료
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
+
+      {/* 2줄: 전체 전화번호 · 전화 · 복사 */}
+      <div className="flex items-center gap-2">
+        {phone ? (
+          <>
+            <a
+              href={`tel:${phone.replace(/[^0-9+]/g, "")}`}
+              className="min-w-0 flex-1 text-sm font-bold tabular-nums underline-offset-4 hover:underline"
+            >
+              {phone}
+            </a>
+            <Button
+              asChild
+              size="icon"
+              variant="outline"
+              className="size-9 shrink-0 rounded-2xl border-2"
+            >
+              <a href={`tel:${phone.replace(/[^0-9+]/g, "")}`} aria-label={`${phone} 전화 걸기`}>
+                <Phone className="size-4" />
+              </a>
+            </Button>
+            <Button
+              size="icon"
+              variant="outline"
+              className="size-9 shrink-0 rounded-2xl border-2"
+              aria-label="전화번호 복사"
+              onClick={copyPhone}
+            >
+              <Copy className="size-4" />
+            </Button>
+          </>
+        ) : (
+          <p className="text-sm text-muted-foreground">전화번호 없음</p>
+        )}
+      </div>
+
+      {/* 3줄: 상태 · 남은 횟수 */}
+      <div className="flex flex-wrap items-center gap-2">
+        <StatusPill tone={MEMBER_STATE_TONE[state]}>{MEMBER_STATE_LABEL[state]}</StatusPill>
+        <span className="text-sm font-bold">남은 {remaining}회</span>
+      </div>
+
+      {!!trainerNote && (
+        <p className="truncate text-xs text-muted-foreground">
+          <StickyNote className="mr-1 inline size-3" />
+          {trainerNote.split("\n")[0]}
+        </p>
+      )}
 
       <div
         className={cn(
@@ -657,11 +723,12 @@ function MemberCard({
         <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-destructive">
-              {member.full_name} 회원을 삭제할까요?
+              {member.full_name} 회원의 PT 이용을 종료할까요?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              예약, PT 사용 이력, 운동 기록은 모두 보존되지만 로그인과 신규 예약이 즉시 차단됩니다.
-              확인을 위해 회원 이름 <b>{member.full_name}</b> 을 입력해 주세요.
+              예약, PT 사용 이력, 운동 기록, 프로필과 사진은 모두 보존됩니다. 계정은 차단되지 않고
+              신규 예약과 PT 이용만 제한되며, 남은 횟수는 보류됩니다. 확인을 위해 회원 이름{" "}
+              <b>{member.full_name}</b> 을 입력해 주세요.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <Input
@@ -681,7 +748,7 @@ function MemberCard({
                 setDeleteStep(false);
               }}
             >
-              삭제
+              이용 종료
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -754,7 +821,11 @@ function EditMemberDialog({
           </Field>
         </div>
         <DialogFooter>
-          <Button variant="outline" className="rounded-2xl border-2" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            className="rounded-2xl border-2"
+            onClick={() => onOpenChange(false)}
+          >
             취소
           </Button>
           <Button

@@ -25,7 +25,7 @@ import {
   type WithdrawalRequest,
 } from "@/lib/withdrawal";
 
-/** 트레이너 첫 화면의 회원 탈퇴 요청 섹션 */
+/** 트레이너 첫 화면의 PT 이용 종료 요청 섹션 */
 export function WithdrawalRequestsSection({
   trainerId,
   members,
@@ -85,7 +85,7 @@ export function WithdrawalRequestsSection({
     },
     onSuccess: () => {
       refresh();
-      toast.success("탈퇴 요청 상태를 변경했습니다");
+      toast.success("이용 종료 요청 상태를 변경했습니다");
     },
     onError: () => toast.error("변경에 실패했습니다"),
   });
@@ -95,7 +95,7 @@ export function WithdrawalRequestsSection({
     onSuccess: () => {
       setConfirm(null);
       refresh();
-      toast.success("탈퇴 요청을 승인했습니다");
+      toast.success("PT 이용을 종료 처리했습니다");
     },
     onError: (error: Error) => toast.error(error.message || "승인에 실패했습니다"),
   });
@@ -105,13 +105,13 @@ export function WithdrawalRequestsSection({
   const confirmUpcoming = confirm ? (context.data?.upcoming.get(confirm.member_id) ?? []) : [];
 
   return (
-    <Section title={`회원 탈퇴 요청 (${list.length})`}>
+    <Section title={`PT 이용 종료 요청 (${list.length})`}>
       {requests.isLoading ? (
         <ListSkeleton rows={1} />
       ) : list.length === 0 ? (
         <EmptyState
-          title="탈퇴 요청이 없어요"
-          description="회원이 탈퇴를 요청하면 여기에서 승인·반려할 수 있습니다."
+          title="이용 종료 요청이 없어요"
+          description="회원이 이용 종료를 요청하면 여기에서 처리·반려할 수 있습니다."
         />
       ) : (
         <div className="space-y-3">
@@ -181,11 +181,11 @@ export function WithdrawalRequestsSection({
       <AlertDialog open={!!confirm} onOpenChange={(next) => !next && setConfirm(null)}>
         <AlertDialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>탈퇴 요청을 승인할까요?</AlertDialogTitle>
+            <AlertDialogTitle>PT 이용을 종료 처리할까요?</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-2 text-left text-sm leading-relaxed">
                 <p>
-                  차단될 계정: <b>{confirmProfile?.full_name || "이름 미입력"}</b>
+                  이용이 종료될 회원: <b>{confirmProfile?.full_name || "이름 미입력"}</b>
                 </p>
                 <p>
                   남은 PT:{" "}
@@ -196,13 +196,16 @@ export function WithdrawalRequestsSection({
                       : 0}
                     회
                   </b>{" "}
-                  (환불은 자동 처리되지 않습니다)
+                  → 보류된 PT 횟수로 보존되며 환불은 자동 처리되지 않습니다
                 </p>
                 <p>
                   취소될 예정 예약: <b>{confirmUpcoming.length}건</b>
                 </p>
-                <p>보존되는 과거 기록: 지난 예약, 운동기록, PT 이력, 매출 기록</p>
-                <p>과거 기록에는 이름 대신 “탈퇴 회원”으로 표시됩니다.</p>
+                <p>보존되는 정보: 프로필·사진·지난 예약·운동기록·PT 이력·매출 기록·트레이너 메모</p>
+                <p>
+                  계정은 삭제·차단하지 않습니다. 회원은 같은 이메일로 로그인해 과거 기록을 볼 수
+                  있고, 재이용 신청도 보낼 수 있습니다.
+                </p>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -216,7 +219,7 @@ export function WithdrawalRequestsSection({
                 if (confirm) approve.mutate(confirm.id);
               }}
             >
-              {approve.isPending ? "처리 중..." : "탈퇴 승인"}
+              {approve.isPending ? "처리 중..." : "이용 종료 처리"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

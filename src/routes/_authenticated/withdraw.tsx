@@ -32,13 +32,14 @@ import {
 export const Route = createFileRoute("/_authenticated/withdraw")({
   head: () => ({
     meta: [
-      { title: "회원 탈퇴 요청 — FORMFIT" },
+      { title: "PT 이용 종료 요청 — FORMFIT" },
       {
         name: "description",
-        content: "남은 PT 횟수와 예정된 예약을 확인한 뒤 트레이너에게 회원 탈퇴 요청을 보냅니다.",
+        content:
+          "남은 PT 횟수와 예정된 예약을 확인한 뒤 트레이너에게 PT 이용 종료 요청을 보냅니다.",
       },
-      { property: "og:title", content: "회원 탈퇴 요청 — FORMFIT" },
-      { property: "og:description", content: "탈퇴 전 확인 사항과 탈퇴 요청 진행 상태." },
+      { property: "og:title", content: "PT 이용 종료 요청 — FORMFIT" },
+      { property: "og:description", content: "이용 종료 전 확인 사항과 요청 진행 상태." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -132,7 +133,7 @@ function WithdrawPage() {
       });
       if (error) {
         if (error.code === "23505" || error.message.includes("duplicate")) {
-          throw new Error("이미 처리 중인 탈퇴 요청이 있습니다");
+          throw new Error("이미 처리 중인 이용 종료 요청이 있습니다");
         }
         throw new Error(error.message);
       }
@@ -144,7 +145,7 @@ function WithdrawPage() {
       setPasswordOk(false);
       setStep(0);
       queryClient.invalidateQueries({ queryKey: ["my-withdrawal"] });
-      toast.success("탈퇴 요청을 보냈습니다");
+      toast.success("이용 종료 요청을 보냈습니다");
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -159,7 +160,7 @@ function WithdrawPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-withdrawal"] });
-      toast.success("탈퇴 요청을 취소했습니다");
+      toast.success("이용 종료 요청을 취소했습니다");
     },
     onError: () => toast.error("취소에 실패했습니다"),
   });
@@ -167,7 +168,11 @@ function WithdrawPage() {
   const loading = remaining.isLoading || bookings.isLoading || request.isLoading;
 
   return (
-    <AppShell title="회원 탈퇴 요청" subtitle="탈퇴 전 아래 내용을 확인해 주세요" role="member">
+    <AppShell
+      title="PT 이용 종료 요청"
+      subtitle="이용 종료 전 아래 내용을 확인해 주세요"
+      role="member"
+    >
       {loading ? (
         <ListSkeleton rows={3} />
       ) : (
@@ -199,12 +204,14 @@ function WithdrawPage() {
                   ? `${renewal.data.status === "contacted" ? "연락 완료" : "상담 요청"} 상태의 요청이 1건 있습니다.`
                   : "처리 중인 재등록 상담 요청이 없습니다."}
               </p>
-              <p className="text-sm font-extrabold pt-2">탈퇴 시 이용할 수 없는 기능</p>
+              <p className="text-sm font-extrabold pt-2">이용 종료 후 사용할 수 없는 기능</p>
               <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-                <li>로그인 및 앱 접속</li>
                 <li>수업 예약 및 예약 취소</li>
-                <li>운동기록·이용권 조회</li>
+                <li>새 운동기록 작성 및 PT 횟수 사용</li>
                 <li>재등록 상담 요청</li>
+                <li className="text-foreground">
+                  로그인과 과거 운동기록·PT 사용 이력 조회는 계속 가능합니다
+                </li>
               </ul>
             </Card>
             <Card className="border-2 border-destructive/40 bg-destructive/5">
@@ -243,16 +250,16 @@ function WithdrawPage() {
                   disabled={cancelRequest.isPending}
                   onClick={() => cancelRequest.mutate()}
                 >
-                  탈퇴 요청 취소
+                  이용 종료 요청 취소
                 </Button>
               </Card>
             </Section>
           ) : !trainerId ? (
-            <Section title="탈퇴 요청">
+            <Section title="이용 종료 요청">
               <Card className="space-y-3">
                 <p className="text-sm text-muted-foreground">
-                  연결된 트레이너가 없어 탈퇴 요청을 보낼 수 없습니다. 트레이너와 연결한 뒤 다시
-                  시도해 주세요.
+                  연결된 트레이너가 없어 이용 종료 요청을 보낼 수 없습니다. 트레이너와 연결한 뒤
+                  다시 시도해 주세요.
                 </p>
                 <Button asChild variant="outline" className="w-full rounded-2xl border-2">
                   <Link to="/connect" search={{ tab: "code" }}>
@@ -262,11 +269,11 @@ function WithdrawPage() {
               </Card>
             </Section>
           ) : (
-            <Section title="탈퇴 요청">
+            <Section title="이용 종료 요청">
               {request.data && request.data.status === "rejected" && (
                 <Card className="border-2 border-destructive/40">
                   <p className="text-sm font-bold text-destructive">
-                    이전 탈퇴 요청이 반려되었습니다. 계정과 기능은 그대로 유지됩니다.
+                    이전 이용 종료 요청이 반려되었습니다. 계정과 기능은 그대로 유지됩니다.
                     {request.data.trainer_note ? ` (${request.data.trainer_note})` : ""}
                   </p>
                 </Card>
@@ -275,21 +282,21 @@ function WithdrawPage() {
                 {step === 0 && (
                   <>
                     <p className="text-sm text-muted-foreground">
-                      위 내용을 모두 확인했다면 탈퇴 요청을 시작할 수 있습니다.
+                      위 내용을 모두 확인했다면 이용 종료 요청을 시작할 수 있습니다.
                     </p>
                     <Button
                       variant="outline"
                       className="w-full rounded-2xl border-2 border-destructive text-destructive"
                       onClick={() => setStep(1)}
                     >
-                      탈퇴 요청 시작
+                      이용 종료 요청 시작
                     </Button>
                   </>
                 )}
 
                 {step === 1 && (
                   <>
-                    <Field label="탈퇴 사유 (선택)">
+                    <Field label="이용 종료 사유 (선택)">
                       <div className="space-y-2">
                         {WITHDRAWAL_REASONS.map((r) => (
                           <button
@@ -379,7 +386,7 @@ function WithdrawPage() {
                       className="w-full rounded-2xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       onClick={() => setConfirmOpen(true)}
                     >
-                      탈퇴 요청 보내기
+                      이용 종료 요청 보내기
                     </Button>
                   </>
                 )}
@@ -392,19 +399,19 @@ function WithdrawPage() {
       <Dialog open={confirmOpen} onOpenChange={(next) => !submit.isPending && setConfirmOpen(next)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>정말 탈퇴를 요청할까요?</DialogTitle>
+            <DialogTitle>정말 이용 종료를 요청할까요?</DialogTitle>
             <DialogDescription className="leading-relaxed">{WITHDRAWAL_NOTICE}</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
               남은 PT {remaining.data ?? 0}회 · 예정 예약 {bookings.data?.length ?? 0}건
             </p>
-            <Field label='확인을 위해 "탈퇴"를 입력해 주세요' htmlFor="withdraw-word">
+            <Field label='확인을 위해 "종료"를 입력해 주세요' htmlFor="withdraw-word">
               <Input
                 id="withdraw-word"
                 value={confirmWord}
                 onChange={(e) => setConfirmWord(e.target.value)}
-                placeholder="탈퇴"
+                placeholder="종료"
               />
             </Field>
           </div>
@@ -419,10 +426,10 @@ function WithdrawPage() {
             </Button>
             <Button
               className="rounded-2xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={confirmWord.trim() !== "탈퇴" || submit.isPending}
+              disabled={confirmWord.trim() !== "종료" || submit.isPending}
               onClick={() => submit.mutate()}
             >
-              {submit.isPending ? "전송 중..." : "탈퇴 요청 보내기"}
+              {submit.isPending ? "전송 중..." : "이용 종료 요청 보내기"}
             </Button>
           </DialogFooter>
         </DialogContent>

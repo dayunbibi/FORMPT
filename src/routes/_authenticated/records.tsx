@@ -12,7 +12,10 @@ export const Route = createFileRoute("/_authenticated/records")({
   head: () => ({
     meta: [
       { title: "운동기록 타임라인 — FORMFIT" },
-      { name: "description", content: "날짜별 운동 종목·무게·횟수·세트와 트레이너 피드백을 확인하세요." },
+      {
+        name: "description",
+        content: "날짜별 운동 종목·무게·횟수·세트와 트레이너 피드백을 확인하세요.",
+      },
       { property: "og:title", content: "운동기록 타임라인 — FORMFIT" },
       { property: "og:description", content: "이전 기록과 비교한 증가 표시까지 함께 제공." },
     ],
@@ -20,11 +23,16 @@ export const Route = createFileRoute("/_authenticated/records")({
   component: RecordsPage,
 });
 
-type Item = { exercise: string; weight_kg: number | null; reps: number | null; sets: number | null };
+type Item = {
+  exercise: string;
+  weight_kg: number | null;
+  reps: number | null;
+  sets: number | null;
+};
 type Log = { id: string; log_date: string; feedback: string | null; workout_items: Item[] };
 
 export function RecordsPage() {
-  const me = useRoleGate("member");
+  const me = useRoleGate("member", { allowEnded: true });
 
   const logs = useQuery({
     queryKey: ["my-logs", me.data?.user.id],

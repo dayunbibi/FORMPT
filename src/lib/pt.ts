@@ -20,7 +20,7 @@ export type Profile = {
   renewal_dismissed_at: string | null;
 };
 
-/** 회원 상태: 삭제 > 잔여 횟수(3회 미만은 소진 임박) 순으로 판정한다. */
+/** 회원 상태: 이용 종료 > 잔여 횟수(3회 미만은 소진 임박) 순으로 판정한다. */
 export type MemberState = "deleted" | "low" | "active";
 
 export function memberState(p: Pick<Profile, "deleted_at">, remaining: number): MemberState {
@@ -29,8 +29,13 @@ export function memberState(p: Pick<Profile, "deleted_at">, remaining: number): 
   return "active";
 }
 
+/** 이용이 종료된 회원인지 (계정은 유지되며 예약·PT 기능만 제한된다) */
+export function isEndedMember(p: Pick<Profile, "deleted_at"> | null | undefined) {
+  return !!p?.deleted_at;
+}
+
 export const MEMBER_STATE_LABEL: Record<MemberState, string> = {
-  deleted: "삭제된 회원",
+  deleted: "이용 종료 회원",
   low: "소진 임박",
   active: "정상 이용 중",
 };
@@ -119,7 +124,7 @@ export async function getMe() {
       .from("profiles")
       .insert({
         id: user.id,
-        full_name: meta.full_name ?? (user.email?.split("@")[0] ?? "회원"),
+        full_name: meta.full_name ?? user.email?.split("@")[0] ?? "회원",
         onboarded: role === "trainer",
       })
       .select("*")
@@ -148,12 +153,7 @@ export async function getMe() {
     }
   }
 
-  // 소프트 삭제된 회원은 남아 있는 세션도 즉시 종료한다.
-  if (role === "member" && (profile as Profile | null)?.deleted_at) {
-    await supabase.auth.signOut();
-    return null;
-  }
-
+  // 이용이 종료된 회원도 로그인 세션을 유지한다 (제한 화면에서 과거 기록 조회 · 재이용 신청).
   return { user, profile: profile as Profile | null, role, email: user.email ?? "" };
 }
 
@@ -255,7 +255,9 @@ export function useMemberCredits(trainerId?: string, memberIds: string[] = []) {
         .in("member_id", memberIds);
       if (error) throw error;
       const map = new Map<string, number>();
-      (data ?? []).forEach((row) => map.set(row.member_id, (map.get(row.member_id) ?? 0) + row.delta));
+      (data ?? []).forEach((row) =>
+        map.set(row.member_id, (map.get(row.member_id) ?? 0) + row.delta),
+      );
       return map;
     },
     enabled: !!trainerId && memberIds.length > 0,

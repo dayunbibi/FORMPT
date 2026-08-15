@@ -19,10 +19,10 @@ export type WithdrawalRequest = {
 };
 
 export const WITHDRAWAL_STATUS_LABEL: Record<WithdrawalStatus, string> = {
-  requested: "탈퇴 요청 확인 중",
+  requested: "이용 종료 요청 확인 중",
   needs_info: "회원 확인 필요",
-  approved: "탈퇴 처리 완료",
-  rejected: "탈퇴 요청 반려",
+  approved: "이용 종료 처리 완료",
+  rejected: "이용 종료 요청 반려",
   cancelled: "회원이 취소함",
 };
 
@@ -48,9 +48,9 @@ export const WITHDRAWAL_REASONS = [
 ] as const;
 
 export const WITHDRAWAL_NOTICE =
-  "탈퇴 요청이 승인되면 로그인과 예약 기능을 이용할 수 없습니다. 남은 PT 횟수의 환불 여부는 트레이너와 별도로 확인해 주세요.";
+  "이용 종료가 처리되면 예약과 PT 이용 기능을 사용할 수 없습니다. 계정은 삭제되지 않으므로 같은 이메일로 로그인해 과거 운동 기록과 PT 사용 이력을 계속 확인할 수 있고, 나중에 다시 이용 신청도 가능합니다. 남은 PT 횟수는 보류되며 환불 여부는 트레이너와 별도로 확인해 주세요.";
 
-/** 내 탈퇴 요청 (가장 최근 1건) */
+/** 내 이용 종료 요청 (가장 최근 1건) */
 export function useMyWithdrawal(memberId?: string) {
   return useQuery({
     queryKey: ["my-withdrawal", memberId],
@@ -69,7 +69,7 @@ export function useMyWithdrawal(memberId?: string) {
   });
 }
 
-/** 트레이너에게 온 처리 대기 탈퇴 요청 */
+/** 트레이너에게 온 처리 대기 이용 종료 요청 */
 export function useTrainerWithdrawals(trainerId?: string) {
   return useQuery({
     queryKey: ["trainer-withdrawals", trainerId],

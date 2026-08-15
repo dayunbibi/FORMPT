@@ -4,7 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/pt/AppShell";
 import { useRoleGate } from "@/components/pt/guards";
-import { Card, EmptyState, ListSkeleton, Section, StatCard, StatSkeleton } from "@/components/pt/kit";
+import {
+  Card,
+  EmptyState,
+  ListSkeleton,
+  Section,
+  StatCard,
+  StatSkeleton,
+} from "@/components/pt/kit";
 import { ConnectRequired } from "@/components/pt/ConnectNotice";
 import { fmtDate } from "@/lib/pt";
 
@@ -40,7 +47,7 @@ function label(e: Entry) {
 }
 
 function PassPage() {
-  const me = useRoleGate("member");
+  const me = useRoleGate("member", { allowEnded: true });
 
   const entries = useQuery({
     queryKey: ["my-credits", me.data?.user.id],
@@ -114,7 +121,6 @@ function PassPage() {
           </div>
         )}
       </Section>
-
     </AppShell>
   );
 }
