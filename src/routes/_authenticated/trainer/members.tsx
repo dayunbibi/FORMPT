@@ -165,36 +165,16 @@ function MembersPage() {
     onError: () => toast.error("저장에 실패했습니다"),
   });
 
-  const suspend = useMutation({
-    mutationFn: async (input: { memberId: string; suspended: boolean }) => {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ suspended: input.suspended })
-        .eq("id", input.memberId);
-      if (error) throw error;
+  const noteSave = useMutation({
+    mutationFn: async (input: { memberId: string; note: string }) =>
+      saveMemberNote(trainerId!, input.memberId, input.note),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["member-notes"] });
+      toast.success("메모를 저장했습니다");
     },
-    onSuccess: (_, input) => {
-      invalidateAll();
-      toast.success(input.suspended ? "이용을 정지했습니다" : "정지를 해제했습니다");
-    },
-    onError: () => toast.error("변경에 실패했습니다"),
+    onError: () => toast.error("메모 저장에 실패했습니다"),
   });
 
-  const photo = useMutation({
-    mutationFn: async (input: { member: Profile; file: File | null }) => {
-      if (input.file) {
-        await uploadMemberPhoto(input.member.id, input.file, input.member.photo_path);
-      } else {
-        await removeMemberPhoto(input.member.id, input.member.photo_path);
-      }
-    },
-    onSuccess: (_, input) => {
-      queryClient.invalidateQueries({ queryKey: ["trainer-members"] });
-      queryClient.invalidateQueries({ queryKey: ["member-photo"] });
-      toast.success(input.file ? "사진을 저장했습니다" : "사진을 삭제했습니다");
-    },
-    onError: (error: Error) => toast.error(error.message || "사진 처리에 실패했습니다"),
-  });
 
   const remove = useMutation({
     mutationFn: async (memberId: string) => softDeleteMember({ data: { memberId } }),
