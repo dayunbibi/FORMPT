@@ -186,6 +186,20 @@ function ProfilePage() {
         </Card>
       </Section>
 
+      <div className="flex flex-col items-center gap-2 pt-2 text-center">
+        {withdrawal && OPEN_WITHDRAWAL_STATUSES.includes(withdrawal.status) && (
+          <StatusPill tone={WITHDRAWAL_STATUS_TONE[withdrawal.status]}>
+            {WITHDRAWAL_STATUS_LABEL[withdrawal.status]}
+          </StatusPill>
+        )}
+        <Link
+          to="/withdraw"
+          className="text-xs font-bold text-destructive underline underline-offset-4"
+        >
+          회원 탈퇴 요청
+        </Link>
+      </div>
+
       {profile && (
         <EditProfileDialog
           key={`${profile.id}-${editing}`}
