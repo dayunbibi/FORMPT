@@ -15,6 +15,56 @@ export type Profile = {
   suspended: boolean;
   trainer_id: string | null;
   created_at: string;
+  photo_path: string | null;
+  deleted_at: string | null;
+  renewal_dismissed_at: string | null;
+};
+
+/** 회원 상태: 삭제 > 정지 > 잔여 횟수 순으로 판정한다. */
+export type MemberState = "deleted" | "suspended" | "empty" | "low" | "active";
+
+export function memberState(p: Pick<Profile, "suspended" | "deleted_at">, remaining: number): MemberState {
+  if (p.deleted_at) return "deleted";
+  if (p.suspended) return "suspended";
+  if (remaining <= 0) return "empty";
+  if (remaining <= 2) return "low";
+  return "active";
+}
+
+export const MEMBER_STATE_LABEL: Record<MemberState, string> = {
+  deleted: "삭제된 회원",
+  suspended: "이용정지",
+  empty: "남은 0회",
+  low: "소진 임박",
+  active: "정상 이용 중",
+};
+
+export const MEMBER_STATE_TONE: Record<MemberState, "lime" | "warn" | "alert" | "danger" | "muted"> = {
+  deleted: "muted",
+  suspended: "danger",
+  empty: "alert",
+  low: "warn",
+  active: "lime",
+};
+
+export const RENEWAL_STATUS_LABEL: Record<string, string> = {
+  requested: "상담 요청",
+  contacted: "연락 완료",
+  renewed: "재등록 완료",
+  declined: "재등록 안 함",
+};
+
+export type RenewalStatus = "requested" | "contacted" | "renewed" | "declined";
+
+export type RenewalRequest = {
+  id: string;
+  member_id: string;
+  trainer_id: string;
+  remaining_at_request: number;
+  status: RenewalStatus;
+  created_at: string;
+  updated_at: string;
+  resolved_at: string | null;
 };
 
 export type Booking = {
