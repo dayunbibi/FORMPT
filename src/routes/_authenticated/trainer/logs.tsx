@@ -22,9 +22,9 @@ import { dayKey, useMyMembers } from "@/lib/pt";
 export const Route = createFileRoute("/_authenticated/trainer/logs")({
   head: () => ({
     meta: [
-      { title: "운동기록 작성 — FORMFIT 트레이너" },
+      { title: "운동기록 작성 — FORMPT 트레이너" },
       { name: "description", content: "회원을 선택해 운동 종목, 무게, 횟수, 세트와 피드백을 기록하세요." },
-      { property: "og:title", content: "운동기록 작성 — FORMFIT 트레이너" },
+      { property: "og:title", content: "운동기록 작성 — FORMPT 트레이너" },
       { property: "og:description", content: "여러 종목을 한 번에 추가하고 피드백까지 저장." },
     ],
   }),

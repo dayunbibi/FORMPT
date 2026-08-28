@@ -31,12 +31,12 @@ export const Route = createFileRoute("/_authenticated/connect")({
   }),
   head: () => ({
     meta: [
-      { title: "트레이너 연결 — FORMFIT" },
+      { title: "트레이너 연결 — FORMPT" },
       {
         name: "description",
         content: "초대코드를 입력하거나 트레이너를 검색해 연결 요청을 보내세요.",
       },
-      { property: "og:title", content: "트레이너 연결 — FORMFIT" },
+      { property: "og:title", content: "트레이너 연결 — FORMPT" },
       { property: "og:description", content: "초대코드 또는 검색으로 담당 트레이너와 연결하기." },
     ],
   }),

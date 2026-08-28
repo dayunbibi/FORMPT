@@ -31,12 +31,12 @@ import {
 export const Route = createFileRoute("/_authenticated/trainer/home")({
   head: () => ({
     meta: [
-      { title: "트레이너 홈 — FORMFIT" },
+      { title: "트레이너 홈 — FORMPT" },
       {
         name: "description",
         content: "승인 대기와 취소 요청, 오늘 예약된 수업을 가장 먼저 처리하세요.",
       },
-      { property: "og:title", content: "트레이너 홈 — FORMFIT" },
+      { property: "og:title", content: "트레이너 홈 — FORMPT" },
       { property: "og:description", content: "오늘 처리할 일과 수업 일정을 한 화면에서." },
     ],
   }),

@@ -22,9 +22,9 @@ import { fetchSettings, fmtDateTime, statusLabel, statusTone, type Booking } fro
 export const Route = createFileRoute("/_authenticated/bookings")({
   head: () => ({
     meta: [
-      { title: "내 예약 목록 — FORMFIT" },
+      { title: "내 예약 목록 — FORMPT" },
       { name: "description", content: "예정된 예약과 지난 예약을 시간 기준으로 나눠서 확인하고 취소하세요." },
-      { property: "og:title", content: "내 예약 목록 — FORMFIT" },
+      { property: "og:title", content: "내 예약 목록 — FORMPT" },
       { property: "og:description", content: "예정·지난 예약과 취소/노쇼 상태를 한눈에." },
     ],
   }),

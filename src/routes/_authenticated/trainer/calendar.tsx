@@ -15,9 +15,9 @@ import { useTrainerBookings } from "./home";
 export const Route = createFileRoute("/_authenticated/trainer/calendar")({
   head: () => ({
     meta: [
-      { title: "예약 캘린더 — FORMFIT 트레이너" },
+      { title: "예약 캘린더 — FORMPT 트레이너" },
       { name: "description", content: "월간 캘린더에서 날짜별 예약 상태를 점으로 확인하고 탭해서 리스트를 펼치세요." },
-      { property: "og:title", content: "예약 캘린더 — FORMFIT 트레이너" },
+      { property: "og:title", content: "예약 캘린더 — FORMPT 트레이너" },
       { property: "og:description", content: "월간 뷰 + 날짜별 예약 리스트." },
     ],
   }),

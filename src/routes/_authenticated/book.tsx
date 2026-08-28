@@ -14,9 +14,9 @@ import { dayKey, fetchSettings, fmtTime } from "@/lib/pt";
 export const Route = createFileRoute("/_authenticated/book")({
   head: () => ({
     meta: [
-      { title: "PT 예약하기 — FORMFIT" },
+      { title: "PT 예약하기 — FORMPT" },
       { name: "description", content: "캘린더에서 날짜를 고르고 가능한 시간을 선택해 PT를 예약하세요." },
-      { property: "og:title", content: "PT 예약하기 — FORMFIT" },
+      { property: "og:title", content: "PT 예약하기 — FORMPT" },
       { property: "og:description", content: "운영시간과 마감시간을 반영한 실시간 예약 가능 시간." },
     ],
   }),

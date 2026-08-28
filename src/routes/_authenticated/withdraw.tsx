@@ -32,13 +32,13 @@ import {
 export const Route = createFileRoute("/_authenticated/withdraw")({
   head: () => ({
     meta: [
-      { title: "PT 이용 종료 요청 — FORMFIT" },
+      { title: "PT 이용 종료 요청 — FORMPT" },
       {
         name: "description",
         content:
           "남은 PT 횟수와 예정된 예약을 확인한 뒤 트레이너에게 PT 이용 종료 요청을 보냅니다.",
       },
-      { property: "og:title", content: "PT 이용 종료 요청 — FORMFIT" },
+      { property: "og:title", content: "PT 이용 종료 요청 — FORMPT" },
       { property: "og:description", content: "이용 종료 전 확인 사항과 요청 진행 상태." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
