@@ -41,12 +41,12 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
     meta: [
-      { title: "내 정보 — FORMFIT 회원" },
+      { title: "내 정보 — FORMPT 회원" },
       {
         name: "description",
         content: "프로필 사진과 내 기본 정보를 확인하고 얼굴 사진을 직접 등록하거나 삭제하세요.",
       },
-      { property: "og:title", content: "내 정보 — FORMFIT 회원" },
+      { property: "og:title", content: "내 정보 — FORMPT 회원" },
       { property: "og:description", content: "프로필 사진 등록·삭제와 기본 정보 확인." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

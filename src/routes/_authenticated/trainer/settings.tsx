@@ -15,12 +15,12 @@ import { unblockEndedAccounts } from "@/lib/members.functions";
 export const Route = createFileRoute("/_authenticated/trainer/settings")({
   head: () => ({
     meta: [
-      { title: "운영시간 · 예약 정책 — FORMFIT 트레이너" },
+      { title: "운영시간 · 예약 정책 — FORMPT 트레이너" },
       {
         name: "description",
         content: "수업 시간, 예약·취소 마감 시간, 휴무일을 설정해 예약 가능 시간을 관리하세요.",
       },
-      { property: "og:title", content: "운영시간 · 예약 정책 — FORMFIT 트레이너" },
+      { property: "og:title", content: "운영시간 · 예약 정책 — FORMPT 트레이너" },
       { property: "og:description", content: "예약 가능 시간에 즉시 반영되는 운영 정책." },
     ],
   }),

@@ -15,13 +15,13 @@ import { REQUEST_STATUS_LABEL, joinRequestErrorMessage, requestStatusTone } from
 export const Route = createFileRoute("/_authenticated/ended")({
   head: () => ({
     meta: [
-      { title: "PT 이용 종료 안내 — FORMFIT" },
+      { title: "PT 이용 종료 안내 — FORMPT" },
       {
         name: "description",
         content:
           "PT 이용이 종료된 계정입니다. 과거 운동 기록과 PT 사용 이력을 확인하고 재이용을 신청할 수 있습니다.",
       },
-      { property: "og:title", content: "PT 이용 종료 안내 — FORMFIT" },
+      { property: "og:title", content: "PT 이용 종료 안내 — FORMPT" },
       { property: "og:description", content: "과거 기록 조회와 재이용 신청 안내." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

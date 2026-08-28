@@ -60,12 +60,12 @@ import { useTrainerBookings } from "./home";
 export const Route = createFileRoute("/_authenticated/trainer/dashboard")({
   head: () => ({
     meta: [
-      { title: "운영 현황 · 매출 장부 — FORMFIT 트레이너" },
+      { title: "운영 현황 · 매출 장부 — FORMPT 트레이너" },
       {
         name: "description",
         content: "이번 달 수업 수와 매출 합계를 확인하고, 회원별 매출 기록을 직접 추가·수정하세요.",
       },
-      { property: "og:title", content: "운영 현황 · 매출 장부 — FORMFIT 트레이너" },
+      { property: "og:title", content: "운영 현황 · 매출 장부 — FORMPT 트레이너" },
       { property: "og:description", content: "수업량·월 매출·재등록 임박 회원 요약." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

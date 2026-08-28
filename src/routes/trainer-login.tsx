@@ -4,12 +4,12 @@ import { AuthCard } from "@/components/pt/AuthCard";
 export const Route = createFileRoute("/trainer-login")({
   head: () => ({
     meta: [
-      { title: "트레이너 로그인 — FORMFIT" },
+      { title: "트레이너 로그인 — FORMPT" },
       {
         name: "description",
         content: "회원 예약 승인, 이용권 관리, 운동기록 작성을 위한 트레이너 전용 로그인.",
       },
-      { property: "og:title", content: "트레이너 로그인 — FORMFIT" },
+      { property: "og:title", content: "트레이너 로그인 — FORMPT" },
       {
         property: "og:description",
         content: "예약 승인과 회원 관리를 한 화면에서 처리하는 트레이너 콘솔.",

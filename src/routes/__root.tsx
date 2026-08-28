@@ -79,9 +79,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "FORMFIT — PT 예약 관리" },
+      { title: "FORMPT — PT 예약 관리" },
       { name: "description", content: "트레이너와 회원을 위한 PT 예약·이용권·운동기록 관리 서비스." },
-      { name: "author", content: "FORMFIT" },
+      { name: "author", content: "FORMPT" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

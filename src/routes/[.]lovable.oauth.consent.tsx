@@ -83,7 +83,7 @@ function Consent() {
         {clientName}을(를) 내 계정에 연결할까요?
       </h1>
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-        연결하면 {clientName}이(가) 내 계정 권한으로 FORMFIT 데이터를 읽고 쓸 수 있습니다. 회원은 본인 데이터,
+        연결하면 {clientName}이(가) 내 계정 권한으로 FORMPT 데이터를 읽고 쓸 수 있습니다. 회원은 본인 데이터,
         트레이너는 담당 회원 데이터까지만 접근됩니다.
       </p>
 

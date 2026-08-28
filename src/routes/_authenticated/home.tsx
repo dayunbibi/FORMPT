@@ -13,9 +13,9 @@ import { fetchRemaining, fmtDateTime, statusLabel, statusTone, type Booking } fr
 export const Route = createFileRoute("/_authenticated/home")({
   head: () => ({
     meta: [
-      { title: "내 PT 홈 — FORMFIT" },
+      { title: "내 PT 홈 — FORMPT" },
       { name: "description", content: "남은 PT 횟수와 다음 예약, 오늘의 운동 피드백을 한눈에 확인하세요." },
-      { property: "og:title", content: "내 PT 홈 — FORMFIT" },
+      { property: "og:title", content: "내 PT 홈 — FORMPT" },
       { property: "og:description", content: "남은 횟수·다음 예약·최근 피드백 요약." },
     ],
   }),

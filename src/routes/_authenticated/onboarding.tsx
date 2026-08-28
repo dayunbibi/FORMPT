@@ -13,9 +13,9 @@ import { useMe } from "@/lib/pt";
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
     meta: [
-      { title: "시작 설문 — FORMFIT" },
+      { title: "시작 설문 — FORMPT" },
       { name: "description", content: "운동 목표와 부상 이력, 선호 시간대를 남기면 트레이너가 참고합니다." },
-      { property: "og:title", content: "시작 설문 — FORMFIT" },
+      { property: "og:title", content: "시작 설문 — FORMPT" },
       { property: "og:description", content: "PT 시작 전 목표와 컨디션을 트레이너에게 공유하세요." },
     ],
   }),

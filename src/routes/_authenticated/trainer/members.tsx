@@ -69,12 +69,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/trainer/members")({
   head: () => ({
     meta: [
-      { title: "회원 관리 — FORMFIT 트레이너" },
+      { title: "회원 관리 — FORMPT 트레이너" },
       {
         name: "description",
         content: "회원별 남은 횟수와 연락처, 이용 현황을 확인하고 PT 횟수를 조정하세요.",
       },
-      { property: "og:title", content: "회원 관리 — FORMFIT 트레이너" },
+      { property: "og:title", content: "회원 관리 — FORMPT 트레이너" },
       { property: "og:description", content: "요약형 카드와 아코디언으로 간소화된 회원 관리." },
     ],
   }),

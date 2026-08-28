@@ -4,12 +4,12 @@ import { AuthCard } from "@/components/pt/AuthCard";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "FORMFIT — PT 예약하고 기록하기" },
+      { title: "FORMPT — PT 예약하고 기록하기" },
       {
         name: "description",
         content: "남은 PT 횟수, 예약, 운동기록을 한 곳에서. 트레이너를 검색해 바로 가입 요청하세요.",
       },
-      { property: "og:title", content: "FORMFIT — PT 예약하고 기록하기" },
+      { property: "og:title", content: "FORMPT — PT 예약하고 기록하기" },
       {
         property: "og:description",
         content: "남은 PT 횟수, 예약, 운동기록을 한 곳에서 관리하는 퍼스널 트레이닝 앱.",
@@ -28,7 +28,7 @@ function MemberAuthPage() {
         </p>
         <h1 className="display-xl mt-3 text-6xl">
           FORM
-          <span className="text-lime">FIT</span>
+          <span className="text-lime">PT</span>
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           남은 PT 횟수, 다음 예약, 오늘의 피드백까지 한 화면에서 확인하세요.
